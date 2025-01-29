@@ -1,12 +1,12 @@
 use super::{BlockLocator, ClientVersion, Keys, PubKey};
 
 pub struct ZcashdWallet {
-    client_version: ClientVersion,
-    min_version: ClientVersion,
-    keys: Keys,
-    default_key: PubKey,
-    bestblock: BlockLocator,
     bestblock_nomerkle: BlockLocator,
+    bestblock: BlockLocator,
+    client_version: ClientVersion,
+    default_key: PubKey,
+    keys: Keys,
+    min_version: ClientVersion,
 }
 
 impl std::fmt::Debug for ZcashdWallet {
@@ -24,20 +24,20 @@ impl std::fmt::Debug for ZcashdWallet {
 
 impl ZcashdWallet {
     pub fn new(
+        bestblock_nomerkle: BlockLocator,
+        bestblock: BlockLocator,
         client_version: ClientVersion,
-        min_version: ClientVersion,
         default_key: PubKey,
         keys: Keys,
-        bestblock: BlockLocator,
-        bestblock_nomerkle: BlockLocator,
+        min_version: ClientVersion,
     ) -> Self {
         Self {
+            bestblock_nomerkle,
+            bestblock,
             client_version,
-            min_version,
             default_key,
             keys,
-            bestblock,
-            bestblock_nomerkle,
+            min_version,
         }
     }
 

@@ -24,19 +24,103 @@ impl<'a> ZcashdParser<'a> {
     }
 
     fn parse(&self) -> Result<ZcashdWallet> {
-        let version = self.parse_client_version("version")?;
-        let min_version = self.parse_client_version("minversion")?;
-        let default_key = self.parse_default_key()?;
-        let keys = self.parse_keys()?;
+        //
+        // Since version 3
+        //
+
+        // ~~acc~~: Removed in 4.5.0
+        // ~~acentry~~: Removed in 4.5.0
+
+        // **bestblock**: Empty in 6.0.0
         let bestblock = self.parse_block_locator("bestblock")?;
+
+        // ~~**chdseed**~~: Removed in 5.0.0
+
+        // ckey
+
+        // csapzkey
+
+        // cscript
+
+        // czkey
+
+        // **defaultkey**
+        let default_key = self.parse_default_key()?;
+
+        // destdata
+
+        // **hdchain**
+
+        // ~~hdseed~~: Removed in 5.0.0
+
+        // key
+        // keymeta
+        let keys = self.parse_keys()?;
+
+        // **minversion**
+        let min_version = self.parse_client_version("minversion")?;
+
+        // **mkey**
+
+        // name
+
+        // **orderposnext**
+
+        // pool
+
+        // purpose
+
+        // sapzaddr
+
+        // sapextfvk
+
+        // sapzkey
+
+        // tx
+
+        // **version**
+        let client_version = self.parse_client_version("version")?;
+
+        // vkey
+
+        // watchs
+
+        // **witnesscachesize**
+
+        // wkey
+
+        // zkey
+
+        // zkeymeta
+
+        //
+        // Since version 5
+        //
+
+        // **networkinfo**
+        // **orchard_note_commitment_tree**
+        // unifiedaccount\*
+        // unifiedfvk\*
+        // unifiedaddrmeta\*
+        // **mnemonicphrase**
+        // **cmnemonicphrase**
+        // **mnemonichdchain**
+        // recipientmapping\*
+
+        //
+        // Since version 6
+        //
+
+        // **bestblock_nomerkle**
         let bestblock_nomerkle = self.parse_block_locator("bestblock_nomerkle")?;
+
         Ok(ZcashdWallet::new(
-            version,
-            min_version,
+            bestblock_nomerkle,
+            bestblock,
+            client_version,
             default_key,
             keys,
-            bestblock,
-            bestblock_nomerkle,
+            min_version,
         ))
     }
 
