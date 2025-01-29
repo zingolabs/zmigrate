@@ -1,9 +1,10 @@
-use super::{ClientVersion, Keys};
+use super::{ClientVersion, Keys, PubKey};
 
 pub struct ZcashdWallet {
     client_version: ClientVersion,
     min_version: ClientVersion,
     keys: Keys,
+    default_key: PubKey,
 }
 
 impl std::fmt::Debug for ZcashdWallet {
@@ -11,6 +12,7 @@ impl std::fmt::Debug for ZcashdWallet {
         f.debug_struct("ZcashdWallet")
             .field("client_version", &self.client_version)
             .field("min_version", &self.min_version)
+            .field("default_key", &self.default_key)
             .field("keys", &self.keys)
             .finish()
     }
@@ -20,11 +22,13 @@ impl ZcashdWallet {
     pub fn new(
         client_version: ClientVersion,
         min_version: ClientVersion,
-        keys: Keys
+        default_key: PubKey,
+        keys: Keys,
     ) -> Self {
         Self {
             client_version,
             min_version,
+            default_key,
             keys,
         }
     }

@@ -26,11 +26,13 @@ impl<'a> ZcashdParser<'a> {
     fn parse(&self) -> Result<ZcashdWallet> {
         let version = self.parse_client_version("version")?;
         let min_version = self.parse_client_version("minversion")?;
+        let default_key = self.parse_default_key()?;
         let keys = self.parse_keys()?;
         Ok(ZcashdWallet::new(
             version,
             min_version,
-            keys
+            default_key,
+            keys,
         ))
     }
 
@@ -68,5 +70,10 @@ impl<'a> ZcashdParser<'a> {
             keys_map.insert(pubkey, keypair);
         }
         Ok(Keys::new(keys_map))
+    }
+
+    fn parse_default_key(&self) -> Result<PubKey> {
+        let value = self.dump.value_for_keyname("defaultkey")?;
+        PubKey::parse_binary(value)
     }
 }
