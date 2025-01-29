@@ -5,7 +5,7 @@ use anyhow::{ Context, Result };
 use crate::Parseable;
 
 use super::{
-    zcashd_dump::DBKey, ClientVersion, Key, KeyMetadata, Keys, PrivKey, PubKey, ZcashdDump, ZcashdWallet
+    zcashd_dump::DBKey, BlockLocator, ClientVersion, Key, KeyMetadata, Keys, PrivKey, PubKey, ZcashdDump, ZcashdWallet
 };
 
 #[derive(Debug)]
@@ -28,17 +28,28 @@ impl<'a> ZcashdParser<'a> {
         let min_version = self.parse_client_version("minversion")?;
         let default_key = self.parse_default_key()?;
         let keys = self.parse_keys()?;
+        let bestblock = self.parse_block_locator("bestblock")?;
+        let bestblock_nomerkle = self.parse_block_locator("bestblock_nomerkle")?;
         Ok(ZcashdWallet::new(
             version,
             min_version,
             default_key,
             keys,
+            bestblock,
+            bestblock_nomerkle,
         ))
     }
 
     fn parse_client_version(&self, keyname: &str) -> Result<ClientVersion> {
         let value = self.dump.value_for_keyname(keyname)?;
         ClientVersion::parse_binary(value)
+            .context(format!("Failed to parse client version for keyname: {}", keyname))
+    }
+
+    fn parse_block_locator(&self, keyname: &str) -> Result<BlockLocator> {
+        let value = self.dump.value_for_keyname(keyname)?;
+        BlockLocator::parse_binary(value)
+            .context(format!("Failed to parse block locator for keyname: {}", keyname))
     }
 
     fn parse_keys(&self) -> Result<Keys> {

@@ -167,7 +167,7 @@ impl<'a> Parser<'a> {
     }
 
     pub fn parse_item<T: Parseable>(&mut self) -> Result<T> {
-        T::parse(self).context(format!("Failed to parse item of type '{}'", T::parse_type()))
+        T::parse(self).with_context(|| format!("Failed to parse item of type '{}'", T::parse_type()))
     }
 
     pub fn parse_pair<T: Parseable, U: Parseable>(&mut self) -> Result<(T, U)> {
@@ -178,8 +178,8 @@ impl<'a> Parser<'a> {
 
     pub fn parse_fixed_length_array<T: Parseable>(&mut self, length: usize) -> Result<Vec<T>> {
         let mut items = Vec::with_capacity(length);
-        for _ in 0..length {
-            items.push(self.parse_item::<T>().context("Failed to parse array item")?);
+        for i in 0..length {
+            items.push(self.parse_item::<T>().with_context(|| format!("Failed to parse array item {} of {}", i, length - 1))?);
         }
         Ok(items)
     }

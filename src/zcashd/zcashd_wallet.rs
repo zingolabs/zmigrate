@@ -1,10 +1,12 @@
-use super::{ClientVersion, Keys, PubKey};
+use super::{BlockLocator, ClientVersion, Keys, PubKey};
 
 pub struct ZcashdWallet {
     client_version: ClientVersion,
     min_version: ClientVersion,
     keys: Keys,
     default_key: PubKey,
+    bestblock: BlockLocator,
+    bestblock_nomerkle: BlockLocator,
 }
 
 impl std::fmt::Debug for ZcashdWallet {
@@ -14,6 +16,8 @@ impl std::fmt::Debug for ZcashdWallet {
             .field("min_version", &self.min_version)
             .field("default_key", &self.default_key)
             .field("keys", &self.keys)
+            .field("bestblock", &self.bestblock)
+            .field("bestblock_nomerkle", &self.bestblock_nomerkle)
             .finish()
     }
 }
@@ -24,12 +28,16 @@ impl ZcashdWallet {
         min_version: ClientVersion,
         default_key: PubKey,
         keys: Keys,
+        bestblock: BlockLocator,
+        bestblock_nomerkle: BlockLocator,
     ) -> Self {
         Self {
             client_version,
             min_version,
             default_key,
             keys,
+            bestblock,
+            bestblock_nomerkle,
         }
     }
 
@@ -43,5 +51,13 @@ impl ZcashdWallet {
 
     pub fn keys(&self) -> &Keys {
         &self.keys
+    }
+
+    pub fn best_block(&self) -> &BlockLocator {
+        &self.bestblock
+    }
+
+    pub fn best_block_nomerkle(&self) -> &BlockLocator {
+        &self.bestblock_nomerkle
     }
 }

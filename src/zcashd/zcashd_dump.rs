@@ -111,6 +111,7 @@ impl ZcashdDump {
     pub fn value_for_keyname(&self, keyname: &str) -> Result<&DBValue> {
         let key = DBKey::new(keyname.to_string(), Data::new());
         self.value_for_key(&key)
+            .context(format!("No record found for keyname: {}", keyname))
     }
 
     pub fn records_by_keyname(&self) -> &HashMap<String, HashMap<DBKey, DBValue>> {

@@ -1,4 +1,6 @@
-use anyhow::{bail, Result};
+use anyhow::{bail, Result, Context};
+
+use crate::Parseable;
 
 /// Represents a fixed-size byte array.
 #[derive(Clone, PartialEq, Eq, Hash)]
@@ -72,6 +74,17 @@ impl<const T: usize> From<Vec<u8>> for Blob<T> {
 impl<const T: usize> From<&[u8]> for Blob<T> {
     fn from(data: &[u8]) -> Self {
         Self::from_vec(data.to_vec()).unwrap()
+    }
+}
+
+impl<const T: usize> Parseable for Blob<T> {
+    fn parse_type() -> &'static str {
+        "Blob"
+    }
+
+    fn parse(parser: &mut crate::Parser) -> Result<Self> where Self: Sized {
+        let data = parser.parse_slice(T).with_context(|| format!("Failed to parse Blob<{}>", T))?;
+        Self::from_slice(data)
     }
 }
 

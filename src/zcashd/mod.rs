@@ -24,3 +24,6 @@ pub use key_metadata::KeyMetadata;
 
 mod client_version;
 pub use client_version::ClientVersion;
+
+mod block_locator;
+pub use block_locator::BlockLocator;
