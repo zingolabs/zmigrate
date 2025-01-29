@@ -4,7 +4,6 @@
 
 ### Single
 
-- [ ] mnemonichdchain: 1 (61)
 - [ ] mnemonicphrase: 1 (168)
 - [ ] networkinfo: 1 (14)
 - [ ] orchard_note_commitment_tree: 1 (20)
@@ -14,6 +13,7 @@
 - [x] bestblock: 1 (5)
 - [x] defaultkey: 1 (34)
 - [x] minversion: 1 (4)
+- [x] mnemonichdchain: 1 (61)
 - [x] version: 1 (4)
 
 ### Multiple

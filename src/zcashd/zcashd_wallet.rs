@@ -1,4 +1,4 @@
-use super::{BlockLocator, ClientVersion, Keys, PubKey};
+use super::{BlockLocator, ClientVersion, Keys, MnemonicHDChain, PubKey};
 
 pub struct ZcashdWallet {
     bestblock_nomerkle: BlockLocator,
@@ -7,6 +7,7 @@ pub struct ZcashdWallet {
     default_key: PubKey,
     keys: Keys,
     min_version: ClientVersion,
+    mnemonic_hd_chain: MnemonicHDChain,
 }
 
 impl std::fmt::Debug for ZcashdWallet {
@@ -18,6 +19,7 @@ impl std::fmt::Debug for ZcashdWallet {
             .field("keys", &self.keys)
             .field("bestblock", &self.bestblock)
             .field("bestblock_nomerkle", &self.bestblock_nomerkle)
+            .field("mnemonic_hd_chain", &self.mnemonic_hd_chain)
             .finish()
     }
 }
@@ -30,6 +32,7 @@ impl ZcashdWallet {
         default_key: PubKey,
         keys: Keys,
         min_version: ClientVersion,
+        mnemonic_hd_chain: MnemonicHDChain,
     ) -> Self {
         Self {
             bestblock_nomerkle,
@@ -38,6 +41,7 @@ impl ZcashdWallet {
             default_key,
             keys,
             min_version,
+            mnemonic_hd_chain,
         }
     }
 

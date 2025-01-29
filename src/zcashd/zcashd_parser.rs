@@ -5,7 +5,7 @@ use anyhow::{ Context, Result };
 use crate::Parseable;
 
 use super::{
-    zcashd_dump::DBKey, BlockLocator, ClientVersion, Key, KeyMetadata, Keys, PrivKey, PubKey, ZcashdDump, ZcashdWallet
+    zcashd_dump::DBKey, BlockLocator, ClientVersion, Key, KeyMetadata, Keys, MnemonicHDChain, PrivKey, PubKey, ZcashdDump, ZcashdWallet
 };
 
 #[derive(Debug)]
@@ -98,14 +98,23 @@ impl<'a> ZcashdParser<'a> {
         //
 
         // **networkinfo**
+
         // **orchard_note_commitment_tree**
-        // unifiedaccount\*
-        // unifiedfvk\*
-        // unifiedaddrmeta\*
+
+        // unifiedaccount
+
+        // unifiedfvk
+
+        // unifiedaddrmeta
+
         // **mnemonicphrase**
+
         // **cmnemonicphrase**
+
         // **mnemonichdchain**
-        // recipientmapping\*
+        let mnemonic_hd_chain = self.parse_mnemonic_hd_chain()?;
+
+        // recipientmapping
 
         //
         // Since version 6
@@ -121,6 +130,7 @@ impl<'a> ZcashdParser<'a> {
             default_key,
             keys,
             min_version,
+            mnemonic_hd_chain,
         ))
     }
 
@@ -170,5 +180,10 @@ impl<'a> ZcashdParser<'a> {
     fn parse_default_key(&self) -> Result<PubKey> {
         let value = self.dump.value_for_keyname("defaultkey")?;
         PubKey::parse_binary(value)
+    }
+
+    fn parse_mnemonic_hd_chain(&self) -> Result<MnemonicHDChain> {
+        let value = self.dump.value_for_keyname("mnemonichdchain")?;
+        MnemonicHDChain::parse_binary(value)
     }
 }

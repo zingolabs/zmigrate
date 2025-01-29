@@ -27,3 +27,6 @@ pub use client_version::ClientVersion;
 
 mod block_locator;
 pub use block_locator::BlockLocator;
+
+mod mnemonic_hd_chain;
+pub use mnemonic_hd_chain::MnemonicHDChain;

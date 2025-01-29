@@ -32,8 +32,8 @@ fn main() -> Result<()> {
 
     zcashd_dump.print_keyname_summary();
 
-    println!("---");
-    zcashd_dump.print_keys();
+    // println!("---");
+    // zcashd_dump.print_keys();
 
     let zcashd_wallet = ZcashdParser::parse_dump(&zcashd_dump)
         .context("Failed to parse Zcashd dump")?;
