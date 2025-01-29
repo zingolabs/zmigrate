@@ -68,6 +68,12 @@ impl std::fmt::Debug for Data {
     }
 }
 
+impl AsRef<Data> for Data {
+    fn as_ref(&self) -> &Data {
+        self
+    }
+}
+
 impl From<Data> for Vec<u8> {
     fn from(data: Data) -> Vec<u8> {
         data.to_vec()

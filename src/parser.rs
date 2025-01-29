@@ -11,7 +11,9 @@ pub trait Parseable {
 
     fn parse_binary(buffer: &dyn AsRef<[u8]>) -> Result<Self> where Self: Sized {
         let mut parser = Parser::new(&buffer);
-        Self::parse(&mut parser)
+        let result = Self::parse(&mut parser)?;
+        parser.check_finished()?;
+        Ok(result)
     }
 }
 
@@ -28,9 +30,28 @@ impl<'a> Parser<'a> {
         }
     }
 
+    pub fn len(&self) -> usize {
+        self.buffer.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.buffer.is_empty()
+    }
+
+    pub fn remaining(&self) -> usize {
+        self.len() - self.offset
+    }
+
+    pub fn check_finished(&self) -> Result<()> {
+        if self.offset < self.buffer.len() {
+            bail!("Buffer has {} bytes left", self.remaining());
+        }
+        Ok(())
+    }
+
     pub fn parse_slice(&mut self, n: usize) -> Result<&'a [u8]> {
         if self.offset + n > self.buffer.len() {
-            bail!("Buffer underflow at offset {}, needed {} bytes", self.offset, n);
+            bail!("Buffer underflow at offset {}, needed {} bytes, only {} remaining", self.offset, n, self.remaining());
         }
         let bytes = &self.buffer[self.offset..self.offset + n];
         self.offset += n;

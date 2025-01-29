@@ -4,7 +4,16 @@ use anyhow::{ Context, Result };
 
 use crate::{ Parseable, Parser };
 
-use super::{ KeyPair, Keys, PrivKey, PubKey, ZcashdDump, ZcashdWallet };
+use super::{
+    zcashd_dump::DBKey,
+    KeyMetadata,
+    KeyPair,
+    Keys,
+    PrivKey,
+    PubKey,
+    ZcashdDump,
+    ZcashdWallet,
+};
 
 #[derive(Debug)]
 pub struct ZcashdParser<'a> {
@@ -33,17 +42,31 @@ impl<'a> ZcashdParser<'a> {
     }
 
     fn parse_keys(&self) -> Result<Keys> {
-        let records_for_keyname = self.dump
+        let key_records = self.dump
             .records_for_keyname("key")
             .context("Failed to get 'key' records")?;
+        let keymeta_records = self.dump
+            .records_for_keyname("keymeta")
+            .context("Failed to get 'keymeta' records")?;
+        if key_records.len() != keymeta_records.len() {
+            anyhow::bail!("Mismatched key and keymeta records");
+        }
         let mut keys_map = HashMap::new();
-        for (key, value) in records_for_keyname {
+        for (key, value) in key_records {
             let pubkey = PubKey::parse_binary(&key.data()).context("Failed to parse pubkey")?;
             let privkey = PrivKey::parse_binary(&value.as_data()).context(
                 "Failed to parse privkey"
             )?;
-            let keypair = KeyPair::new(pubkey.clone(), privkey.clone())
-                .context("Failed to create keypair")?;
+            let metakey = DBKey::new("keymeta", key.data());
+            let metadata_binary = self.dump
+                .value_for_key(&metakey)
+                .context("Failed to get metadata")?;
+            let metadata = KeyMetadata::parse_binary(&metadata_binary).context(
+                "Failed to parse metadata"
+            )?;
+            let keypair = KeyPair::new(pubkey.clone(), privkey.clone(), metadata).context(
+                "Failed to create keypair"
+            )?;
             keys_map.insert(pubkey, keypair);
         }
         Ok(Keys::new(keys_map))

@@ -21,15 +21,15 @@ impl std::fmt::Display for DBKey {
 }
 
 impl DBKey {
-    pub fn new(keyname: String, data: Data) -> Self {
-        Self { keyname, data }
+    pub fn new(keyname: impl Into<String>, data: impl AsRef<Data>) -> Self {
+        Self { keyname: keyname.into(), data: data.as_ref().clone() }
     }
 
     pub fn parse(key_data: &Data) -> Result<Self> {
         let mut parser = Parser::new(&key_data);
         let keyname = parser.parse_utf8().context("Failed to parse keyname")?;
         let data = parser.rest();
-        Ok(Self::new(keyname, data))
+        Ok(Self { keyname, data })
     }
 
     pub fn keyname(&self) -> &str {
@@ -77,7 +77,7 @@ pub struct ZcashdDump {
 }
 
 impl ZcashdDump {
-    pub fn from_berkeley_dump(berkeley_dump: &BDBDump) -> Result<Self> {
+    pub fn from_bdb_dump(berkeley_dump: &BDBDump) -> Result<Self> {
         let mut records: HashMap<DBKey, DBValue> = HashMap::new();
         let mut records_by_keyname: HashMap<String, HashMap<DBKey, DBValue>> = HashMap::new();
 
