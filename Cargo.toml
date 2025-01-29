@@ -1,0 +1,9 @@
+[package]
+name = "zmigrate"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.95"
+hex = "0.4.3"
+sha2 = "^0.10.6"
