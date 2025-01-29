@@ -13,8 +13,8 @@ pub use pub_key::PubKey;
 mod priv_key;
 pub use priv_key::PrivKey;
 
-mod keypair;
-pub use keypair::KeyPair;
+mod key;
+pub use key::Key;
 
 mod keys;
 pub use keys::Keys;

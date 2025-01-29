@@ -1,20 +1,20 @@
 use std::collections::HashMap;
 
-use super::{KeyPair, PubKey};
+use super::{Key, PubKey};
 
 #[derive(Clone, PartialEq)]
-pub struct Keys (HashMap<PubKey, KeyPair>);
+pub struct Keys (HashMap<PubKey, Key>);
 
 impl Keys {
-    pub fn new(map: HashMap<PubKey, KeyPair>) -> Self {
+    pub fn new(map: HashMap<PubKey, Key>) -> Self {
         Self(map)
     }
 
-    pub fn map(&self) -> &HashMap<PubKey, KeyPair> {
+    pub fn map(&self) -> &HashMap<PubKey, Key> {
         &self.0
     }
 
-    pub fn get(&self, pubkey: &PubKey) -> Option<&KeyPair> {
+    pub fn get(&self, pubkey: &PubKey) -> Option<&Key> {
         self.0.get(pubkey)
     }
 
@@ -26,7 +26,7 @@ impl Keys {
         self.0.is_empty()
     }
 
-    pub fn keypairs(&self) -> impl Iterator<Item = &KeyPair> {
+    pub fn keypairs(&self) -> impl Iterator<Item = &Key> {
         self.0.values()
     }
 }

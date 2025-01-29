@@ -5,13 +5,13 @@ use crate::{hash256, Data};
 use super::{KeyMetadata, PrivKey, PubKey};
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct KeyPair {
+pub struct Key {
     pub pubkey: PubKey,
     pub privkey: PrivKey,
     pub metadata: KeyMetadata,
 }
 
-impl KeyPair {
+impl Key {
     pub fn new(pubkey: PubKey, privkey: PrivKey, metadata: KeyMetadata) -> Result<Self> {
         let hash = hash256(Data::concat(&[&pubkey, &privkey]));
         if &hash != privkey.hash() {

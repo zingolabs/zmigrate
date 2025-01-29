@@ -7,7 +7,7 @@ use crate::{ Parseable, Parser };
 use super::{
     zcashd_dump::DBKey,
     KeyMetadata,
-    KeyPair,
+    Key,
     Keys,
     PrivKey,
     PubKey,
@@ -64,7 +64,7 @@ impl<'a> ZcashdParser<'a> {
             let metadata = KeyMetadata::parse_binary(&metadata_binary).context(
                 "Failed to parse metadata"
             )?;
-            let keypair = KeyPair::new(pubkey.clone(), privkey.clone(), metadata).context(
+            let keypair = Key::new(pubkey.clone(), privkey.clone(), metadata).context(
                 "Failed to create keypair"
             )?;
             keys_map.insert(pubkey, keypair);
