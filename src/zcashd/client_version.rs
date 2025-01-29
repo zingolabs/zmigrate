@@ -2,13 +2,33 @@ use anyhow::Result;
 
 use crate::Parseable;
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone)]
 pub struct ClientVersion {
     version: u32,
     major: u32,
     minor: u32,
     revision: u32,
     build: u32,
+}
+
+impl PartialEq for ClientVersion {
+    fn eq(&self, other: &Self) -> bool {
+        self.version == other.version
+    }
+}
+
+impl Eq for ClientVersion {}
+
+impl PartialOrd for ClientVersion {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.version.cmp(&other.version))
+    }
+}
+
+impl std::hash::Hash for ClientVersion {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.version.hash(state);
+    }
 }
 
 impl ClientVersion {
@@ -77,13 +97,43 @@ impl Parseable for ClientVersion {
     }
 }
 
+// Per zcashd's `clientversion.cpp`
 impl std::fmt::Display for ClientVersion {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(
-            f,
-            "{}.{}.{}.{}",
-            self.major, self.minor, self.revision, self.build
-        )
+        if self.build < 25 {
+            write!(
+                f,
+                "{}.{}.{}-beta{}",
+                self.major,
+                self.minor,
+                self.revision,
+                self.build + 1
+            )
+        } else if self.build < 50 {
+            write!(
+                f,
+                "{}.{}.{}-rc{}",
+                self.major,
+                self.minor,
+                self.revision,
+                self.build - 24
+            )
+        } else if self.build == 50 {
+            write!(
+                f,
+                "{}.{}.{}",
+                self.major, self.minor, self.revision
+            )
+        } else {
+            write!(
+                f,
+                "{}.{}.{}-{}",
+                self.major,
+                self.minor,
+                self.revision,
+                self.build - 50
+            )
+        }
     }
 }
 

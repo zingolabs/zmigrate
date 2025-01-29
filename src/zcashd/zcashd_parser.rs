@@ -24,13 +24,18 @@ impl<'a> ZcashdParser<'a> {
     }
 
     fn parse(&self) -> Result<ZcashdWallet> {
-        let version = self.parse_client_version()?;
+        let version = self.parse_client_version("version")?;
+        let min_version = self.parse_client_version("minversion")?;
         let keys = self.parse_keys()?;
-        Ok(ZcashdWallet::new(version, keys))
+        Ok(ZcashdWallet::new(
+            version,
+            min_version,
+            keys
+        ))
     }
 
-    fn parse_client_version(&self) -> Result<ClientVersion> {
-        let value = self.dump.value_for_keyname("version")?;
+    fn parse_client_version(&self, keyname: &str) -> Result<ClientVersion> {
+        let value = self.dump.value_for_keyname(keyname)?;
         ClientVersion::parse_binary(value)
     }
 
