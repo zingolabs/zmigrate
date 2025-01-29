@@ -2,10 +2,10 @@ use std::collections::HashMap;
 
 use anyhow::{ Context, Result };
 
-use crate::Parseable;
+use crate::{Blob32, Parseable};
 
 use super::{
-    zcashd_dump::DBKey, BlockLocator, ClientVersion, Key, KeyMetadata, Keys, MnemonicHDChain, PrivKey, PubKey, ZcashdDump, ZcashdWallet
+    zcashd_dump::DBKey, BlockLocator, ClientVersion, Key, KeyMetadata, Keys, MnemonicHDChain, MnemonicSeed, PrivKey, PubKey, ZcashdDump, ZcashdWallet
 };
 
 #[derive(Debug)]
@@ -108,6 +108,7 @@ impl<'a> ZcashdParser<'a> {
         // unifiedaddrmeta
 
         // **mnemonicphrase**
+        let mnemonic_phrase = self.parse_mnemonic_phrase()?;
 
         // **cmnemonicphrase**
 
@@ -131,6 +132,7 @@ impl<'a> ZcashdParser<'a> {
             keys,
             min_version,
             mnemonic_hd_chain,
+            mnemonic_phrase,
         ))
     }
 
@@ -185,5 +187,16 @@ impl<'a> ZcashdParser<'a> {
     fn parse_mnemonic_hd_chain(&self) -> Result<MnemonicHDChain> {
         let value = self.dump.value_for_keyname("mnemonichdchain")?;
         MnemonicHDChain::parse_binary(value)
+    }
+
+    fn parse_mnemonic_phrase(&self) -> Result<MnemonicSeed> {
+        let (key, value) = self.dump.record_for_keyname("mnemonicphrase")
+            .context("Failed to get 'mnemonicphrase' record")?;
+        let fingerprint = Blob32::parse_binary(key.data())
+            .context("Failed to parse seed fingerprint")?;
+        let seed = MnemonicSeed::parse_binary(&value)
+            .context("Failed to parse mnemonic phrase")?
+            .set_fingerprint(fingerprint);
+        Ok(seed)
     }
 }

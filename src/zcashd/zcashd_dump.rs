@@ -125,6 +125,17 @@ impl ZcashdDump {
         }
     }
 
+    pub fn record_for_keyname(&self, keyname: &str) -> Result<(DBKey, DBValue)> {
+        let records = self.records_for_keyname(keyname)?;
+        if records.len() != 1 {
+            bail!("Expected exactly one record for keyname: {}", keyname);
+        }
+        match records.iter().next() {
+            Some((key, value)) => Ok((key.clone(), value.clone())),
+            None => bail!("No record found for keyname: {}", keyname),
+        }
+    }
+
     fn sorted_key_names(&self) -> Vec<String> {
         let mut keynames: Vec<String> = self.records_by_keyname.keys().cloned().collect();
         keynames.sort();

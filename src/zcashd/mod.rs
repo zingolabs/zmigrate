@@ -30,3 +30,6 @@ pub use block_locator::BlockLocator;
 
 mod mnemonic_hd_chain;
 pub use mnemonic_hd_chain::MnemonicHDChain;
+
+mod mnemonic_seed;
+pub use mnemonic_seed::{ MnemonicSeed, Language };
