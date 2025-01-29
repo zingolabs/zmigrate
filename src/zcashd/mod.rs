@@ -21,3 +21,6 @@ pub use keys::Keys;
 
 mod key_metadata;
 pub use key_metadata::KeyMetadata;
+
+mod client_version;
+pub use client_version::ClientVersion;

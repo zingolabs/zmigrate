@@ -2,17 +2,10 @@ use std::collections::HashMap;
 
 use anyhow::{ Context, Result };
 
-use crate::{ Parseable, Parser };
+use crate::Parseable;
 
 use super::{
-    zcashd_dump::DBKey,
-    KeyMetadata,
-    Key,
-    Keys,
-    PrivKey,
-    PubKey,
-    ZcashdDump,
-    ZcashdWallet,
+    zcashd_dump::DBKey, ClientVersion, Key, KeyMetadata, Keys, PrivKey, PubKey, ZcashdDump, ZcashdWallet
 };
 
 #[derive(Debug)]
@@ -31,14 +24,14 @@ impl<'a> ZcashdParser<'a> {
     }
 
     fn parse(&self) -> Result<ZcashdWallet> {
-        let version = self.parse_version()?;
+        let version = self.parse_client_version()?;
         let keys = self.parse_keys()?;
         Ok(ZcashdWallet::new(version, keys))
     }
 
-    fn parse_version(&self) -> Result<i32> {
-        let mut parser = Parser::new(self.dump.value_for_keyname("version")?);
-        parser.parse_i32().context("Failed to parse version")
+    fn parse_client_version(&self) -> Result<ClientVersion> {
+        let value = self.dump.value_for_keyname("version")?;
+        ClientVersion::parse_binary(value)
     }
 
     fn parse_keys(&self) -> Result<Keys> {
