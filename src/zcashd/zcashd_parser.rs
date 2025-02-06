@@ -2,10 +2,24 @@ use std::collections::HashMap;
 
 use anyhow::{ Context, Result };
 
-use crate::{Blob32, Parseable};
+use crate::{ Blob32, Parseable };
 
 use super::{
-    zcashd_dump::DBKey, BlockLocator, ClientVersion, Key, KeyMetadata, Keys, MnemonicHDChain, MnemonicSeed, PrivKey, PubKey, ZcashdDump, ZcashdWallet
+    zcashd_dump::DBKey,
+    Address,
+    BlockLocator,
+    ClientVersion,
+    Key,
+    KeyMetadata,
+    Keys,
+    MnemonicHDChain,
+    MnemonicSeed,
+    NetworkInfo,
+    OrchardNoteCommitmentTree,
+    PrivKey,
+    PubKey,
+    ZcashdDump,
+    ZcashdWallet,
 };
 
 #[derive(Debug)]
@@ -63,6 +77,7 @@ impl<'a> ZcashdParser<'a> {
         // **mkey**
 
         // name
+        let address_names = self.parse_address_names()?;
 
         // **orderposnext**
 
@@ -98,8 +113,10 @@ impl<'a> ZcashdParser<'a> {
         //
 
         // **networkinfo**
+        let network_info = self.parse_network_info()?;
 
         // **orchard_note_commitment_tree**
+        let orchard_note_commitment_tree = self.parse_orchard_note_commitment_tree()?;
 
         // unifiedaccount
 
@@ -124,28 +141,35 @@ impl<'a> ZcashdParser<'a> {
         // **bestblock_nomerkle**
         let bestblock_nomerkle = self.parse_block_locator("bestblock_nomerkle")?;
 
-        Ok(ZcashdWallet::new(
-            bestblock_nomerkle,
-            bestblock,
-            client_version,
-            default_key,
-            keys,
-            min_version,
-            mnemonic_hd_chain,
-            mnemonic_phrase,
-        ))
+        Ok(
+            ZcashdWallet::new(
+                bestblock_nomerkle,
+                bestblock,
+                client_version,
+                default_key,
+                keys,
+                min_version,
+                mnemonic_hd_chain,
+                mnemonic_phrase,
+                address_names,
+                network_info,
+                orchard_note_commitment_tree
+            )
+        )
     }
 
     fn parse_client_version(&self, keyname: &str) -> Result<ClientVersion> {
         let value = self.dump.value_for_keyname(keyname)?;
-        ClientVersion::parse_binary(value)
-            .context(format!("Failed to parse client version for keyname: {}", keyname))
+        ClientVersion::parse_binary(value).context(
+            format!("Failed to parse client version for keyname: {}", keyname)
+        )
     }
 
     fn parse_block_locator(&self, keyname: &str) -> Result<BlockLocator> {
         let value = self.dump.value_for_keyname(keyname)?;
-        BlockLocator::parse_binary(value)
-            .context(format!("Failed to parse block locator for keyname: {}", keyname))
+        BlockLocator::parse_binary(value).context(
+            format!("Failed to parse block locator for keyname: {}", keyname)
+        )
     }
 
     fn parse_keys(&self) -> Result<Keys> {
@@ -190,13 +214,48 @@ impl<'a> ZcashdParser<'a> {
     }
 
     fn parse_mnemonic_phrase(&self) -> Result<MnemonicSeed> {
-        let (key, value) = self.dump.record_for_keyname("mnemonicphrase")
+        let (key, value) = self.dump
+            .record_for_keyname("mnemonicphrase")
             .context("Failed to get 'mnemonicphrase' record")?;
-        let fingerprint = Blob32::parse_binary(key.data())
-            .context("Failed to parse seed fingerprint")?;
+        let fingerprint = Blob32::parse_binary(key.data()).context(
+            "Failed to parse seed fingerprint"
+        )?;
         let seed = MnemonicSeed::parse_binary(&value)
             .context("Failed to parse mnemonic phrase")?
             .set_fingerprint(fingerprint);
         Ok(seed)
+    }
+
+    fn parse_address_names(&self) -> Result<HashMap<Address, String>> {
+        let records = self.dump
+            .records_for_keyname("name")
+            .context("Failed to get 'name' records")?;
+        let mut address_names = HashMap::new();
+        for (key, value) in records {
+            let address = Address::parse_binary(key.data()).context("Failed to parse address")?;
+            let name = String::parse_binary(value.as_data()).context("Failed to parse name")?;
+            address_names.insert(address, name);
+        }
+        Ok(address_names)
+    }
+
+    fn parse_network_info(&self) -> Result<NetworkInfo> {
+        let (_, value) = self.dump
+            .record_for_keyname("networkinfo")
+            .context("Failed to get 'networkinfo' record")?;
+        let network_info = NetworkInfo::parse_binary(value.as_data()).context(
+            "Failed to parse network info"
+        )?;
+        Ok(network_info)
+    }
+
+    fn parse_orchard_note_commitment_tree(&self) -> Result<OrchardNoteCommitmentTree> {
+        let (_, value) = self.dump
+            .record_for_keyname("orchard_note_commitment_tree")
+            .context("Failed to get 'orchard_note_commitment_tree' record")?;
+        let orchard_note_commitment_tree = OrchardNoteCommitmentTree::parse_binary(
+            value.as_data()
+        ).context("Failed to parse orchard note commitment tree")?;
+        Ok(orchard_note_commitment_tree)
     }
 }

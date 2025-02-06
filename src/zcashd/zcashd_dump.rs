@@ -29,6 +29,7 @@ impl DBKey {
         let mut parser = Parser::new(&key_data);
         let keyname = parser.parse_utf8().context("Failed to parse keyname")?;
         let data = parser.rest();
+        parser.check_finished()?;
         Ok(Self { keyname, data })
     }
 

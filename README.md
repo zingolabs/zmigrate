@@ -4,10 +4,10 @@
 
 ### Single
 
-- [ ] networkinfo: 1 (14)
 - [ ] orchard_note_commitment_tree: 1 (20)
 - [ ] orderposnext: 1 (8)
 - [ ] witnesscachesize: 1 (8)
+- [x] networkinfo: 1 (14)
 - [x] bestblock_nomerkle: 1 (613)
 - [x] bestblock: 1 (5)
 - [x] defaultkey: 1 (34)
@@ -18,16 +18,16 @@
 
 ### Multiple
 
-- [ ] name: 1 (1)
 - [ ] pool: 1 (46)
 - [ ] purpose: 1 (8)
 - [ ] tx: 50 (229...231)
+- [x] name: 1 (1)
 - [x] key: 52 (247)
 - [x] keymeta: 52 (69...70)
 
 ### Not Appearing in `wallet0.dat`
 
-### Single
+## Single
 
 - [ ] chdseed
 - [ ] cmnemonicphrase
@@ -35,7 +35,7 @@
 - [ ] mkey
 - [ ] orchard_note_commitment_tree
 
-### Multiple
+## Multiple
 
 - [ ] ckey
 - [ ] csapzkey

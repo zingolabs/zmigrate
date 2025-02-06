@@ -68,8 +68,9 @@ impl<'a> Parser<'a> {
         Ok(Data::from_slice(bytes))
     }
 
-    pub fn rest(&self) -> Data {
-        Data::from_slice(&self.buffer[self.offset..])
+    pub fn rest(&mut self) -> Data {
+        let bytes = self.parse_slice(self.remaining()).unwrap();
+        Data::from_slice(bytes)
     }
 
     pub fn parse_u8(&mut self) -> Result<u8> {

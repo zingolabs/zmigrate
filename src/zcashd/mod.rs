@@ -33,3 +33,14 @@ pub use mnemonic_hd_chain::MnemonicHDChain;
 
 mod mnemonic_seed;
 pub use mnemonic_seed::{ MnemonicSeed, Language };
+
+mod address;
+pub use address::Address;
+
+mod string;
+
+mod network_info;
+pub use network_info::NetworkInfo;
+
+mod orchard_note_commitment_tree;
+pub use orchard_note_commitment_tree::OrchardNoteCommitmentTree;

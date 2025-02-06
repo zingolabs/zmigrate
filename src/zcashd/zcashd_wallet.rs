@@ -1,4 +1,6 @@
-use super::{BlockLocator, ClientVersion, Keys, MnemonicHDChain, MnemonicSeed, PubKey};
+use std::collections::HashMap;
+
+use super::{Address, BlockLocator, ClientVersion, Keys, MnemonicHDChain, MnemonicSeed, NetworkInfo, OrchardNoteCommitmentTree, PubKey};
 
 pub struct ZcashdWallet {
     bestblock_nomerkle: BlockLocator,
@@ -9,6 +11,9 @@ pub struct ZcashdWallet {
     min_version: ClientVersion,
     mnemonic_hd_chain: MnemonicHDChain,
     mnemonic_phrase: MnemonicSeed,
+    address_names: HashMap<Address, String>,
+    network_info: NetworkInfo,
+    orchard_note_commitment_tree: OrchardNoteCommitmentTree,
 }
 
 impl std::fmt::Debug for ZcashdWallet {
@@ -22,6 +27,9 @@ impl std::fmt::Debug for ZcashdWallet {
             .field("bestblock_nomerkle", &self.bestblock_nomerkle)
             .field("mnemonic_hd_chain", &self.mnemonic_hd_chain)
             .field("mnemonic_phrase", &self.mnemonic_phrase)
+            .field("address_names", &self.address_names)
+            .field("network_info", &self.network_info)
+            .field("orchard_note_commitment_tree", &self.orchard_note_commitment_tree)
             .finish()
     }
 }
@@ -37,6 +45,9 @@ impl ZcashdWallet {
         min_version: ClientVersion,
         mnemonic_hd_chain: MnemonicHDChain,
         mnemonic_phrase: MnemonicSeed,
+        address_names: HashMap<Address, String>,
+        network_info: NetworkInfo,
+        orchard_note_commitment_tree: OrchardNoteCommitmentTree,
     ) -> Self {
         Self {
             bestblock_nomerkle,
@@ -47,6 +58,9 @@ impl ZcashdWallet {
             min_version,
             mnemonic_hd_chain,
             mnemonic_phrase,
+            address_names,
+            network_info,
+            orchard_note_commitment_tree,
         }
     }
 
@@ -80,5 +94,17 @@ impl ZcashdWallet {
 
     pub fn mnemonic_phrase(&self) -> &MnemonicSeed {
         &self.mnemonic_phrase
+    }
+
+    pub fn address_names(&self) -> &HashMap<Address, String> {
+        &self.address_names
+    }
+
+    pub fn network_info(&self) -> &NetworkInfo {
+        &self.network_info
+    }
+
+    pub fn orchard_note_commitment_tree(&self) -> &OrchardNoteCommitmentTree {
+        &self.orchard_note_commitment_tree
     }
 }
