@@ -11,3 +11,13 @@ impl Parseable for String {
         parser.parse_utf8()
     }
 }
+
+impl Parseable for i64 {
+    fn parse_type() -> &'static str {
+        "i64"
+    }
+
+    fn parse(parser: &mut crate::Parser) -> Result<Self> where Self: Sized {
+        parser.parse_i64()
+    }
+}

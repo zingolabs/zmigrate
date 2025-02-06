@@ -80,6 +80,7 @@ impl<'a> ZcashdParser<'a> {
         let address_names = self.parse_address_names()?;
 
         // **orderposnext**
+        let orderposnext = self.parse_i64("orderposnext")?;
 
         // pool
 
@@ -101,6 +102,7 @@ impl<'a> ZcashdParser<'a> {
         // watchs
 
         // **witnesscachesize**
+        let witnesscachesize = self.parse_i64("witnesscachesize")?;
 
         // wkey
 
@@ -153,8 +155,17 @@ impl<'a> ZcashdParser<'a> {
                 mnemonic_phrase,
                 address_names,
                 network_info,
-                orchard_note_commitment_tree
+                orchard_note_commitment_tree,
+                orderposnext,
+                witnesscachesize,
             )
+        )
+    }
+
+    fn parse_i64(&self, keyname: &str) -> Result<i64> {
+        let value = self.dump.value_for_keyname(keyname)?;
+        i64::parse_binary(value).context(
+            format!("Failed to parse i64 for keyname: {}", keyname)
         )
     }
 

@@ -14,6 +14,8 @@ pub struct ZcashdWallet {
     address_names: HashMap<Address, String>,
     network_info: NetworkInfo,
     orchard_note_commitment_tree: OrchardNoteCommitmentTree,
+    orderposnext: i64,
+    witnesscachesize: i64,
 }
 
 impl std::fmt::Debug for ZcashdWallet {
@@ -30,6 +32,8 @@ impl std::fmt::Debug for ZcashdWallet {
             .field("address_names", &self.address_names)
             .field("network_info", &self.network_info)
             .field("orchard_note_commitment_tree", &self.orchard_note_commitment_tree)
+            .field("orderposnext", &self.orderposnext)
+            .field("witnesscachesize", &self.witnesscachesize)
             .finish()
     }
 }
@@ -48,6 +52,8 @@ impl ZcashdWallet {
         address_names: HashMap<Address, String>,
         network_info: NetworkInfo,
         orchard_note_commitment_tree: OrchardNoteCommitmentTree,
+        orderposnext: i64,
+        witnesscachesize: i64,
     ) -> Self {
         Self {
             bestblock_nomerkle,
@@ -61,6 +67,8 @@ impl ZcashdWallet {
             address_names,
             network_info,
             orchard_note_commitment_tree,
+            orderposnext,
+            witnesscachesize,
         }
     }
 
@@ -106,5 +114,9 @@ impl ZcashdWallet {
 
     pub fn orchard_note_commitment_tree(&self) -> &OrchardNoteCommitmentTree {
         &self.orchard_note_commitment_tree
+    }
+
+    pub fn orderposnext(&self) -> i64 {
+        self.orderposnext
     }
 }

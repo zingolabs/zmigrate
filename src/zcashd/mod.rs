@@ -37,7 +37,7 @@ pub use mnemonic_seed::{ MnemonicSeed, Language };
 mod address;
 pub use address::Address;
 
-mod string;
+mod parseable_types;
 
 mod network_info;
 pub use network_info::NetworkInfo;

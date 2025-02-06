@@ -4,9 +4,9 @@
 
 ### Single
 
-- [ ] orchard_note_commitment_tree: 1 (20)
-- [ ] orderposnext: 1 (8)
-- [ ] witnesscachesize: 1 (8)
+- [x] witnesscachesize: 1 (8)
+- [x] orderposnext: 1 (8)
+- [x] orchard_note_commitment_tree: 1 (20)
 - [x] networkinfo: 1 (14)
 - [x] bestblock_nomerkle: 1 (613)
 - [x] bestblock: 1 (5)
