@@ -18,8 +18,8 @@
 
 ### Multiple
 
-- [ ] purpose: 1 (8)
 - [ ] tx: 50 (229...231)
+- [x] purpose: 1 (8)
 - [x] pool: 1 (46)
 - [x] name: 1 (1)
 - [x] key: 52 (247)

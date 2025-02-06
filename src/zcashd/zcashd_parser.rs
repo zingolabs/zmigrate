@@ -87,6 +87,7 @@ impl<'a> ZcashdParser<'a> {
         let key_pool = self.parse_key_pool()?;
 
         // purpose
+        let address_purposes = self.parse_address_purposes()?;
 
         // sapzaddr
 
@@ -156,11 +157,12 @@ impl<'a> ZcashdParser<'a> {
                 mnemonic_hd_chain,
                 mnemonic_phrase,
                 address_names,
+                address_purposes,
                 network_info,
                 orchard_note_commitment_tree,
                 orderposnext,
                 witnesscachesize,
-                key_pool
+                key_pool,
             )
         )
     }
@@ -240,6 +242,20 @@ impl<'a> ZcashdParser<'a> {
             address_names.insert(address, name);
         }
         Ok(address_names)
+    }
+
+    fn parse_address_purposes(&self) -> Result<HashMap<Address, String>> {
+        let records = self.dump.records_for_keyname("purpose").context("Getting 'purpose' records")?;
+        let mut address_purposes = HashMap::new();
+        for (key, value) in records {
+            let address = Address::parse_binary(key.data()).context("Parsing address")?;
+            let purpose = String::parse_binary(value.as_data()).context("Parsing purpose")?;
+            if address_purposes.contains_key(&address) {
+                bail!("Duplicate address found: {}", address);
+            }
+            address_purposes.insert(address, purpose);
+        }
+        Ok(address_purposes)
     }
 
     fn parse_network_info(&self) -> Result<NetworkInfo> {

@@ -12,6 +12,7 @@ pub struct ZcashdWallet {
     mnemonic_hd_chain: MnemonicHDChain,
     mnemonic_phrase: MnemonicSeed,
     address_names: HashMap<Address, String>,
+    address_purposes: HashMap<Address, String>,
     network_info: NetworkInfo,
     orchard_note_commitment_tree: OrchardNoteCommitmentTree,
     orderposnext: i64,
@@ -31,6 +32,7 @@ impl std::fmt::Debug for ZcashdWallet {
             .field("mnemonic_hd_chain", &self.mnemonic_hd_chain)
             .field("mnemonic_phrase", &self.mnemonic_phrase)
             .field("address_names", &self.address_names)
+            .field("address_purposes", &self.address_purposes)
             .field("network_info", &self.network_info)
             .field("orchard_note_commitment_tree", &self.orchard_note_commitment_tree)
             .field("orderposnext", &self.orderposnext)
@@ -52,6 +54,7 @@ impl ZcashdWallet {
         mnemonic_hd_chain: MnemonicHDChain,
         mnemonic_phrase: MnemonicSeed,
         address_names: HashMap<Address, String>,
+        address_purposes: HashMap<Address, String>,
         network_info: NetworkInfo,
         orchard_note_commitment_tree: OrchardNoteCommitmentTree,
         orderposnext: i64,
@@ -68,6 +71,7 @@ impl ZcashdWallet {
             mnemonic_hd_chain,
             mnemonic_phrase,
             address_names,
+            address_purposes,
             network_info,
             orchard_note_commitment_tree,
             orderposnext,
