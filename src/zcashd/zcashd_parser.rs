@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use anyhow::{ Context, Result };
+use anyhow::{ Context, Result, bail };
 
 use crate::{ Blob32, Parseable };
 
@@ -11,6 +11,7 @@ use super::{
     ClientVersion,
     Key,
     KeyMetadata,
+    KeyPoolEntry,
     Keys,
     MnemonicHDChain,
     MnemonicSeed,
@@ -83,6 +84,7 @@ impl<'a> ZcashdParser<'a> {
         let orderposnext = self.parse_i64("orderposnext")?;
 
         // pool
+        let key_pool = self.parse_key_pool()?;
 
         // purpose
 
@@ -158,56 +160,47 @@ impl<'a> ZcashdParser<'a> {
                 orchard_note_commitment_tree,
                 orderposnext,
                 witnesscachesize,
+                key_pool
             )
         )
     }
 
     fn parse_i64(&self, keyname: &str) -> Result<i64> {
         let value = self.dump.value_for_keyname(keyname)?;
-        i64::parse_binary(value).context(
-            format!("Failed to parse i64 for keyname: {}", keyname)
-        )
+        i64::parse_binary(value).context(format!("Parsing i64 for keyname: {}", keyname))
     }
 
     fn parse_client_version(&self, keyname: &str) -> Result<ClientVersion> {
         let value = self.dump.value_for_keyname(keyname)?;
         ClientVersion::parse_binary(value).context(
-            format!("Failed to parse client version for keyname: {}", keyname)
+            format!("Parsing client version for keyname: {}", keyname)
         )
     }
 
     fn parse_block_locator(&self, keyname: &str) -> Result<BlockLocator> {
         let value = self.dump.value_for_keyname(keyname)?;
         BlockLocator::parse_binary(value).context(
-            format!("Failed to parse block locator for keyname: {}", keyname)
+            format!("Parsing block locator for keyname: {}", keyname)
         )
     }
 
     fn parse_keys(&self) -> Result<Keys> {
-        let key_records = self.dump
-            .records_for_keyname("key")
-            .context("Failed to get 'key' records")?;
+        let key_records = self.dump.records_for_keyname("key").context("Getting 'key' records")?;
         let keymeta_records = self.dump
             .records_for_keyname("keymeta")
-            .context("Failed to get 'keymeta' records")?;
+            .context("Getting 'keymeta' records")?;
         if key_records.len() != keymeta_records.len() {
-            anyhow::bail!("Mismatched key and keymeta records");
+            bail!("Mismatched key and keymeta records");
         }
         let mut keys_map = HashMap::new();
         for (key, value) in key_records {
-            let pubkey = PubKey::parse_binary(&key.data()).context("Failed to parse pubkey")?;
-            let privkey = PrivKey::parse_binary(&value.as_data()).context(
-                "Failed to parse privkey"
-            )?;
+            let pubkey = PubKey::parse_binary(&key.data()).context("Parsing pubkey")?;
+            let privkey = PrivKey::parse_binary(&value.as_data()).context("Parsing privkey")?;
             let metakey = DBKey::new("keymeta", key.data());
-            let metadata_binary = self.dump
-                .value_for_key(&metakey)
-                .context("Failed to get metadata")?;
-            let metadata = KeyMetadata::parse_binary(&metadata_binary).context(
-                "Failed to parse metadata"
-            )?;
+            let metadata_binary = self.dump.value_for_key(&metakey).context("Getting metadata")?;
+            let metadata = KeyMetadata::parse_binary(&metadata_binary).context("Parsing metadata")?;
             let keypair = Key::new(pubkey.clone(), privkey.clone(), metadata).context(
-                "Failed to create keypair"
+                "Creating keypair"
             )?;
             keys_map.insert(pubkey, keypair);
         }
@@ -227,24 +220,23 @@ impl<'a> ZcashdParser<'a> {
     fn parse_mnemonic_phrase(&self) -> Result<MnemonicSeed> {
         let (key, value) = self.dump
             .record_for_keyname("mnemonicphrase")
-            .context("Failed to get 'mnemonicphrase' record")?;
-        let fingerprint = Blob32::parse_binary(key.data()).context(
-            "Failed to parse seed fingerprint"
-        )?;
+            .context("Getting 'mnemonicphrase' record")?;
+        let fingerprint = Blob32::parse_binary(key.data()).context("Parsing seed fingerprint")?;
         let seed = MnemonicSeed::parse_binary(&value)
-            .context("Failed to parse mnemonic phrase")?
+            .context("Parsing mnemonic phrase")?
             .set_fingerprint(fingerprint);
         Ok(seed)
     }
 
     fn parse_address_names(&self) -> Result<HashMap<Address, String>> {
-        let records = self.dump
-            .records_for_keyname("name")
-            .context("Failed to get 'name' records")?;
+        let records = self.dump.records_for_keyname("name").context("Getting 'name' records")?;
         let mut address_names = HashMap::new();
         for (key, value) in records {
-            let address = Address::parse_binary(key.data()).context("Failed to parse address")?;
-            let name = String::parse_binary(value.as_data()).context("Failed to parse name")?;
+            let address = Address::parse_binary(key.data()).context("Parsing address")?;
+            let name = String::parse_binary(value.as_data()).context("Parsing name")?;
+            if address_names.contains_key(&address) {
+                bail!("Duplicate address found: {}", address);
+            }
             address_names.insert(address, name);
         }
         Ok(address_names)
@@ -253,9 +245,9 @@ impl<'a> ZcashdParser<'a> {
     fn parse_network_info(&self) -> Result<NetworkInfo> {
         let (_, value) = self.dump
             .record_for_keyname("networkinfo")
-            .context("Failed to get 'networkinfo' record")?;
+            .context("Getting 'networkinfo' record")?;
         let network_info = NetworkInfo::parse_binary(value.as_data()).context(
-            "Failed to parse network info"
+            "Parsing network info"
         )?;
         Ok(network_info)
     }
@@ -263,10 +255,23 @@ impl<'a> ZcashdParser<'a> {
     fn parse_orchard_note_commitment_tree(&self) -> Result<OrchardNoteCommitmentTree> {
         let (_, value) = self.dump
             .record_for_keyname("orchard_note_commitment_tree")
-            .context("Failed to get 'orchard_note_commitment_tree' record")?;
+            .context("Getting 'orchard_note_commitment_tree' record")?;
         let orchard_note_commitment_tree = OrchardNoteCommitmentTree::parse_binary(
             value.as_data()
-        ).context("Failed to parse orchard note commitment tree")?;
+        ).context("Parsing orchard note commitment tree")?;
         Ok(orchard_note_commitment_tree)
+    }
+
+    fn parse_key_pool(&self) -> Result<HashMap<i64, KeyPoolEntry>> {
+        let records = self.dump.records_for_keyname("pool").context("Getting 'pool' records")?;
+        let mut key_pool = HashMap::new();
+        for (key, value) in records {
+            let index = i64::parse_binary(key.data()).context("Parsing key pool index")?;
+            let entry = KeyPoolEntry::parse_binary(value.as_data()).context(
+                "Parsing key pool entry"
+            )?;
+            key_pool.insert(index, entry);
+        }
+        Ok(key_pool)
     }
 }

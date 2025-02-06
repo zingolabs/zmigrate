@@ -12,6 +12,10 @@ pub struct BlockLocator {
 }
 
 impl BlockLocator {
+    pub fn version(&self) -> &ClientVersion {
+        &self.version
+    }
+    
     pub fn blocks(&self) -> &[Blob32] {
         &self.blocks
     }
@@ -24,7 +28,7 @@ impl Parseable for BlockLocator {
 
     fn parse(parser: &mut crate::Parser) -> Result<Self> {
         let version = ClientVersion::parse(parser)?;
-        let blocks = parser.parse_array().context("Failed to parse BlockLocator")?;
+        let blocks = parser.parse_array().context("Parsing BlockLocator")?;
         Ok(Self { version, blocks })
     }
 }

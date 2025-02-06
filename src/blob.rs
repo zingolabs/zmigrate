@@ -83,7 +83,7 @@ impl<const T: usize> Parseable for Blob<T> {
     }
 
     fn parse(parser: &mut crate::Parser) -> Result<Self> where Self: Sized {
-        let data = parser.parse_slice(T).with_context(|| format!("Failed to parse Blob<{}>", T))?;
+        let data = parser.parse_slice(T).with_context(|| format!("Parsing Blob<{}>", T))?;
         Self::from_slice(data)
     }
 }

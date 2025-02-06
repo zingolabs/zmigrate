@@ -25,10 +25,10 @@ fn main() -> Result<()> {
     }
 
     let db_dump = BDBDump::from_file(Path::new(&args[1]))
-        .context("Failed to parse BerkeleyDB file")?;
+        .context("Parsing BerkeleyDB file")?;
 
     let zcashd_dump = ZcashdDump::from_bdb_dump(&db_dump)
-        .context("Failed to parse Zcashd dump")?;
+        .context("Parsing Zcashd dump")?;
 
     zcashd_dump.print_keyname_summary();
 
@@ -36,7 +36,7 @@ fn main() -> Result<()> {
     // zcashd_dump.print_keys();
 
     let zcashd_wallet = ZcashdParser::parse_dump(&zcashd_dump)
-        .context("Failed to parse Zcashd dump")?;
+        .context("Parsing Zcashd dump")?;
 
     println!("---");
     println!("{:#?}", zcashd_wallet);

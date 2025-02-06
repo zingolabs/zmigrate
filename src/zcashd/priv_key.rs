@@ -42,11 +42,11 @@ impl Parseable for PrivKey {
     }
 
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
-        let size = parser.parse_compact_size().context("Failed to parse PrivKey size")?;
+        let size = parser.parse_compact_size().context("Parsing PrivKey size")?;
         if size != 214 && size != 279 {
             bail!("Invalid PrivKey size: {}", size);
         }
-        let data = parser.parse_data(size).context("Failed to parse PrivKey")?;
+        let data = parser.parse_data(size).context("Parsing PrivKey")?;
         let hash = parser.parse_u256()?;
         Ok(Self { data, hash })
     }

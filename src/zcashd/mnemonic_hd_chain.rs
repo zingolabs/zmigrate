@@ -54,21 +54,21 @@ impl Parseable for MnemonicHDChain {
 
     fn parse(parser: &mut crate::Parser) -> Result<Self> {
         let version = parser.parse_i32()
-            .context("Failed to parse MnemonicHDChain version")?;
+            .context("Parsing MnemonicHDChain version")?;
         let seed_fp = parser.parse_blob()
-            .context("Failed to parse MnemonicHDChain seed_fp")?;
+            .context("Parsing MnemonicHDChain seed_fp")?;
         let create_time = SecondsSinceEpoch::parse(parser)
-            .context("Failed to parse MnemonicHDChain create_time")?;
+            .context("Parsing MnemonicHDChain create_time")?;
         let account_counter = parser.parse_u32()
-            .context("Failed to parse MnemonicHDChain account_counter")?;
+            .context("Parsing MnemonicHDChain account_counter")?;
         let legacy_tkey_external_counter = parser.parse_u32()
-            .context("Failed to parse MnemonicHDChain legacy_tkey_external_counter")?;
+            .context("Parsing MnemonicHDChain legacy_tkey_external_counter")?;
         let legacy_tkey_internal_counter = parser.parse_u32()
-            .context("Failed to parse MnemonicHDChain legacy_tkey_internal_counter")?;
+            .context("Parsing MnemonicHDChain legacy_tkey_internal_counter")?;
         let legacy_sapling_key_counter = parser.parse_u32()
-            .context("Failed to parse MnemonicHDChain legacy_sapling_key_counter")?;
+            .context("Parsing MnemonicHDChain legacy_sapling_key_counter")?;
         let mnemonic_seed_backup_confirmed = parser.parse_bool()
-            .context("Failed to parse MnemonicHDChain mnemonic_seed_backup_confirmed")?;
+            .context("Parsing MnemonicHDChain mnemonic_seed_backup_confirmed")?;
 
         Ok(Self {
             version,

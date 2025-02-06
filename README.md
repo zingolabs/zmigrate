@@ -18,9 +18,9 @@
 
 ### Multiple
 
-- [ ] pool: 1 (46)
 - [ ] purpose: 1 (8)
 - [ ] tx: 50 (229...231)
+- [x] pool: 1 (46)
 - [x] name: 1 (1)
 - [x] key: 52 (247)
 - [x] keymeta: 52 (69...70)

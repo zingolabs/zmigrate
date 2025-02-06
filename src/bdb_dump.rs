@@ -25,7 +25,7 @@ impl BDBDump {
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())
             .output()
-            .map_err(|e| anyhow!("Failed to execute db_dump: {}", e))?;
+            .map_err(|e| anyhow!("Executing db_dump: {}", e))?;
 
         // Check if db_dump executed successfully
         if !output.status.success() {

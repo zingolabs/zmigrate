@@ -20,3 +20,9 @@ impl Parseable for Address {
         Ok(Self(address))
     }
 }
+
+impl std::fmt::Display for Address {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}

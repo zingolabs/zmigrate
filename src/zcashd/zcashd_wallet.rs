@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use super::{Address, BlockLocator, ClientVersion, Keys, MnemonicHDChain, MnemonicSeed, NetworkInfo, OrchardNoteCommitmentTree, PubKey};
+use super::{Address, BlockLocator, ClientVersion, KeyPoolEntry, Keys, MnemonicHDChain, MnemonicSeed, NetworkInfo, OrchardNoteCommitmentTree, PubKey};
 
 pub struct ZcashdWallet {
     bestblock_nomerkle: BlockLocator,
@@ -16,6 +16,7 @@ pub struct ZcashdWallet {
     orchard_note_commitment_tree: OrchardNoteCommitmentTree,
     orderposnext: i64,
     witnesscachesize: i64,
+    key_pool: HashMap<i64, KeyPoolEntry>,
 }
 
 impl std::fmt::Debug for ZcashdWallet {
@@ -34,6 +35,7 @@ impl std::fmt::Debug for ZcashdWallet {
             .field("orchard_note_commitment_tree", &self.orchard_note_commitment_tree)
             .field("orderposnext", &self.orderposnext)
             .field("witnesscachesize", &self.witnesscachesize)
+            .field("key_pool", &self.key_pool)
             .finish()
     }
 }
@@ -54,6 +56,7 @@ impl ZcashdWallet {
         orchard_note_commitment_tree: OrchardNoteCommitmentTree,
         orderposnext: i64,
         witnesscachesize: i64,
+        key_pool: HashMap<i64, KeyPoolEntry>,
     ) -> Self {
         Self {
             bestblock_nomerkle,
@@ -69,6 +72,7 @@ impl ZcashdWallet {
             orchard_note_commitment_tree,
             orderposnext,
             witnesscachesize,
+            key_pool,
         }
     }
 

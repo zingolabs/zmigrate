@@ -44,3 +44,6 @@ pub use network_info::NetworkInfo;
 
 mod orchard_note_commitment_tree;
 pub use orchard_note_commitment_tree::OrchardNoteCommitmentTree;
+
+mod key_pool;
+pub use key_pool::KeyPoolEntry;
