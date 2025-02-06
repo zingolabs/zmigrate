@@ -5,22 +5,7 @@ use anyhow::{ Context, Result, bail };
 use crate::{ Blob32, Parseable };
 
 use super::{
-    zcashd_dump::DBKey,
-    Address,
-    BlockLocator,
-    ClientVersion,
-    Key,
-    KeyMetadata,
-    KeyPoolEntry,
-    Keys,
-    MnemonicHDChain,
-    MnemonicSeed,
-    NetworkInfo,
-    OrchardNoteCommitmentTree,
-    PrivKey,
-    PubKey,
-    ZcashdDump,
-    ZcashdWallet,
+    zcashd_dump::DBKey, Address, BlockLocator, ClientVersion, Key, KeyMetadata, KeyPoolEntry, Keys, MnemonicHDChain, MnemonicSeed, NetworkInfo, OrchardNoteCommitmentTree, PrivKey, PubKey, Transaction, ZcashdDump, ZcashdWallet
 };
 
 #[derive(Debug)]
@@ -96,6 +81,7 @@ impl<'a> ZcashdParser<'a> {
         // sapzkey
 
         // tx
+        let transactions = self.parse_transactions()?;
 
         // **version**
         let client_version = self.parse_client_version("version")?;
@@ -289,5 +275,21 @@ impl<'a> ZcashdParser<'a> {
             key_pool.insert(index, entry);
         }
         Ok(key_pool)
+    }
+
+    fn parse_transactions(&self) -> Result<HashMap<Blob32, Transaction>> {
+        let records = self.dump.records_for_keyname("tx").context("Getting 'tx' records")?;
+        let mut transactions = HashMap::new();
+        for (key, value) in records {
+            let txid = Blob32::parse_binary(key.data()).context("Parsing transaction ID")?;
+            let transaction = Transaction::parse_binary(value.as_data()).context(
+                "Parsing transaction"
+            )?;
+            if transactions.contains_key(&txid) {
+                bail!("Duplicate transaction found: {:?}", txid);
+            }
+            transactions.insert(txid, transaction);
+        }
+        Ok(transactions)
     }
 }

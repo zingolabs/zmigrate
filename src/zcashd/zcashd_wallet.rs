@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 
-use super::{Address, BlockLocator, ClientVersion, KeyPoolEntry, Keys, MnemonicHDChain, MnemonicSeed, NetworkInfo, OrchardNoteCommitmentTree, PubKey};
+use crate::Blob32;
+
+use super::{Address, BlockLocator, ClientVersion, KeyPoolEntry, Keys, MnemonicHDChain, MnemonicSeed, NetworkInfo, OrchardNoteCommitmentTree, PubKey, Transaction};
 
 pub struct ZcashdWallet {
     bestblock_nomerkle: BlockLocator,
@@ -18,6 +20,7 @@ pub struct ZcashdWallet {
     orderposnext: i64,
     witnesscachesize: i64,
     key_pool: HashMap<i64, KeyPoolEntry>,
+    transactions: HashMap<Blob32, Transaction>,
 }
 
 impl std::fmt::Debug for ZcashdWallet {
@@ -38,6 +41,7 @@ impl std::fmt::Debug for ZcashdWallet {
             .field("orderposnext", &self.orderposnext)
             .field("witnesscachesize", &self.witnesscachesize)
             .field("key_pool", &self.key_pool)
+            .field("transactions", &self.transactions)
             .finish()
     }
 }
@@ -60,6 +64,7 @@ impl ZcashdWallet {
         orderposnext: i64,
         witnesscachesize: i64,
         key_pool: HashMap<i64, KeyPoolEntry>,
+        transactions: HashMap<Blob32, Transaction>,
     ) -> Self {
         Self {
             bestblock_nomerkle,
@@ -77,6 +82,7 @@ impl ZcashdWallet {
             orderposnext,
             witnesscachesize,
             key_pool,
+            transactions,
         }
     }
 
@@ -126,5 +132,17 @@ impl ZcashdWallet {
 
     pub fn orderposnext(&self) -> i64 {
         self.orderposnext
+    }
+
+    pub fn witnesscachesize(&self) -> i64 {
+        self.witnesscachesize
+    }
+
+    pub fn key_pool(&self) -> &HashMap<i64, KeyPoolEntry> {
+        &self.key_pool
+    }
+
+    pub fn transactions(&self) -> &HashMap<Blob32, Transaction> {
+        &self.transactions
     }
 }
