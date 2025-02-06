@@ -149,6 +149,7 @@ impl<'a> ZcashdParser<'a> {
                 orderposnext,
                 witnesscachesize,
                 key_pool,
+                transactions,
             )
         )
     }
