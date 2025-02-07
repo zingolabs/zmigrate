@@ -3,9 +3,10 @@ use anyhow::{ Result, Context, bail };
 use crate::{ Blob32, Parseable };
 
 #[derive(Clone, PartialEq, Eq, Hash)]
-pub struct U252(Blob32);
+#[allow(non_camel_case_types)]
+pub struct u252(Blob32);
 
-impl U252 {
+impl u252 {
     pub fn from_blob(blob: Blob32) -> Result<Self> {
         if (blob.as_bytes()[0] & 0xf0) != 0 {
             bail!("First four bits of u252 must be zero");
@@ -22,13 +23,25 @@ impl U252 {
     }
 }
 
-impl std::fmt::Debug for U252 {
+impl AsRef<Blob32> for u252 {
+    fn as_ref(&self) -> &Blob32 {
+        &self.0
+    }
+}
+
+impl AsRef<[u8]> for u252 {
+    fn as_ref(&self) -> &[u8] {
+        self.0.as_bytes()
+    }
+}
+
+impl std::fmt::Debug for u252 {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "U252({})", hex::encode(self.as_blob()))
     }
 }
 
-impl Parseable for U252 {
+impl Parseable for u252 {
     fn parse_type() -> &'static str {
         "u252"
     }

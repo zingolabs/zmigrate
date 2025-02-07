@@ -3,9 +3,10 @@ use anyhow::{ Result, Context };
 use crate::{ Blob32, Parseable };
 
 #[derive(Clone, PartialEq, Eq, Hash)]
-pub struct U256(Blob32);
+#[allow(non_camel_case_types)]
+pub struct u256(Blob32);
 
-impl U256 {
+impl u256 {
     pub fn from_blob(blob: Blob32) -> Self {
         Self(blob)
     }
@@ -24,13 +25,25 @@ impl U256 {
     }
 }
 
-impl std::fmt::Debug for U256 {
+impl AsRef<Blob32> for u256 {
+    fn as_ref(&self) -> &Blob32 {
+        &self.0
+    }
+}
+
+impl AsRef<[u8]> for u256 {
+    fn as_ref(&self) -> &[u8] {
+        self.0.as_bytes()
+    }
+}
+
+impl std::fmt::Debug for u256 {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "U256({})", hex::encode(self.as_blob()))
     }
 }
 
-impl Parseable for U256 {
+impl Parseable for u256 {
     fn parse_type() -> &'static str {
         "u256"
     }

@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use anyhow::{ Context, Result, bail };
 
-use crate::{ U256, Parseable };
+use crate::{ u256, Parseable };
 
 use super::{
     zcashd_dump::DBKey, Address, BlockLocator, ClientVersion, Key, KeyMetadata, KeyPoolEntry, Keys, MnemonicHDChain, MnemonicSeed, NetworkInfo, OrchardNoteCommitmentTree, PrivKey, PubKey, WalletTx, ZcashdDump, ZcashdWallet
@@ -218,7 +218,7 @@ impl<'a> ZcashdParser<'a> {
         let (key, value) = self.dump
             .record_for_keyname("mnemonicphrase")
             .context("Getting 'mnemonicphrase' record")?;
-        let fingerprint = U256::parse_binary(key.data()).context("Parsing seed fingerprint")?;
+        let fingerprint = u256::parse_binary(key.data()).context("Parsing seed fingerprint")?;
         let seed = MnemonicSeed::parse_binary(&value)
             .context("Parsing mnemonic phrase")?
             .set_fingerprint(fingerprint);
@@ -286,13 +286,13 @@ impl<'a> ZcashdParser<'a> {
         Ok(key_pool)
     }
 
-    fn parse_transactions(&self) -> Result<HashMap<U256, WalletTx>> {
+    fn parse_transactions(&self) -> Result<HashMap<u256, WalletTx>> {
         let mut transactions = HashMap::new();
         // Some wallet files don't have any transactions
         if self.dump.has_records_for_keyname("tx") {
             let records = self.dump.records_for_keyname("tx").context("Getting 'tx' records")?;
             for (key, value) in records {
-                let txid = U256::parse_binary(key.data()).context("Parsing transaction ID")?;
+                let txid = u256::parse_binary(key.data()).context("Parsing transaction ID")?;
                 let transaction = WalletTx::parse_binary(value.as_data()).context(
                     "Parsing transaction"
                 )?;

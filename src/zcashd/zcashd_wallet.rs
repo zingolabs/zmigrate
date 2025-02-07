@@ -1,8 +1,19 @@
 use std::collections::HashMap;
 
-use crate::Blob32;
-
-use super::{Address, BlockLocator, ClientVersion, KeyPoolEntry, Keys, MnemonicHDChain, MnemonicSeed, NetworkInfo, OrchardNoteCommitmentTree, PubKey, WalletTx};
+use super::{
+    u256,
+    Address,
+    BlockLocator,
+    ClientVersion,
+    KeyPoolEntry,
+    Keys,
+    MnemonicHDChain,
+    MnemonicSeed,
+    NetworkInfo,
+    OrchardNoteCommitmentTree,
+    PubKey,
+    WalletTx,
+};
 
 pub struct ZcashdWallet {
     bestblock_nomerkle: BlockLocator,
@@ -20,7 +31,7 @@ pub struct ZcashdWallet {
     orderposnext: Option<i64>,
     witnesscachesize: i64,
     key_pool: HashMap<i64, KeyPoolEntry>,
-    transactions: HashMap<Blob32, WalletTx>,
+    transactions: HashMap<u256, WalletTx>,
 }
 
 impl std::fmt::Debug for ZcashdWallet {
@@ -64,7 +75,7 @@ impl ZcashdWallet {
         orderposnext: Option<i64>,
         witnesscachesize: i64,
         key_pool: HashMap<i64, KeyPoolEntry>,
-        transactions: HashMap<Blob32, WalletTx>,
+        transactions: HashMap<u256, WalletTx>
     ) -> Self {
         Self {
             bestblock_nomerkle,
@@ -142,7 +153,7 @@ impl ZcashdWallet {
         &self.key_pool
     }
 
-    pub fn transactions(&self) -> &HashMap<Blob32, WalletTx> {
+    pub fn transactions(&self) -> &HashMap<u256, WalletTx> {
         &self.transactions
     }
 }

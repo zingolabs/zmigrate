@@ -2,13 +2,13 @@ use anyhow::{ Result, Context };
 
 use crate::Parseable;
 
-use super::{parse_array, ClientVersion, U256};
+use super::{parse_array, ClientVersion, u256};
 
 /// Vector of block hashes
 #[derive(Debug, Clone, PartialEq)]
 pub struct BlockLocator {
     version: ClientVersion,
-    blocks: Vec<U256>,
+    blocks: Vec<u256>,
 }
 
 impl BlockLocator {
@@ -16,7 +16,7 @@ impl BlockLocator {
         &self.version
     }
 
-    pub fn blocks(&self) -> &[U256] {
+    pub fn blocks(&self) -> &[u256] {
         &self.blocks
     }
 }

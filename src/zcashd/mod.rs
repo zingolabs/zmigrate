@@ -51,14 +51,14 @@ pub use key_pool::*;
 mod tx;
 pub use tx::*;
 
-mod u160;
-pub use u160::*;
+mod u160_type;
+pub use u160_type::*;
 
-mod u252;
-pub use u252::U252;
+mod u252_type;
+pub use u252_type::*;
 
-mod u256;
-pub use u256::*;
+mod u256_type;
+pub use u256_type::*;
 
 mod parsing;
 pub use parsing::*;

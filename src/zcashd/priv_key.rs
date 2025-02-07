@@ -1,13 +1,13 @@
 use anyhow::{ Result, Context, bail };
 
-use crate::{ U256, Data, Parseable, Parser };
+use crate::{ u256, Data, Parseable, Parser };
 
 use super::parse_compact_size;
 
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct PrivKey {
     data: Data,
-    hash: U256,
+    hash: u256,
 }
 
 impl std::fmt::Debug for PrivKey {
@@ -21,7 +21,7 @@ impl PrivKey {
         &self.data
     }
 
-    pub fn hash(&self) -> &U256 {
+    pub fn hash(&self) -> &u256 {
         &self.hash
     }
 }
@@ -49,7 +49,7 @@ impl Parseable for PrivKey {
             bail!("Invalid PrivKey size: {}", size);
         }
         let data = Data::parse(size, parser).context("Parsing PrivKey")?;
-        let hash = U256::parse(parser).context("Parsing PrivKey hash")?;
+        let hash = u256::parse(parser).context("Parsing PrivKey hash")?;
         Ok(Self { data, hash })
     }
 }

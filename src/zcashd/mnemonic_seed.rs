@@ -1,6 +1,6 @@
 use anyhow::{ Result, bail };
 
-use crate::{ U256, Parseable };
+use crate::{ u256, Parseable };
 
 #[derive(Clone, Copy, PartialEq)]
 pub enum Language {
@@ -76,7 +76,7 @@ impl Parseable for Language {
 pub struct MnemonicSeed {
     language: Language,
     mnemonic: String,
-    fingerprint: Option<U256>,
+    fingerprint: Option<u256>,
 }
 
 impl MnemonicSeed {
@@ -88,11 +88,11 @@ impl MnemonicSeed {
         &self.mnemonic
     }
 
-    pub fn fingerprint(&self) -> &U256 {
+    pub fn fingerprint(&self) -> &u256 {
         self.fingerprint.as_ref().expect("Fingerprint not set")
     }
 
-    pub fn set_fingerprint(mut self, fingerprint: U256) -> Self {
+    pub fn set_fingerprint(mut self, fingerprint: u256) -> Self {
         self.fingerprint = Some(fingerprint);
         self
     }
