@@ -9,7 +9,11 @@ pub struct WalletTx {
     pub rest: Data,
 }
 
-impl WalletTx {}
+impl WalletTx {
+    pub fn version(&self) -> &TxVersion {
+        &self.version
+    }
+}
 
 impl Parseable for WalletTx {
     fn parse_type() -> &'static str {

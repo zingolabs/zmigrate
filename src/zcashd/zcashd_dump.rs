@@ -119,6 +119,11 @@ impl ZcashdDump {
             .context(format!("No record found for keyname: {}", keyname))
     }
 
+    pub fn has_value_for_keyname(&self, keyname: &str) -> bool {
+        let key = DBKey::new(keyname.to_string(), Data::new());
+        self.records.contains_key(&key)
+    }
+
     pub fn records_by_keyname(&self) -> &HashMap<String, HashMap<DBKey, DBValue>> {
         &self.records_by_keyname
     }
@@ -128,6 +133,10 @@ impl ZcashdDump {
             Some(records) => Ok(records),
             None => bail!("No records found for keyname: {}", keyname),
         }
+    }
+
+    pub fn has_records_for_keyname(&self, keyname: &str) -> bool {
+        self.records_by_keyname.contains_key(keyname)
     }
 
     pub fn record_for_keyname(&self, keyname: &str) -> Result<(DBKey, DBValue)> {

@@ -66,7 +66,7 @@ impl<'a> ZcashdParser<'a> {
         let address_names = self.parse_address_names()?;
 
         // **orderposnext**
-        let orderposnext = self.parse_i64("orderposnext")?;
+        let orderposnext = self.parse_opt_i64("orderposnext")?;
 
         // pool
         let key_pool = self.parse_key_pool()?;
@@ -157,6 +157,14 @@ impl<'a> ZcashdParser<'a> {
     fn parse_i64(&self, keyname: &str) -> Result<i64> {
         let value = self.dump.value_for_keyname(keyname)?;
         i64::parse_binary(value).context(format!("Parsing i64 for keyname: {}", keyname))
+    }
+
+    fn parse_opt_i64(&self, keyname: &str) -> Result<Option<i64>> {
+        if self.dump.has_value_for_keyname(keyname) {
+            self.parse_i64(keyname).map(Some)
+        } else {
+            Ok(None)
+        }
     }
 
     fn parse_client_version(&self, keyname: &str) -> Result<ClientVersion> {
@@ -279,17 +287,20 @@ impl<'a> ZcashdParser<'a> {
     }
 
     fn parse_transactions(&self) -> Result<HashMap<Blob32, WalletTx>> {
-        let records = self.dump.records_for_keyname("tx").context("Getting 'tx' records")?;
         let mut transactions = HashMap::new();
-        for (key, value) in records {
-            let txid = Blob32::parse_binary(key.data()).context("Parsing transaction ID")?;
-            let transaction = WalletTx::parse_binary(value.as_data()).context(
-                "Parsing transaction"
-            )?;
-            if transactions.contains_key(&txid) {
-                bail!("Duplicate transaction found: {:?}", txid);
+        // Some wallet files don't have any transactions
+        if self.dump.has_records_for_keyname("tx") {
+            let records = self.dump.records_for_keyname("tx").context("Getting 'tx' records")?;
+            for (key, value) in records {
+                let txid = Blob32::parse_binary(key.data()).context("Parsing transaction ID")?;
+                let transaction = WalletTx::parse_binary(value.as_data()).context(
+                    "Parsing transaction"
+                )?;
+                if transactions.contains_key(&txid) {
+                    bail!("Duplicate transaction found: {:?}", txid);
+                }
+                transactions.insert(txid, transaction);
             }
-            transactions.insert(txid, transaction);
         }
         Ok(transactions)
     }

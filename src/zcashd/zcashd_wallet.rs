@@ -17,7 +17,7 @@ pub struct ZcashdWallet {
     address_purposes: HashMap<Address, String>,
     network_info: NetworkInfo,
     orchard_note_commitment_tree: OrchardNoteCommitmentTree,
-    orderposnext: i64,
+    orderposnext: Option<i64>,
     witnesscachesize: i64,
     key_pool: HashMap<i64, KeyPoolEntry>,
     transactions: HashMap<Blob32, WalletTx>,
@@ -61,7 +61,7 @@ impl ZcashdWallet {
         address_purposes: HashMap<Address, String>,
         network_info: NetworkInfo,
         orchard_note_commitment_tree: OrchardNoteCommitmentTree,
-        orderposnext: i64,
+        orderposnext: Option<i64>,
         witnesscachesize: i64,
         key_pool: HashMap<i64, KeyPoolEntry>,
         transactions: HashMap<Blob32, WalletTx>,
@@ -130,7 +130,7 @@ impl ZcashdWallet {
         &self.orchard_note_commitment_tree
     }
 
-    pub fn orderposnext(&self) -> i64 {
+    pub fn orderposnext(&self) -> Option<i64> {
         self.orderposnext
     }
 

@@ -28,6 +28,12 @@ pub struct TxVersion {
     pub version: u32,
 }
 
+impl TxVersion {
+    pub fn is_overwintered(&self) -> bool {
+        self.group != TxVersionGroup::PreOverwinter
+    }
+}
+
 impl Parseable for TxVersion {
     fn parse_type() -> &'static str {
         "TxVersion"
