@@ -16,7 +16,7 @@ impl Parseable for Address {
     }
 
     fn parse(parser: &mut crate::Parser) -> Result<Self> where Self: Sized {
-        let address = parser.parse_utf8()?;
+        let address = String::parse(parser)?;
         Ok(Self(address))
     }
 }

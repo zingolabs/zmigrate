@@ -59,13 +59,13 @@ impl Parseable for MnemonicHDChain {
             .context("Parsing MnemonicHDChain seed_fp")?;
         let create_time = SecondsSinceEpoch::parse(parser)
             .context("Parsing MnemonicHDChain create_time")?;
-        let account_counter = parser.parse_u32()
+        let account_counter = u32::parse(parser)
             .context("Parsing MnemonicHDChain account_counter")?;
-        let legacy_tkey_external_counter = parser.parse_u32()
+        let legacy_tkey_external_counter = u32::parse(parser)
             .context("Parsing MnemonicHDChain legacy_tkey_external_counter")?;
-        let legacy_tkey_internal_counter = parser.parse_u32()
+        let legacy_tkey_internal_counter = u32::parse(parser)
             .context("Parsing MnemonicHDChain legacy_tkey_internal_counter")?;
-        let legacy_sapling_key_counter = parser.parse_u32()
+        let legacy_sapling_key_counter = u32::parse(parser)
             .context("Parsing MnemonicHDChain legacy_sapling_key_counter")?;
         let mnemonic_seed_backup_confirmed = parser.parse_bool()
             .context("Parsing MnemonicHDChain mnemonic_seed_backup_confirmed")?;

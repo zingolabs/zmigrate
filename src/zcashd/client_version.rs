@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{Result, Context};
 
 use crate::Parseable;
 
@@ -92,7 +92,8 @@ impl Parseable for ClientVersion {
     }
 
     fn parse(parser: &mut crate::Parser) -> Result<Self> {
-        let version = parser.parse_u32()?;
+        let version = u32::parse(parser)
+            .context("Parsing ClientVersion")?;
         Ok(ClientVersion::from_integer(version))
     }
 }

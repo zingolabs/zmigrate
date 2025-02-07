@@ -40,7 +40,7 @@ impl Parseable for TxVersion {
     }
 
     fn parse(parser: &mut crate::Parser) -> Result<Self> where Self: Sized {
-        let header = parser.parse_u32().context("Parsing Transaction header")?;
+        let header = u32::parse(parser).context("Parsing Transaction header")?;
         let overwintered = (header >> 31) == 1;
         let version = header & 0x7fffffff;
 

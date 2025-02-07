@@ -34,7 +34,7 @@ impl Parseable for IntID {
     }
 
     fn parse(parser: &mut crate::Parser) -> Result<Self> where Self: Sized {
-        let id = parser.parse_u32().context("Parsing IntID")?;
+        let id = u32::parse(parser).context("Parsing IntID")?;
         Ok(Self(id))
     }
 }

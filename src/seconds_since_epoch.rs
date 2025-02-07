@@ -23,7 +23,7 @@ impl Parseable for SecondsSinceEpoch {
     }
 
     fn parse(parser: &mut crate::Parser) -> Result<Self> {
-        let seconds = parser.parse_u64()?;
+        let seconds = u64::parse(parser)?;
         Ok(Self::new(seconds))
     }
 }

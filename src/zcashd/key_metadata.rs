@@ -56,7 +56,7 @@ impl Parseable for KeyMetadata {
         let hd_keypath: Option<String>;
         let seed_fp: Option<Blob32>;
         if version >= VERSION_WITH_HDDATA {
-            hd_keypath = Some(parser.parse_utf8()?);
+            hd_keypath = Some(String::parse(parser)?);
             seed_fp = Some(parser.parse_blob()?);
         } else {
             hd_keypath = None;

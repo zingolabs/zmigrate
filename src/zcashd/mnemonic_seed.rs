@@ -67,7 +67,7 @@ impl Parseable for Language {
     }
 
     fn parse(parser: &mut crate::Parser) -> Result<Self> where Self: Sized {
-        let value = parser.parse_u32()?;
+        let value = u32::parse(parser)?;
         Language::from_u32(value)
     }
 }
@@ -115,7 +115,7 @@ impl Parseable for MnemonicSeed {
 
     fn parse(parser: &mut crate::Parser) -> Result<Self> {
         let language = Language::parse(parser)?;
-        let mnemonic = parser.parse_utf8()?;
+        let mnemonic = String::parse(parser)?;
         Ok(Self { language, mnemonic, fingerprint: None })
     }
 }
