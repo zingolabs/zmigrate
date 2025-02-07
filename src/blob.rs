@@ -2,7 +2,7 @@ use anyhow::{bail, Result, Context};
 
 use crate::Parseable;
 
-/// Represents a fixed-size byte array.
+/// A fixed-size byte array.
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct Blob<const N: usize>([u8; N]);
 

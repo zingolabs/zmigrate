@@ -3,7 +3,7 @@ use anyhow::{ Result, Context };
 use crate::Parser;
 
 #[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
-/// Represents a variable-size byte array.
+/// A variable-size byte array.
 pub struct Data(Vec<u8>);
 
 impl Data {

@@ -15,8 +15,6 @@ mod digest;
 pub use digest::*;
 mod parser;
 pub use parser::*;
-mod seconds_since_epoch;
-pub use seconds_since_epoch::*;
 
 fn main() -> Result<()> {
     let args: Vec<String> = env::args().collect();
