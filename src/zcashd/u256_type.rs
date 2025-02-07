@@ -44,9 +44,6 @@ impl std::fmt::Debug for u256 {
 }
 
 impl Parseable for u256 {
-    fn parse_type() -> &'static str {
-        "u256"
-    }
     fn parse(parser: &mut crate::Parser) -> Result<Self> where Self: Sized {
         let blob = Blob32::parse(parser).context("Parsing u256")?;
         Ok(Self(blob))

@@ -12,10 +12,6 @@ impl OrchardNoteCommitmentTree {
 }
 
 impl Parseable for OrchardNoteCommitmentTree {
-    fn parse_type() -> &'static str {
-        "OrchardNoteCommitmentTree"
-    }
-
     fn parse(parser: &mut crate::Parser) -> Result<Self> where Self: Sized {
         let data = parser.rest();
         Ok(Self(data))

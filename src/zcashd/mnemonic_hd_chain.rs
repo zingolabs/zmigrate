@@ -48,10 +48,6 @@ impl MnemonicHDChain {
 }
 
 impl Parseable for MnemonicHDChain {
-    fn parse_type() -> &'static str {
-        "MnemonicHDChain"
-    }
-
     fn parse(parser: &mut crate::Parser) -> Result<Self> {
         let version = i32::parse(parser)
             .context("Parsing MnemonicHDChain version")?;

@@ -87,10 +87,6 @@ impl ClientVersion {
 }
 
 impl Parseable for ClientVersion {
-    fn parse_type() -> &'static str {
-        "ClientVersion"
-    }
-
     fn parse(parser: &mut crate::Parser) -> Result<Self> {
         let version = u32::parse(parser)
             .context("Parsing ClientVersion")?;

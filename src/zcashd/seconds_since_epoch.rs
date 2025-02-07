@@ -4,12 +4,16 @@ use anyhow::Result;
 use chrono::{ TimeZone, Utc, SecondsFormat };
 
 /// Represents a number of seconds since the Unix epoch.
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct SecondsSinceEpoch(u64);
 
 impl SecondsSinceEpoch {
-    pub fn new(seconds: u64) -> Self {
+    pub fn from_u64(seconds: u64) -> Self {
         Self(seconds)
+    }
+
+    pub fn from_u32(seconds: u32) -> Self {
+        Self(seconds as u64)
     }
 
     pub fn as_u64(&self) -> u64 {
@@ -17,14 +21,22 @@ impl SecondsSinceEpoch {
     }
 }
 
-impl Parseable for SecondsSinceEpoch {
-    fn parse_type() -> &'static str {
-        "SecondsSinceEpoch"
+impl From<u64> for SecondsSinceEpoch {
+    fn from(seconds: u64) -> Self {
+        Self::from_u64(seconds)
     }
+}
 
+impl From<u32> for SecondsSinceEpoch {
+    fn from(seconds: u32) -> Self {
+        Self::from_u32(seconds)
+    }
+}
+
+impl Parseable for SecondsSinceEpoch {
     fn parse(parser: &mut crate::Parser) -> Result<Self> {
         let seconds = u64::parse(parser)?;
-        Ok(Self::new(seconds))
+        Ok(Self::from_u64(seconds))
     }
 }
 

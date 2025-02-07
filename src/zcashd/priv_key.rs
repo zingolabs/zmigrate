@@ -39,16 +39,12 @@ impl AsRef<[u8]> for PrivKey {
 }
 
 impl Parseable for PrivKey {
-    fn parse_type() -> &'static str {
-        "PrivKey"
-    }
-
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
         let size = parse_compact_size(parser).context("Parsing PrivKey size")?;
         if size != 214 && size != 279 {
             bail!("Invalid PrivKey size: {}", size);
         }
-        let data = Data::parse(size, parser).context("Parsing PrivKey")?;
+        let data = Data::parse_len(size, parser).context("Parsing PrivKey")?;
         let hash = u256::parse(parser).context("Parsing PrivKey hash")?;
         Ok(Self { data, hash })
     }

@@ -15,6 +15,8 @@ mod digest;
 pub use digest::*;
 mod parser;
 pub use parser::*;
+mod string_utils;
+pub use string_utils::*;
 
 fn main() -> Result<()> {
     let args: Vec<String> = env::args().collect();

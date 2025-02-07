@@ -44,10 +44,6 @@ impl KeyMetadata {
 }
 
 impl Parseable for KeyMetadata {
-    fn parse_type() -> &'static str {
-        "KeyMetadata"
-    }
-
     fn parse(parser: &mut crate::Parser) -> Result<Self> {
         let version = i32::parse(parser)?;
         let create_time = SecondsSinceEpoch::parse(parser)?;

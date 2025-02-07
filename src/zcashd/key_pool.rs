@@ -25,10 +25,6 @@ impl KeyPoolEntry {
 }
 
 impl Parseable for KeyPoolEntry {
-    fn parse_type() -> &'static str {
-        "KeyPoolEntry"
-    }
-
     fn parse(parser: &mut crate::Parser) -> Result<Self> {
         let version = ClientVersion::parse(parser)?;
         let timestamp  = SecondsSinceEpoch::parse(parser)?;

@@ -3,8 +3,6 @@ use anyhow::{ Result, bail };
 use crate::Data;
 
 pub trait Parseable {
-    fn parse_type() -> &'static str;
-
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized;
 
     fn parse_binary(buffer: &dyn AsRef<[u8]>) -> Result<Self> where Self: Sized {
@@ -57,6 +55,6 @@ impl<'a> Parser<'a> {
     }
 
     pub fn rest(&mut self) -> Data {
-        Data::parse(self.remaining(), self).unwrap()
+        Data::parse_len(self.remaining(), self).unwrap()
     }
 }

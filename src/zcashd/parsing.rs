@@ -28,7 +28,7 @@ pub fn parse_pair<T: Parseable, U: Parseable>(parser: &mut Parser) -> Result<(T,
     Ok((first, second))
 }
 
-pub fn parse_fixed_length_array<T: Parseable>(parser: &mut Parser, length: usize) -> Result<Vec<T>> {
+pub fn parse_fixed_length_vec<T: Parseable>(parser: &mut Parser, length: usize) -> Result<Vec<T>> {
     let mut items = Vec::with_capacity(length);
     for i in 0..length {
         items.push(T::parse(parser).with_context(|| format!("Parsing array item {} of {}", i, length - 1))?);
@@ -36,9 +36,15 @@ pub fn parse_fixed_length_array<T: Parseable>(parser: &mut Parser, length: usize
     Ok(items)
 }
 
-pub fn parse_array<T: Parseable>(parser: &mut Parser) -> Result<Vec<T>> {
+pub fn parse_vec<T: Parseable>(parser: &mut Parser) -> Result<Vec<T>> {
     let length = parse_compact_size(parser).context("Parsing array length")?;
-    parse_fixed_length_array(parser, length)
+    parse_fixed_length_vec(parser, length)
+}
+
+impl<T: Parseable> Parseable for Vec<T> {
+    fn parse(parser: &mut Parser) -> Result<Self> {
+        parse_vec(parser)
+    }
 }
 
 pub fn parse_map<K: Parseable, V: Parseable>(parser: &mut Parser) -> Result<Vec<(K, V)>> {
@@ -50,15 +56,18 @@ pub fn parse_map<K: Parseable, V: Parseable>(parser: &mut Parser) -> Result<Vec<
     Ok(items)
 }
 
-pub fn parse_hashmap<K, V: Parseable>(parser: &mut Parser) -> Result<Vec<(K, V)>>
+pub fn parse_hashmap<K, V: Parseable>(parser: &mut Parser) -> Result<HashMap<K, V>>
     where K: Parseable + Eq + std::hash::Hash
 {
-    let map = parse_map::<K, V>(parser)?;
-    let mut hashmap = HashMap::new();
-    for (key, value) in map {
-        hashmap.insert(key, value);
+    Ok(parse_map::<K, V>(parser)?.into_iter().collect())
+}
+
+impl<K: Parseable, V: Parseable> Parseable for HashMap<K, V>
+    where K: Parseable + Eq + std::hash::Hash
+{
+    fn parse(parser: &mut Parser) -> Result<Self> {
+        parse_hashmap(parser)
     }
-    Ok(hashmap.into_iter().collect())
 }
 
 /// A container that optionally holds a value, serialized with a presence flag followed by the value if present.                      | 1 byte (discriminant: 0x00 = absent, 0x01 = present) + serialized value `T` if present.
@@ -67,5 +76,11 @@ pub fn parse_optional<T: Parseable>(parser: &mut Parser) -> Result<Option<T>> {
         0x00 => Ok(None),
         0x01 => Ok(Some(T::parse(parser).context("Parsing optional value")?)),
         discriminant => bail!("Invalid optional discriminant: {}", discriminant),
+    }
+}
+
+impl<T: Parseable> Parseable for Option<T> {
+    fn parse(parser: &mut Parser) -> Result<Self> {
+        parse_optional(parser)
     }
 }

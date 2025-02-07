@@ -32,16 +32,12 @@ impl AsRef<[u8]> for PubKey {
 }
 
 impl Parseable for PubKey {
-    fn parse_type() -> &'static str {
-        "PubKey"
-    }
-
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
         let size = parse_compact_size(parser).context("Parsing PubKey size")?;
         if size != 33 && size != 65 {
             bail!("Invalid PubKey size: {}", size);
         }
-        let key_data = Data::parse(size, parser).context("Parsing PubKey")?;
+        let key_data = Data::parse_len(size, parser).context("Parsing PubKey")?;
         Ok(Self(key_data))
     }
 }

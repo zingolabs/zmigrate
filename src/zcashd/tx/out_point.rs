@@ -19,10 +19,6 @@ impl OutPoint {
 }
 
 impl Parseable for OutPoint {
-    fn parse_type() -> &'static str {
-        "OutPoint"
-    }
-
     fn parse(parser: &mut crate::Parser) -> Result<Self> where Self: Sized {
         let txid = u256::parse(parser)
             .context("Parsing out point txid")?;

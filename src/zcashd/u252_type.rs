@@ -42,9 +42,6 @@ impl std::fmt::Debug for u252 {
 }
 
 impl Parseable for u252 {
-    fn parse_type() -> &'static str {
-        "u252"
-    }
     fn parse(parser: &mut crate::Parser) -> Result<Self> where Self: Sized {
         let blob = Blob32::parse(parser).context("Parsing u252")?;
         Self::from_blob(blob)

@@ -20,10 +20,6 @@ impl NetworkInfo {
 }
 
 impl Parseable for NetworkInfo {
-    fn parse_type() -> &'static str {
-        "NetworkInfo"
-    }
-
     fn parse(parser: &mut crate::Parser) -> Result<Self> where Self: Sized {
         let (zcash, identifier) = parse_pair(parser)?;
         Ok(Self { zcash, identifier })

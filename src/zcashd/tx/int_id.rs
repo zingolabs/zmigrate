@@ -29,10 +29,6 @@ impl std::fmt::Debug for IntID {
 }
 
 impl Parseable for IntID {
-    fn parse_type() -> &'static str {
-        "IntID"
-    }
-
     fn parse(parser: &mut crate::Parser) -> Result<Self> where Self: Sized {
         let id = u32::parse(parser).context("Parsing IntID")?;
         Ok(Self(id))

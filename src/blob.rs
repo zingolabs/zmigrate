@@ -78,7 +78,6 @@ impl<const N: usize> From<&[u8]> for Blob<N> {
 }
 
 impl<const N: usize> Parseable for Blob<N> {
-    fn parse_type() -> &'static str { "Blob" }
     fn parse(parser: &mut crate::Parser) -> Result<Self> where Self: Sized {
         let data = parser.next(N).with_context(|| format!("Parsing Blob<{}>", N))?;
         Self::from_slice(data)

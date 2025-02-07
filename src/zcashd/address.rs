@@ -11,10 +11,6 @@ impl Address {
 }
 
 impl Parseable for Address {
-    fn parse_type() -> &'static str {
-        "Address"
-    }
-
     fn parse(parser: &mut crate::Parser) -> Result<Self> where Self: Sized {
         let address = String::parse(parser)?;
         Ok(Self(address))

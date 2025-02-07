@@ -29,16 +29,24 @@ pub struct TxVersion {
 }
 
 impl TxVersion {
-    pub fn is_overwintered(&self) -> bool {
+    pub fn is_overwinter(&self) -> bool {
         self.group != TxVersionGroup::PreOverwinter
+    }
+
+    pub fn is_sapling(&self) -> bool {
+        self.group == TxVersionGroup::SaplingV4
+    }
+
+    pub fn is_zip225(&self) -> bool {
+        self.group == TxVersionGroup::Zip225V5
+    }
+
+    pub fn is_future(&self) -> bool {
+        self.group == TxVersionGroup::Future
     }
 }
 
 impl Parseable for TxVersion {
-    fn parse_type() -> &'static str {
-        "TxVersion"
-    }
-
     fn parse(parser: &mut crate::Parser) -> Result<Self> where Self: Sized {
         let header = u32::parse(parser).context("Parsing Transaction header")?;
         let overwintered = (header >> 31) == 1;

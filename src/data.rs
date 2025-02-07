@@ -53,7 +53,7 @@ impl Data {
 }
 
 impl Data {
-    pub fn parse(len: usize, parser: &mut Parser) -> Result<Self> {
+    pub fn parse_len(len: usize, parser: &mut Parser) -> Result<Self> {
         let bytes = parser.next(len).context("Parsing Data")?;
         Ok(Self::from_slice(bytes))
     }
@@ -73,7 +73,7 @@ impl AsRef<[u8]> for Data {
 
 impl std::fmt::Debug for Data {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "Data<{}>({})", self.len(), hex::encode(&self.0))
+        write!(f, "Data<{}>({})", self.len(), hex::encode(self))
     }
 }
 
