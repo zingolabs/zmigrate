@@ -46,8 +46,8 @@ impl Parseable for PrivKey {
         if size != 214 && size != 279 {
             bail!("Invalid PrivKey size: {}", size);
         }
-        let data = parser.parse_data(size).context("Parsing PrivKey")?;
-        let hash = parser.parse_u256()?;
+        let data = Data::parse(size, parser).context("Parsing PrivKey")?;
+        let hash = Blob32::parse(parser).context("Parsing PrivKey hash")?;
         Ok(Self { data, hash })
     }
 }

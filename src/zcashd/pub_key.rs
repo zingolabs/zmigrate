@@ -39,7 +39,7 @@ impl Parseable for PubKey {
         if size != 33 && size != 65 {
             bail!("Invalid PubKey size: {}", size);
         }
-        let key_data = parser.parse_data(size).context("Parsing PubKey")?;
+        let key_data = Data::parse(size, parser).context("Parsing PubKey")?;
         Ok(Self(key_data))
     }
 }

@@ -1,4 +1,6 @@
-use anyhow::Result;
+use anyhow::{ Result, Context };
+
+use crate::Parser;
 
 #[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 /// Represents a variable-size byte array.
@@ -47,6 +49,13 @@ impl Data {
             bytes.extend_from_slice(data.as_ref());
         }
         Self(bytes)
+    }
+}
+
+impl Data {
+    pub fn parse(len: usize, parser: &mut Parser) -> Result<Self> {
+        let bytes = parser.next(len).context("Parsing Data")?;
+        Ok(Self::from_slice(bytes))
     }
 }
 
