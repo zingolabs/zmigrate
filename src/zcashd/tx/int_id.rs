@@ -2,7 +2,7 @@ use anyhow::{ Result, Context };
 
 use crate::Parseable;
 
-#[derive(Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub struct IntID(u32);
 
 impl IntID {

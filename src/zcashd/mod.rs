@@ -48,5 +48,5 @@ pub use orchard_note_commitment_tree::*;
 mod key_pool;
 pub use key_pool::*;
 
-mod transaction;
-pub use transaction::*;
+mod tx;
+pub use tx::*;
