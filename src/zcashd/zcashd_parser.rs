@@ -5,7 +5,7 @@ use anyhow::{ Context, Result, bail };
 use crate::{ Blob32, Parseable };
 
 use super::{
-    zcashd_dump::DBKey, Address, BlockLocator, ClientVersion, Key, KeyMetadata, KeyPoolEntry, Keys, MnemonicHDChain, MnemonicSeed, NetworkInfo, OrchardNoteCommitmentTree, PrivKey, PubKey, Transaction, ZcashdDump, ZcashdWallet
+    zcashd_dump::DBKey, Address, BlockLocator, ClientVersion, Key, KeyMetadata, KeyPoolEntry, Keys, MnemonicHDChain, MnemonicSeed, NetworkInfo, OrchardNoteCommitmentTree, PrivKey, PubKey, WalletTransaction, ZcashdDump, ZcashdWallet
 };
 
 #[derive(Debug)]
@@ -278,12 +278,12 @@ impl<'a> ZcashdParser<'a> {
         Ok(key_pool)
     }
 
-    fn parse_transactions(&self) -> Result<HashMap<Blob32, Transaction>> {
+    fn parse_transactions(&self) -> Result<HashMap<Blob32, WalletTransaction>> {
         let records = self.dump.records_for_keyname("tx").context("Getting 'tx' records")?;
         let mut transactions = HashMap::new();
         for (key, value) in records {
             let txid = Blob32::parse_binary(key.data()).context("Parsing transaction ID")?;
-            let transaction = Transaction::parse_binary(value.as_data()).context(
+            let transaction = WalletTransaction::parse_binary(value.as_data()).context(
                 "Parsing transaction"
             )?;
             if transactions.contains_key(&txid) {

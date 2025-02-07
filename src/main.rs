@@ -4,7 +4,7 @@ use std::path::Path;
 use anyhow::{Result, bail, Context};
 
 mod bdb_dump;
-pub use bdb_dump::BDBDump;
+pub use bdb_dump::*;
 mod zcashd;
 pub use zcashd::*;
 mod blob;
