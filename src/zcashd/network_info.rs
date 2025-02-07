@@ -1,6 +1,8 @@
 use anyhow::Result;
 use crate::Parseable;
 
+use super::parse_pair;
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct NetworkInfo {
     zcash: String,
@@ -23,7 +25,7 @@ impl Parseable for NetworkInfo {
     }
 
     fn parse(parser: &mut crate::Parser) -> Result<Self> where Self: Sized {
-        let (zcash, identifier) = parser.parse_pair()?;
+        let (zcash, identifier) = parse_pair(parser)?;
         Ok(Self { zcash, identifier })
     }
 }

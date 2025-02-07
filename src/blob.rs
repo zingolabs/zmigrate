@@ -4,10 +4,10 @@ use crate::Parseable;
 
 /// Represents a fixed-size byte array.
 #[derive(Clone, PartialEq, Eq, Hash)]
-pub struct Blob<const T: usize>([u8; T]);
+pub struct Blob<const N: usize>([u8; N]);
 
-impl<const T: usize> Blob<T> {
-    pub fn new(data: [u8; T]) -> Self {
+impl<const N: usize> Blob<N> {
+    pub fn new(data: [u8; N]) -> Self {
         Self(data)
     }
 
@@ -16,11 +16,11 @@ impl<const T: usize> Blob<T> {
     }
 
     pub fn len(&self) -> usize {
-        T
+        N
     }
 
     pub fn is_empty(&self) -> bool {
-        T == 0
+        N == 0
     }
 
     pub fn to_vec(&self) -> Vec<u8> {
@@ -28,10 +28,10 @@ impl<const T: usize> Blob<T> {
     }
 
     pub fn from_slice(data: &[u8]) -> Result<Self> {
-        if data.len() != T {
-            bail!("Invalid data length: expected {}, got {}", T, data.len());
+        if data.len() != N {
+            bail!("Invalid data length: expected {}, got {}", N, data.len());
         }
-        let mut bytes = [0u8; T];
+        let mut bytes = [0u8; N];
         bytes.copy_from_slice(data);
         Ok(Self::new(bytes))
     }
@@ -41,46 +41,46 @@ impl<const T: usize> Blob<T> {
     }
 }
 
-impl<const T: usize> AsRef<[u8]> for Blob<T> {
+impl<const N: usize> AsRef<[u8]> for Blob<N> {
     fn as_ref(&self) -> &[u8] {
         &self.0
     }
 }
 
-impl<const T: usize> std::fmt::Debug for Blob<T> {
+impl<const N: usize> std::fmt::Debug for Blob<N> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "Blob<{}>({})", T, hex::encode(self.0))
+        write!(f, "Blob<{}>({})", N, hex::encode(self.0))
     }
 }
 
-impl<const T: usize> From<Blob<T>> for Vec<u8> {
-    fn from(blob: Blob<T>) -> Vec<u8> {
+impl<const N: usize> From<Blob<N>> for Vec<u8> {
+    fn from(blob: Blob<N>) -> Vec<u8> {
         blob.to_vec()
     }
 }
 
-impl<const T: usize> From<&Blob<T>> for Vec<u8> {
-    fn from(blob: &Blob<T>) -> Vec<u8> {
+impl<const N: usize> From<&Blob<N>> for Vec<u8> {
+    fn from(blob: &Blob<N>) -> Vec<u8> {
         blob.to_vec()
     }
 }
 
-impl<const T: usize> From<Vec<u8>> for Blob<T> {
+impl<const N: usize> From<Vec<u8>> for Blob<N> {
     fn from(data: Vec<u8>) -> Self {
         Self::from_vec(data).unwrap()
     }
 }
 
-impl<const T: usize> From<&[u8]> for Blob<T> {
+impl<const N: usize> From<&[u8]> for Blob<N> {
     fn from(data: &[u8]) -> Self {
         Self::from_vec(data.to_vec()).unwrap()
     }
 }
 
-impl<const T: usize> Parseable for Blob<T> {
+impl<const N: usize> Parseable for Blob<N> {
     fn parse_type() -> &'static str { "Blob" }
     fn parse(parser: &mut crate::Parser) -> Result<Self> where Self: Sized {
-        let data = parser.next(T).with_context(|| format!("Parsing Blob<{}>", T))?;
+        let data = parser.next(N).with_context(|| format!("Parsing Blob<{}>", N))?;
         Self::from_slice(data)
     }
 }

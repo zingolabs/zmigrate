@@ -2,6 +2,8 @@ use anyhow::{ Result, Context, bail };
 
 use crate::{ Blob32, Data, Parseable, Parser };
 
+use super::parse_compact_size;
+
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct PrivKey {
     data: Data,
@@ -42,7 +44,7 @@ impl Parseable for PrivKey {
     }
 
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
-        let size = parser.parse_compact_size().context("Parsing PrivKey size")?;
+        let size = parse_compact_size(parser).context("Parsing PrivKey size")?;
         if size != 214 && size != 279 {
             bail!("Invalid PrivKey size: {}", size);
         }
