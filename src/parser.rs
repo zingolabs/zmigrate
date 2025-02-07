@@ -1,6 +1,6 @@
 use anyhow::{ Context, Result, bail };
 
-use crate::{ Blob20, Blob32, Data };
+use crate::Data;
 
 pub trait Parseable {
     fn parse_type() -> &'static str;
@@ -58,28 +58,6 @@ impl<'a> Parser<'a> {
 
     pub fn rest(&mut self) -> Data {
         Data::parse(self.remaining(), self).unwrap()
-    }
-
-    pub fn parse_u160(&mut self) -> Result<Blob20> {
-        const SIZE: usize = 20;
-        let bytes = self.next(SIZE).context("Parsing u160")?;
-        Blob20::from_slice(bytes)
-    }
-
-    pub fn parse_u256(&mut self) -> Result<Blob32> {
-        const SIZE: usize = 32;
-        let bytes = self.next(SIZE).context("Parsing u256")?;
-        Blob32::from_slice(bytes)
-    }
-
-    /// Wrapper of uint256 with guarantee that first four bits are zero.
-    pub fn parse_u252(&mut self) -> Result<Blob32> {
-        const SIZE: usize = 32;
-        let bytes = self.next(SIZE).context("Parsing u252")?;
-        if (bytes[0] & 0xf0) != 0 {
-            bail!("First four bits of u252 must be zero");
-        }
-        Blob32::from_slice(bytes)
     }
 
     pub fn parse_compact_size(&mut self) -> Result<usize> {

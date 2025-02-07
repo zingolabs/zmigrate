@@ -1,9 +1,11 @@
-use anyhow::{Result, Context, bail};
+use anyhow::{ Result, Context, bail };
 
 use crate::Parseable;
 
 impl Parseable for String {
-    fn parse_type() -> &'static str { "String" }
+    fn parse_type() -> &'static str {
+        "String"
+    }
     /// 1 byte (length) + bytes of the string
     fn parse(parser: &mut crate::Parser) -> Result<Self> where Self: Sized {
         let length = u8::parse(parser)? as usize;
@@ -13,7 +15,9 @@ impl Parseable for String {
 }
 
 impl Parseable for bool {
-    fn parse_type() -> &'static str { "bool" }
+    fn parse_type() -> &'static str {
+        "bool"
+    }
 
     fn parse(parser: &mut crate::Parser) -> Result<Self> where Self: Sized {
         let byte = u8::parse(parser).context("Parsing bool")?;
@@ -26,7 +30,9 @@ impl Parseable for bool {
 }
 
 impl Parseable for u8 {
-    fn parse_type() -> &'static str { "u8" }
+    fn parse_type() -> &'static str {
+        "u8"
+    }
     fn parse(parser: &mut crate::Parser) -> Result<Self> where Self: Sized {
         let bytes = parser.next(1).context("Parsing u8")?;
         Ok(bytes[0])
@@ -34,7 +40,9 @@ impl Parseable for u8 {
 }
 
 impl Parseable for u16 {
-    fn parse_type() -> &'static str { "u16" }
+    fn parse_type() -> &'static str {
+        "u16"
+    }
     fn parse(parser: &mut crate::Parser) -> Result<Self> where Self: Sized {
         const SIZE: usize = std::mem::size_of::<u16>();
         let bytes = parser.next(SIZE).context("Parsing u16")?;
@@ -43,7 +51,9 @@ impl Parseable for u16 {
 }
 
 impl Parseable for u32 {
-    fn parse_type() -> &'static str { "u32" }
+    fn parse_type() -> &'static str {
+        "u32"
+    }
     fn parse(parser: &mut crate::Parser) -> Result<Self> where Self: Sized {
         const SIZE: usize = std::mem::size_of::<u32>();
         let bytes = parser.next(SIZE).context("Parsing u32")?;
@@ -52,7 +62,9 @@ impl Parseable for u32 {
 }
 
 impl Parseable for u64 {
-    fn parse_type() -> &'static str { "u64" }
+    fn parse_type() -> &'static str {
+        "u64"
+    }
     fn parse(parser: &mut crate::Parser) -> Result<Self> where Self: Sized {
         const SIZE: usize = std::mem::size_of::<u64>();
         let bytes = parser.next(SIZE).context("Parsing u64")?;
@@ -61,7 +73,9 @@ impl Parseable for u64 {
 }
 
 impl Parseable for i8 {
-    fn parse_type() -> &'static str { "i8" }
+    fn parse_type() -> &'static str {
+        "i8"
+    }
     fn parse(parser: &mut crate::Parser) -> Result<Self> where Self: Sized {
         let bytes = parser.next(1).context("Parsing i8")?;
         Ok(bytes[0] as i8)
@@ -69,7 +83,9 @@ impl Parseable for i8 {
 }
 
 impl Parseable for i16 {
-    fn parse_type() -> &'static str { "i16" }
+    fn parse_type() -> &'static str {
+        "i16"
+    }
     fn parse(parser: &mut crate::Parser) -> Result<Self> where Self: Sized {
         const SIZE: usize = std::mem::size_of::<i16>();
         let bytes = parser.next(SIZE).context("Parsing i16")?;
@@ -78,7 +94,9 @@ impl Parseable for i16 {
 }
 
 impl Parseable for i32 {
-    fn parse_type() -> &'static str { "i32" }
+    fn parse_type() -> &'static str {
+        "i32"
+    }
     fn parse(parser: &mut crate::Parser) -> Result<Self> where Self: Sized {
         const SIZE: usize = std::mem::size_of::<i32>();
         let bytes = parser.next(SIZE).context("Parsing i32")?;
@@ -87,7 +105,9 @@ impl Parseable for i32 {
 }
 
 impl Parseable for i64 {
-    fn parse_type() -> &'static str { "i64" }
+    fn parse_type() -> &'static str {
+        "i64"
+    }
     fn parse(parser: &mut crate::Parser) -> Result<Self> where Self: Sized {
         const SIZE: usize = std::mem::size_of::<i64>();
         let bytes = parser.next(SIZE).context("Parsing i64")?;
