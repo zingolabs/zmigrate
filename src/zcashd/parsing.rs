@@ -2,22 +2,16 @@ use std::collections::HashMap;
 
 use anyhow::{bail, Context, Result};
 
-use crate::{Parse, Parser};
+use crate::{parse, Parse, Parser};
 
 pub fn parse_compact_size(parser: &mut Parser) -> Result<usize> {
-    match u8::parse(parser).context("Parsing compact size")? {
+    match parse!(parser, u8, "Parsing compact size")? {
         0xfd =>
-            u16::parse(parser)
-                .map(|n| n as usize)
-                .context("Parsing compact size"),
+            parse!(parser, u16, "Parsing compact size").map(|n| n as usize),
         0xfe =>
-            u32::parse(parser)
-                .map(|n| n as usize)
-                .context("Parsing compact size"),
+            parse!(parser, u32, "Parsing compact size").map(|n| n as usize),
         0xff =>
-            u64::parse(parser)
-                .map(|n| n as usize)
-                .context("Parsing compact size"),
+            parse!(parser, u64, "Parsing compact size").map(|n| n as usize),
         size => Ok(size as usize),
     }
 }
