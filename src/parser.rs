@@ -5,10 +5,16 @@ use crate::Data;
 #[macro_export]
 macro_rules! parse {
     ($type:ty, $parser:expr, $context:expr) => {{
-        ::anyhow::Context::with_context(<$type as $crate::Parse>::parse($parser), || concat!("Parsing ", $context))
+        ::anyhow::Context::with_context(
+            <$type as $crate::Parse>::parse($parser),
+            || format!("Parsing {}", $context)
+        )
     }};
     ($parser:expr, $context:expr) => {{
-        ::anyhow::Context::with_context($crate::Parse::parse($parser), || concat!("Parsing ", $context))
+        ::anyhow::Context::with_context(
+            $crate::Parse::parse($parser),
+            || format!("Parsing {}", $context)
+        )
     }};
 }
 
