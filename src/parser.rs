@@ -10,6 +10,12 @@ macro_rules! parse {
             || format!("Parsing {}", $context)
         )
     }};
+    (bytes $length:expr, $parser:expr, $context:expr) => {{
+        ::anyhow::Context::with_context(
+            $crate::Parser::next($parser, $length),
+            || format!("Parsing {}", $context)
+        )
+    }};
     ($parser:expr, $context:expr) => {{
         ::anyhow::Context::with_context(
             $crate::Parse::parse($parser),

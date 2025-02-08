@@ -1,14 +1,14 @@
 use anyhow::{ Result, Context, bail };
 
-use crate::{Data, Parse, Parser};
+use crate::{parse, Data, Parse, Parser};
 
 use super::parse_compact_size;
 
 impl Parse for String {
     /// 1 byte (length) + bytes of the string
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
-        let length = u8::parse(parser)? as usize;
-        let bytes = parser.next(length).context("Parsing string")?;
+        let length = parse!(u8, parser, "string length")? as usize;
+        let bytes = parse!(bytes length, parser, "Parsing string")?;
         String::from_utf8(bytes.to_vec()).context("Parsing string")
     }
 }
