@@ -1,5 +1,5 @@
 use anyhow::{ Result, Context };
-use crate::{ Data, Parseable };
+use crate::{ Data, Parseable, Parser };
 
 use super::{ LockTime, SaplingBundle, TxIn, TxOut, TxVersion };
 
@@ -45,7 +45,7 @@ impl WalletTx {
 }
 
 impl Parseable for WalletTx {
-    fn parse(parser: &mut crate::Parser) -> Result<Self> where Self: Sized {
+    fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
         let version = TxVersion::parse(parser).context("Parsing transaction version")?;
 
         let mut vin = Vec::new();
@@ -62,8 +62,13 @@ impl Parseable for WalletTx {
             if version.is_overwinter() || version.is_sapling() || version.is_future() {
                 expiry_height = u32::parse(parser).context("Parsing transaction expiry height")?;
             }
-            if version.is_overwinter() || version.is_sapling() || version.is_future() {
+            if version.is_sapling() || version.is_future() {
+                // println!("✅ Parsing Sapling bundle");
                 sapling_bundle = SaplingBundle::parse(parser).context("Parsing Sapling bundle")?;
+            }
+
+            if version.number() >= 2 {
+
             }
         }
 

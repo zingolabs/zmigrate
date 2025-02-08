@@ -1,6 +1,6 @@
 use anyhow::{ Result, Context };
 
-use crate::Parseable;
+use crate::{Parseable, Parser};
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub struct IntID(u32);
@@ -29,7 +29,7 @@ impl std::fmt::Debug for IntID {
 }
 
 impl Parseable for IntID {
-    fn parse(parser: &mut crate::Parser) -> Result<Self> where Self: Sized {
+    fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
         let id = u32::parse(parser).context("Parsing IntID")?;
         Ok(Self(id))
     }

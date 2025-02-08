@@ -1,8 +1,8 @@
 use anyhow::{ Result, Context };
 
-use crate::{ u256, Blob, Parseable };
+use crate::{ u256, Blob, Parseable, Parser };
 
-use super::GROTH_PROOF_SIZE;
+use super::GrothProof;
 
 const COMPACT_NOTE_SIZE: usize = 1 + // version
     11 + // diversifier
@@ -23,17 +23,17 @@ pub struct OutputV4 {
     ephemeral_key: u256,
     enc_ciphertext: Blob<ENC_CIPHERTEXT_SIZE>,
     out_ciphertext: Blob<OUT_CIPHERTEXT_SIZE>,
-    zkproof: Blob<GROTH_PROOF_SIZE>,
+    zkproof: GrothProof,
 }
 
 impl Parseable for OutputV4 {
-    fn parse(parser: &mut crate::Parser) -> Result<Self> where Self: Sized {
+    fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
         let cv = u256::parse(parser).context("Parsing cv")?;
         let cmu = u256::parse(parser).context("Parsing cmu")?;
         let ephemeral_key = u256::parse(parser).context("Parsing ephemeral_key")?;
         let enc_ciphertext = Blob::parse(parser).context("Parsing enc_ciphertext")?;
         let out_ciphertext = Blob::parse(parser).context("Parsing out_ciphertext")?;
-        let zkproof = Blob::parse(parser).context("Parsing zkproof")?;
+        let zkproof = GrothProof::parse(parser).context("Parsing zkproof")?;
         Ok(Self {
             cv,
             cmu,

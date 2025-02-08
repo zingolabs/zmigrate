@@ -1,6 +1,6 @@
 use anyhow::{ Result, bail };
 
-use crate::{ u256, Parseable };
+use crate::{ u256, Parseable, Parser };
 
 #[derive(Clone, Copy, PartialEq)]
 pub enum Language {
@@ -62,7 +62,7 @@ impl std::fmt::Debug for Language {
 }
 
 impl Parseable for Language {
-    fn parse(parser: &mut crate::Parser) -> Result<Self> where Self: Sized {
+    fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
         let value = u32::parse(parser)?;
         Language::from_u32(value)
     }
@@ -105,7 +105,7 @@ impl std::fmt::Debug for MnemonicSeed {
 }
 
 impl Parseable for MnemonicSeed {
-    fn parse(parser: &mut crate::Parser) -> Result<Self> {
+    fn parse(parser: &mut Parser) -> Result<Self> {
         let language = Language::parse(parser)?;
         let mnemonic = String::parse(parser)?;
         Ok(Self { language, mnemonic, fingerprint: None })

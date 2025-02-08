@@ -36,9 +36,22 @@ pub fn parse_fixed_length_vec<T: Parseable>(parser: &mut Parser, length: usize) 
     Ok(items)
 }
 
+pub fn parse_fixed_length_array<T: Parseable, const N: usize>(parser: &mut Parser) -> Result<[T; N]> {
+    let items = parse_fixed_length_vec(parser, N)?;
+    let array: [T; N] = items.try_into()
+        .map_err(|_| anyhow::anyhow!("Failed to convert Vec to fixed length array"))?;
+    Ok(array)
+}
+
 pub fn parse_vec<T: Parseable>(parser: &mut Parser) -> Result<Vec<T>> {
     let length = parse_compact_size(parser).context("Parsing array length")?;
     parse_fixed_length_vec(parser, length)
+}
+
+impl<T: Parseable, const N: usize> Parseable for [T; N] {
+    fn parse(parser: &mut Parser) -> Result<Self> {
+        parse_fixed_length_array(parser)
+    }
 }
 
 impl<T: Parseable> Parseable for Vec<T> {

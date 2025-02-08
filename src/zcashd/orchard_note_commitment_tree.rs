@@ -1,4 +1,4 @@
-use crate::Data;
+use crate::{Data, Parser};
 use anyhow::Result;
 use crate::Parseable;
 
@@ -12,7 +12,7 @@ impl OrchardNoteCommitmentTree {
 }
 
 impl Parseable for OrchardNoteCommitmentTree {
-    fn parse(parser: &mut crate::Parser) -> Result<Self> where Self: Sized {
+    fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
         let data = parser.rest();
         Ok(Self(data))
     }

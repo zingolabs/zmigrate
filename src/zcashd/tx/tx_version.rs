@@ -1,6 +1,6 @@
 use anyhow::{Result, Context, bail};
 
-use crate::Parseable;
+use crate::{Parseable, Parser};
 
 use super::IntID;
 
@@ -13,7 +13,7 @@ const ZIP225_TX_VERSION: u32 = 5;
 const ZFUTURE_VERSION_GROUP_ID: IntID = IntID::new(0xffffffff);
 const ZFUTURE_TX_VERSION: u32 = 0x0000ffff;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum TxVersionGroup {
     PreOverwinter,
     OverwinterV3,
@@ -22,13 +22,21 @@ pub enum TxVersionGroup {
     Future,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct TxVersion {
     pub group: TxVersionGroup,
-    pub version: u32,
+    pub number: u32,
 }
 
 impl TxVersion {
+    pub fn group(&self) -> &TxVersionGroup {
+        &self.group
+    }
+
+    pub fn number(&self) -> u32 {
+        self.number
+    }
+
     pub fn is_overwinter(&self) -> bool {
         self.group != TxVersionGroup::PreOverwinter
     }
@@ -47,10 +55,10 @@ impl TxVersion {
 }
 
 impl Parseable for TxVersion {
-    fn parse(parser: &mut crate::Parser) -> Result<Self> where Self: Sized {
+    fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
         let header = u32::parse(parser).context("Parsing Transaction header")?;
         let overwintered = (header >> 31) == 1;
-        let version = header & 0x7fffffff;
+        let number = header & 0x7fffffff;
 
         let version_group_id = if overwintered {
             IntID::parse(parser)
@@ -59,18 +67,18 @@ impl Parseable for TxVersion {
             IntID::default()
         };
 
-        let group = match (overwintered, version_group_id, version) {
+        let group = match (overwintered, version_group_id, number) {
             (false, _, _) => TxVersionGroup::PreOverwinter,
             (true, OVERWINTER_VERSION_GROUP_ID, OVERWINTER_TX_VERSION) => TxVersionGroup::OverwinterV3,
             (true, SAPLING_VERSION_GROUP_ID, SAPLING_TX_VERSION) => TxVersionGroup::SaplingV4,
             (true, ZIP225_VERSION_GROUP_ID, ZIP225_TX_VERSION) => TxVersionGroup::Zip225V5,
             (true, ZFUTURE_VERSION_GROUP_ID, ZFUTURE_TX_VERSION) => TxVersionGroup::Future,
-            _ => bail!("Unsupported transaction format: overwintered={}, version={}, version_group_id={}", overwintered, version, version_group_id),
+            _ => bail!("Unsupported transaction format: overwintered={}, version={}, version_group_id={}", overwintered, number, version_group_id),
         };
 
         Ok(Self {
             group,
-            version,
+            number,
         })
     }
 }

@@ -1,5 +1,5 @@
 use anyhow::{ Result, Context };
-use crate::{ Blob, Blob32, Parseable, SecondsSinceEpoch };
+use crate::{ Blob, Blob32, Parseable, Parser, SecondsSinceEpoch };
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct MnemonicHDChain {
@@ -48,7 +48,7 @@ impl MnemonicHDChain {
 }
 
 impl Parseable for MnemonicHDChain {
-    fn parse(parser: &mut crate::Parser) -> Result<Self> {
+    fn parse(parser: &mut Parser) -> Result<Self> {
         let version = i32::parse(parser)
             .context("Parsing MnemonicHDChain version")?;
         let seed_fp = Blob::parse(parser)

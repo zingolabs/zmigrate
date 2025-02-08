@@ -1,5 +1,5 @@
 use anyhow::Result;
-use crate::Parseable;
+use crate::{Parseable, Parser};
 
 use super::parse_pair;
 
@@ -20,7 +20,7 @@ impl NetworkInfo {
 }
 
 impl Parseable for NetworkInfo {
-    fn parse(parser: &mut crate::Parser) -> Result<Self> where Self: Sized {
+    fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
         let (zcash, identifier) = parse_pair(parser)?;
         Ok(Self { zcash, identifier })
     }

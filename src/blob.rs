@@ -1,6 +1,6 @@
 use anyhow::{bail, Result, Context};
 
-use crate::Parseable;
+use crate::{Parseable, Parser};
 
 /// A fixed-size byte array.
 #[derive(Clone, PartialEq, Eq, Hash)]
@@ -78,7 +78,7 @@ impl<const N: usize> From<&[u8]> for Blob<N> {
 }
 
 impl<const N: usize> Parseable for Blob<N> {
-    fn parse(parser: &mut crate::Parser) -> Result<Self> where Self: Sized {
+    fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
         let data = parser.next(N).with_context(|| format!("Parsing Blob<{}>", N))?;
         Self::from_slice(data)
     }

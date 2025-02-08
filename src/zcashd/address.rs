@@ -1,5 +1,5 @@
 use anyhow::Result;
-use crate::Parseable;
+use crate::{Parseable, Parser};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Address(String);
@@ -11,7 +11,7 @@ impl Address {
 }
 
 impl Parseable for Address {
-    fn parse(parser: &mut crate::Parser) -> Result<Self> where Self: Sized {
+    fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
         let address = String::parse(parser)?;
         Ok(Self(address))
     }

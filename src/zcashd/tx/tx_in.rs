@@ -1,6 +1,6 @@
 use anyhow::{Result, Context};
 
-use crate::Parseable;
+use crate::{Parseable, Parser};
 
 use super::{OutPoint, Script};
 
@@ -26,7 +26,7 @@ impl TxIn {
 }
 
 impl Parseable for TxIn {
-    fn parse(parser: &mut crate::Parser) -> Result<Self> where Self: Sized {
+    fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
         let prevout = OutPoint::parse(parser)
             .context("Parsing txin prevout")?;
         let script_sig = Script::parse(parser)
