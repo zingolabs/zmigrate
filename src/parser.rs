@@ -22,6 +22,18 @@ macro_rules! parse {
             || format!("Parsing {}", $context)
         )
     };
+    (buf $buf:expr, $type:ty, $context:expr) => {
+        ::anyhow::Context::with_context(
+            <$type as $crate::Parse>::parse_buf($buf),
+            || format!("Parsing {}", $context)
+        )
+    };
+    // (buf $buf:expr, $context:expr) => {
+    //     ::anyhow::Context::with_context(
+    //         $crate::Parser::parse_buf($buf),
+    //         || format!("Parsing {}", $context)
+    //     )
+    // };
     ($parser:expr, $context:expr) => {
         ::anyhow::Context::with_context(
             $crate::Parse::parse($parser),
@@ -33,8 +45,8 @@ macro_rules! parse {
 pub trait Parse {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized;
 
-    fn parse_binary(buffer: &dyn AsRef<[u8]>) -> Result<Self> where Self: Sized {
-        let mut parser = Parser::new(&buffer);
+    fn parse_buf(buf: &dyn AsRef<[u8]>) -> Result<Self> where Self: Sized {
+        let mut parser = Parser::new(&buf);
         let result = Self::parse(&mut parser)?;
         parser.check_finished()?;
         Ok(result)
