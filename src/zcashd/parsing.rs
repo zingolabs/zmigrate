@@ -5,20 +5,20 @@ use anyhow::{bail, Context, Result};
 use crate::{parse, Parse, Parser};
 
 pub fn parse_compact_size(parser: &mut Parser) -> Result<usize> {
-    match parse!(parser, u8, "Parsing compact size")? {
+    match parse!(u8, parser, "Parsing compact size")? {
         0xfd =>
-            parse!(parser, u16, "Parsing compact size").map(|n| n as usize),
+            parse!(u16, parser, "Parsing compact size").map(|n| n as usize),
         0xfe =>
-            parse!(parser, u32, "Parsing compact size").map(|n| n as usize),
+            parse!(u32, parser, "Parsing compact size").map(|n| n as usize),
         0xff =>
-            parse!(parser, u64, "Parsing compact size").map(|n| n as usize),
+            parse!(u64, parser, "Parsing compact size").map(|n| n as usize),
         size => Ok(size as usize),
     }
 }
 
 pub fn parse_pair<T: Parse, U: Parse>(parser: &mut Parser) -> Result<(T, U)> {
-    let first = Parse::parse(parser).context("Parsing first item of pair")?;
-    let second = Parse::parse(parser).context("Parsing second item of pair")?;
+    let first = parse!(parser, "Parsing first item of pair")?;
+    let second = parse!(parser, "Parsing second item of pair")?;
     Ok((first, second))
 }
 
