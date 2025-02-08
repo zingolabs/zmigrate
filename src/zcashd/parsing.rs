@@ -23,15 +23,15 @@ pub fn parse_compact_size(parser: &mut Parser) -> Result<usize> {
 }
 
 pub fn parse_pair<T: Parse, U: Parse>(parser: &mut Parser) -> Result<(T, U)> {
-    let first = T::parse(parser).context("Parsing first item of pair")?;
-    let second = U::parse(parser).context("Parsing second item of pair")?;
+    let first = Parse::parse(parser).context("Parsing first item of pair")?;
+    let second = Parse::parse(parser).context("Parsing second item of pair")?;
     Ok((first, second))
 }
 
 pub fn parse_fixed_length_vec<T: Parse>(parser: &mut Parser, length: usize) -> Result<Vec<T>> {
     let mut items = Vec::with_capacity(length);
     for i in 0..length {
-        items.push(T::parse(parser).with_context(|| format!("Parsing array item {} of {}", i, length - 1))?);
+        items.push(Parse::parse(parser).with_context(|| format!("Parsing array item {} of {}", i, length - 1))?);
     }
     Ok(items)
 }
@@ -87,7 +87,7 @@ impl<K: Parse, V: Parse> Parse for HashMap<K, V>
 pub fn parse_optional<T: Parse>(parser: &mut Parser) -> Result<Option<T>> {
     match u8::parse(parser).context("Parsing optional discriminant")? {
         0x00 => Ok(None),
-        0x01 => Ok(Some(T::parse(parser).context("Parsing optional value")?)),
+        0x01 => Ok(Some(Parse::parse(parser).context("Parsing optional value")?)),
         discriminant => bail!("Invalid optional discriminant: {}", discriminant),
     }
 }
