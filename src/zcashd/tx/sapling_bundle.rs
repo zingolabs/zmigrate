@@ -23,11 +23,11 @@ impl SaplingBundle {
 
 impl Parse for SaplingBundle {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
-        let amount = Amount::parse(parser)
+        let amount = Parse::parse(parser)
             .context("Parsing SaplingBundle amount")?;
-        let spends = Vec::parse(parser)
+        let spends = Parse::parse(parser)
             .context("Parsing SaplingBundle spends")?;
-        let outputs = Vec::parse(parser)
+        let outputs = Parse::parse(parser)
             .context("Parsing SaplingBundle outputs")?;
         Ok(Self {
             amount,

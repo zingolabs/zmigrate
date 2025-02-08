@@ -27,11 +27,11 @@ impl TxIn {
 
 impl Parse for TxIn {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
-        let prevout = OutPoint::parse(parser)
+        let prevout = Parse::parse(parser)
             .context("Parsing txin prevout")?;
-        let script_sig = Script::parse(parser)
+        let script_sig = Parse::parse(parser)
             .context("Parsing txin script_sig")?;
-        let sequence = u32::parse(parser)
+        let sequence = Parse::parse(parser)
             .context("Parsing txin sequence")?;
         Ok(Self {
             prevout,

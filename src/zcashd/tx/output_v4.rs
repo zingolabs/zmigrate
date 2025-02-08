@@ -28,12 +28,12 @@ pub struct OutputV4 {
 
 impl Parse for OutputV4 {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
-        let cv = u256::parse(parser).context("Parsing cv")?;
-        let cmu = u256::parse(parser).context("Parsing cmu")?;
-        let ephemeral_key = u256::parse(parser).context("Parsing ephemeral_key")?;
-        let enc_ciphertext = Blob::parse(parser).context("Parsing enc_ciphertext")?;
-        let out_ciphertext = Blob::parse(parser).context("Parsing out_ciphertext")?;
-        let zkproof = GrothProof::parse(parser).context("Parsing zkproof")?;
+        let cv = Parse::parse(parser).context("Parsing cv")?;
+        let cmu = Parse::parse(parser).context("Parsing cmu")?;
+        let ephemeral_key = Parse::parse(parser).context("Parsing ephemeral_key")?;
+        let enc_ciphertext = Parse::parse(parser).context("Parsing enc_ciphertext")?;
+        let out_ciphertext = Parse::parse(parser).context("Parsing out_ciphertext")?;
+        let zkproof = Parse::parse(parser).context("Parsing zkproof")?;
         Ok(Self {
             cv,
             cmu,
