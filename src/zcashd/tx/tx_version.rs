@@ -56,13 +56,13 @@ impl TxVersion {
 
 impl Parse for TxVersion {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
-        let header = u32::parse(parser).context("Parsing Transaction header")?;
+        let header = u32::parse(parser).context("Transaction header")?;
         let overwintered = (header >> 31) == 1;
         let number = header & 0x7fffffff;
 
         let version_group_id = if overwintered {
             Parse::parse(parser)
-                .context("Parsing Transaction version group ID")?
+                .context("Transaction version group ID")?
         } else {
             IntID::default()
         };

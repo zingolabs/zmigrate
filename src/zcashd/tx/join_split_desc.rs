@@ -2,7 +2,7 @@ use anyhow::{ Result, Context };
 
 use crate::{ u256, Parse, Parser };
 
-use super::{ note_encryption::Ciphertext, Amount, SproutProof };
+use super::{ NoteEncryptionCiphertext, Amount, SproutProof };
 
 const ZC_NUM_JS_INPUTS: usize = 2;
 const ZC_NUM_JS_OUTPUTS: usize = 2;
@@ -18,21 +18,21 @@ pub struct JoinSplitDesc {
     pub random_seed: u256,
     pub macs: [u256; ZC_NUM_JS_INPUTS],
     pub zkproof: SproutProof,
-    pub ciphertexts: [Ciphertext; ZC_NUM_JS_OUTPUTS],
+    pub ciphertexts: [NoteEncryptionCiphertext; ZC_NUM_JS_OUTPUTS],
 }
 
 impl JoinSplitDesc {
     pub fn parse(parser: &mut Parser, use_groth: bool) -> Result<Self> {
-        let vpub_old = Parse::parse(parser).context("Parsing vpub_old")?;
-        let vpub_new = Parse::parse(parser).context("Parsing vpub_new")?;
-        let anchor = Parse::parse(parser).context("Parsing anchor")?;
-        let nullifiers = Parse::parse(parser).context("Parsing nullifiers")?;
-        let commitments = Parse::parse(parser).context("Parsing commitments")?;
-        let ephemeral_key = Parse::parse(parser).context("Parsing ephemeral_key")?;
-        let random_seed = Parse::parse(parser).context("Parsing random_seed")?;
-        let macs = Parse::parse(parser).context("Parsing macs")?;
-        let zkproof = SproutProof::parse(parser, use_groth).context("Parsing zkproof")?;
-        let ciphertexts = Parse::parse(parser).context("Parsing ciphertexts")?;
+        let vpub_old = Parse::parse(parser).context("vpub_old")?;
+        let vpub_new = Parse::parse(parser).context("vpub_new")?;
+        let anchor = Parse::parse(parser).context("anchor")?;
+        let nullifiers = Parse::parse(parser).context("nullifiers")?;
+        let commitments = Parse::parse(parser).context("commitments")?;
+        let ephemeral_key = Parse::parse(parser).context("ephemeral_key")?;
+        let random_seed = Parse::parse(parser).context("random_seed")?;
+        let macs = Parse::parse(parser).context("macs")?;
+        let zkproof = SproutProof::parse(parser, use_groth).context("zkproof")?;
+        let ciphertexts = Parse::parse(parser).context("ciphertexts")?;
 
         Ok(Self {
             vpub_old,

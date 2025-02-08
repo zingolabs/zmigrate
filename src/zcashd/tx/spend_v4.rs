@@ -16,12 +16,12 @@ pub struct SpendV4 {
 
 impl Parse for SpendV4 {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
-        let cv = Parse::parse(parser).context("Parsing cv")?;
-        let anchor = Parse::parse(parser).context("Parsing anchor")?;
-        let nullifier = Parse::parse(parser).context("Parsing nullifier")?;
-        let rk = Parse::parse(parser).context("Parsing rk")?;
-        let zkproof = Parse::parse(parser).context("Parsing zkproof")?;
-        let spend_auth_sig = Parse::parse(parser).context("Parsing spend_auth_sig")?;
+        let cv = Parse::parse(parser).context("cv")?;
+        let anchor = Parse::parse(parser).context("anchor")?;
+        let nullifier = Parse::parse(parser).context("nullifier")?;
+        let rk = Parse::parse(parser).context("rk")?;
+        let zkproof = Parse::parse(parser).context("zkproof")?;
+        let spend_auth_sig = Parse::parse(parser).context("spend_auth_sig")?;
         Ok(Self {
             cv,
             anchor,

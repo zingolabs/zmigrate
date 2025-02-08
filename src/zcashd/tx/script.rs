@@ -26,7 +26,7 @@ impl Script {
 impl Parse for Script {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
         let data = Parse::parse(parser)
-            .context("Parsing script data")?;
+            .context("script data")?;
         Ok(Self(data))
     }
 }

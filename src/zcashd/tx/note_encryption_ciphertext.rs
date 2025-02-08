@@ -31,7 +31,7 @@ impl AsRef<[u8]> for NoteEncryptionCiphertext {
 
 impl Parse for NoteEncryptionCiphertext {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
-        let blob = Parse::parse(parser).context("Parsing Ciphertext")?;
+        let blob = Parse::parse(parser).context("Ciphertext")?;
         Ok(Self(blob))
     }
 }

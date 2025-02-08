@@ -45,7 +45,7 @@ impl std::fmt::Debug for u256 {
 
 impl Parse for u256 {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
-        let blob = Parse::parse(parser).context("Parsing u256")?;
+        let blob = Parse::parse(parser).context("u256")?;
         Ok(Self(blob))
     }
 }

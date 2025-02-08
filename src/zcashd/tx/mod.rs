@@ -46,4 +46,5 @@ pub use phgr_proof::*;
 mod sprout_proof;
 pub use sprout_proof::*;
 
-pub mod note_encryption;
+pub mod note_encryption_ciphertext;
+pub use note_encryption_ciphertext::*;

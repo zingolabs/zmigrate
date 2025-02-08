@@ -13,10 +13,10 @@ pub enum SproutProof {
 impl SproutProof {
     pub fn parse(parser: &mut Parser, use_groth: bool) -> Result<Self> where Self: Sized {
         if use_groth {
-            let groth_proof = Parse::parse(parser).context("Parsing groth proof")?;
+            let groth_proof = Parse::parse(parser).context("groth proof")?;
             Ok(Self::GrothProof(groth_proof))
         } else {
-            let phgr_proof = Parse::parse(parser).context("Parsing phgr proof")?;
+            let phgr_proof = Parse::parse(parser).context("phgr proof")?;
             Ok(Self::PHGRProof(phgr_proof))
         }
     }

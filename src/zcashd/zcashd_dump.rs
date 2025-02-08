@@ -28,7 +28,7 @@ impl DBKey {
     pub fn parse_data(key_data: &Data) -> Result<Self> {
         let mut parser = Parser::new(&key_data);
         let keyname = Parse::parse(&mut parser)
-            .context("Parsing keyname")?;
+            .context("keyname")?;
         let data = parser.rest();
         parser.check_finished()?;
         Ok(Self { keyname, data })

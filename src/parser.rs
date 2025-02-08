@@ -4,19 +4,19 @@ use crate::Data;
 
 #[macro_export]
 macro_rules! parse {
-    ($type:ty, $parser:expr, $context:expr) => {
+    ($parser:expr, $type:ty, $context:expr) => {
         ::anyhow::Context::with_context(
             <$type as $crate::Parse>::parse($parser),
             || format!("Parsing {}", $context)
         )
     };
-    (bytes $length:expr, $parser:expr, $context:expr) => {
+    ($parser:expr, bytes $length:expr, $context:expr) => {
         ::anyhow::Context::with_context(
             $crate::Parser::next($parser, $length),
             || format!("Parsing {}", $context)
         )
     };
-    (data $length:expr, $parser:expr, $context:expr) => {
+    ($parser:expr, data $length:expr, $context:expr) => {
         ::anyhow::Context::with_context(
             $crate::Data::parse_len($parser, $length),
             || format!("Parsing {}", $context)

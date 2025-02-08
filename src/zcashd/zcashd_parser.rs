@@ -156,7 +156,7 @@ impl<'a> ZcashdParser<'a> {
 
     fn parse_i64(&self, keyname: &str) -> Result<i64> {
         let value = self.dump.value_for_keyname(keyname)?;
-        i64::parse_binary(value).context(format!("Parsing i64 for keyname: {}", keyname))
+        i64::parse_binary(value).context(format!("i64 for keyname: {}", keyname))
     }
 
     fn parse_opt_i64(&self, keyname: &str) -> Result<Option<i64>> {
@@ -170,14 +170,14 @@ impl<'a> ZcashdParser<'a> {
     fn parse_client_version(&self, keyname: &str) -> Result<ClientVersion> {
         let value = self.dump.value_for_keyname(keyname)?;
         ClientVersion::parse_binary(value).context(
-            format!("Parsing client version for keyname: {}", keyname)
+            format!("client version for keyname: {}", keyname)
         )
     }
 
     fn parse_block_locator(&self, keyname: &str) -> Result<BlockLocator> {
         let value = self.dump.value_for_keyname(keyname)?;
         BlockLocator::parse_binary(value).context(
-            format!("Parsing block locator for keyname: {}", keyname)
+            format!("block locator for keyname: {}", keyname)
         )
     }
 
@@ -191,11 +191,11 @@ impl<'a> ZcashdParser<'a> {
         }
         let mut keys_map = HashMap::new();
         for (key, value) in key_records {
-            let pubkey = PubKey::parse_binary(&key.data()).context("Parsing pubkey")?;
-            let privkey = PrivKey::parse_binary(&value.as_data()).context("Parsing privkey")?;
+            let pubkey = PubKey::parse_binary(&key.data()).context("pubkey")?;
+            let privkey = PrivKey::parse_binary(&value.as_data()).context("privkey")?;
             let metakey = DBKey::new("keymeta", key.data());
             let metadata_binary = self.dump.value_for_key(&metakey).context("Getting metadata")?;
-            let metadata = KeyMetadata::parse_binary(&metadata_binary).context("Parsing metadata")?;
+            let metadata = KeyMetadata::parse_binary(&metadata_binary).context("metadata")?;
             let keypair = Key::new(pubkey.clone(), privkey.clone(), metadata).context(
                 "Creating keypair"
             )?;
@@ -218,9 +218,9 @@ impl<'a> ZcashdParser<'a> {
         let (key, value) = self.dump
             .record_for_keyname("mnemonicphrase")
             .context("Getting 'mnemonicphrase' record")?;
-        let fingerprint = u256::parse_binary(key.data()).context("Parsing seed fingerprint")?;
+        let fingerprint = u256::parse_binary(key.data()).context("seed fingerprint")?;
         let seed = MnemonicSeed::parse_binary(&value)
-            .context("Parsing mnemonic phrase")?
+            .context("mnemonic phrase")?
             .set_fingerprint(fingerprint);
         Ok(seed)
     }
@@ -229,8 +229,8 @@ impl<'a> ZcashdParser<'a> {
         let records = self.dump.records_for_keyname("name").context("Getting 'name' records")?;
         let mut address_names = HashMap::new();
         for (key, value) in records {
-            let address = Address::parse_binary(key.data()).context("Parsing address")?;
-            let name = String::parse_binary(value.as_data()).context("Parsing name")?;
+            let address = Address::parse_binary(key.data()).context("address")?;
+            let name = String::parse_binary(value.as_data()).context("name")?;
             if address_names.contains_key(&address) {
                 bail!("Duplicate address found: {}", address);
             }
@@ -243,8 +243,8 @@ impl<'a> ZcashdParser<'a> {
         let records = self.dump.records_for_keyname("purpose").context("Getting 'purpose' records")?;
         let mut address_purposes = HashMap::new();
         for (key, value) in records {
-            let address = Address::parse_binary(key.data()).context("Parsing address")?;
-            let purpose = String::parse_binary(value.as_data()).context("Parsing purpose")?;
+            let address = Address::parse_binary(key.data()).context("address")?;
+            let purpose = String::parse_binary(value.as_data()).context("purpose")?;
             if address_purposes.contains_key(&address) {
                 bail!("Duplicate address found: {}", address);
             }
@@ -258,7 +258,7 @@ impl<'a> ZcashdParser<'a> {
             .record_for_keyname("networkinfo")
             .context("Getting 'networkinfo' record")?;
         let network_info = NetworkInfo::parse_binary(value.as_data()).context(
-            "Parsing network info"
+            "network info"
         )?;
         Ok(network_info)
     }
@@ -269,7 +269,7 @@ impl<'a> ZcashdParser<'a> {
             .context("Getting 'orchard_note_commitment_tree' record")?;
         let orchard_note_commitment_tree = OrchardNoteCommitmentTree::parse_binary(
             value.as_data()
-        ).context("Parsing orchard note commitment tree")?;
+        ).context("orchard note commitment tree")?;
         Ok(orchard_note_commitment_tree)
     }
 
@@ -277,9 +277,9 @@ impl<'a> ZcashdParser<'a> {
         let records = self.dump.records_for_keyname("pool").context("Getting 'pool' records")?;
         let mut key_pool = HashMap::new();
         for (key, value) in records {
-            let index = i64::parse_binary(key.data()).context("Parsing key pool index")?;
+            let index = i64::parse_binary(key.data()).context("key pool index")?;
             let entry = KeyPoolEntry::parse_binary(value.as_data()).context(
-                "Parsing key pool entry"
+                "key pool entry"
             )?;
             key_pool.insert(index, entry);
         }
@@ -292,9 +292,9 @@ impl<'a> ZcashdParser<'a> {
         if self.dump.has_records_for_keyname("tx") {
             let records = self.dump.records_for_keyname("tx").context("Getting 'tx' records")?;
             for (key, value) in records {
-                let txid = u256::parse_binary(key.data()).context("Parsing transaction ID")?;
+                let txid = u256::parse_binary(key.data()).context("transaction ID")?;
                 let transaction = WalletTx::parse_binary(value.as_data()).context(
-                    "Parsing transaction"
+                    "transaction"
                 )?;
                 if transactions.contains_key(&txid) {
                     bail!("Duplicate transaction found: {:?}", txid);

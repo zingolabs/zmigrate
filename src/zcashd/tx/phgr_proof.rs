@@ -19,14 +19,14 @@ pub struct PHGRProof {
 
 impl Parse for PHGRProof {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
-        let g_a = Parse::parse(parser).context("Parsing g_a")?;
-        let g_a_prime = Parse::parse(parser).context("Parsing g_a_prime")?;
-        let g_b = Parse::parse(parser).context("Parsing g_b")?;
-        let g_b_prime = Parse::parse(parser).context("Parsing g_b_prime")?;
-        let g_c = Parse::parse(parser).context("Parsing g_c")?;
-        let g_c_prime = Parse::parse(parser).context("Parsing g_c_prime")?;
-        let g_k = Parse::parse(parser).context("Parsing g_k")?;
-        let g_h = Parse::parse(parser).context("Parsing g_h")?;
+        let g_a = Parse::parse(parser).context("g_a")?;
+        let g_a_prime = Parse::parse(parser).context("g_a_prime")?;
+        let g_b = Parse::parse(parser).context("g_b")?;
+        let g_b_prime = Parse::parse(parser).context("g_b_prime")?;
+        let g_c = Parse::parse(parser).context("g_c")?;
+        let g_c_prime = Parse::parse(parser).context("g_c_prime")?;
+        let g_k = Parse::parse(parser).context("g_k")?;
+        let g_h = Parse::parse(parser).context("g_h")?;
         Ok(Self {
             g_a,
             g_a_prime,
