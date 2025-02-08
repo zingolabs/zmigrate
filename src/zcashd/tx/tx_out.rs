@@ -22,10 +22,10 @@ impl TxOut {
 
 impl Parse for TxOut {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
-        let value = Amount::parse(parser)
+        let value = Parse::parse(parser)
             .context("Parsing transaction output value")?;
 
-        let script_pub_key = Script::parse(parser)
+        let script_pub_key = Parse::parse(parser)
             .context("Parsing transaction output script")?;
 
         Ok(Self {

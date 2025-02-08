@@ -46,7 +46,7 @@ impl WalletTx {
 
 impl Parse for WalletTx {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
-        let version = TxVersion::parse(parser).context("Parsing transaction version")?;
+        let version: TxVersion = Parse::parse(parser).context("Parsing transaction version")?;
 
         let mut vin = Vec::new();
         let mut vout = Vec::new();
@@ -56,15 +56,15 @@ impl Parse for WalletTx {
         if version.is_zip225() {
             println!("⚠️ Unsupported transaction format: {:?}", version);
         } else {
-            vin = Vec::<TxIn>::parse(parser).context("Parsing transaction inputs")?;
-            vout = Vec::<TxOut>::parse(parser).context("Parsing transaction outputs")?;
-            lock_time = LockTime::parse(parser).context("Parsing transaction lock time")?;
+            vin = Parse::parse(parser).context("Parsing transaction inputs")?;
+            vout = Parse::parse(parser).context("Parsing transaction outputs")?;
+            lock_time = Parse::parse(parser).context("Parsing transaction lock time")?;
             if version.is_overwinter() || version.is_sapling() || version.is_future() {
-                expiry_height = u32::parse(parser).context("Parsing transaction expiry height")?;
+                expiry_height = Parse::parse(parser).context("Parsing transaction expiry height")?;
             }
             if version.is_sapling() || version.is_future() {
                 // println!("✅ Parsing Sapling bundle");
-                sapling_bundle = SaplingBundle::parse(parser).context("Parsing Sapling bundle")?;
+                sapling_bundle = Parse::parse(parser).context("Parsing Sapling bundle")?;
             }
 
             if version.number() >= 2 {

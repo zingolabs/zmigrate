@@ -61,7 +61,7 @@ impl Parse for TxVersion {
         let number = header & 0x7fffffff;
 
         let version_group_id = if overwintered {
-            IntID::parse(parser)
+            Parse::parse(parser)
                 .context("Parsing Transaction version group ID")?
         } else {
             IntID::default()
