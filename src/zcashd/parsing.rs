@@ -85,9 +85,9 @@ impl<K: Parse, V: Parse> Parse for HashMap<K, V>
 
 /// A container that optionally holds a value, serialized with a presence flag followed by the value if present.                      | 1 byte (discriminant: 0x00 = absent, 0x01 = present) + serialized value `T` if present.
 pub fn parse_optional<T: Parse>(parser: &mut Parser) -> Result<Option<T>> {
-    match u8::parse(parser).context("Parsing optional discriminant")? {
+    match parse!(u8, parser, "Parsing optional discriminant")? {
         0x00 => Ok(None),
-        0x01 => Ok(Some(Parse::parse(parser).context("Parsing optional value")?)),
+        0x01 => Ok(Some(parse!(parser, "Parsing optional value")?)),
         discriminant => bail!("Invalid optional discriminant: {}", discriminant),
     }
 }

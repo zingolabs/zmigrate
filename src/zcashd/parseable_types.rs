@@ -15,7 +15,7 @@ impl Parse for String {
 
 impl Parse for bool {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
-        let byte = u8::parse(parser).context("Parsing bool")?;
+        let byte = parse!(u8, parser, "Parsing bool")?;
         match byte {
             0 => Ok(false),
             1 => Ok(true),
