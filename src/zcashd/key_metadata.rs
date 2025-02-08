@@ -44,16 +44,16 @@ impl KeyMetadata {
 }
 
 impl Parse for KeyMetadata {
-    fn parse(parser: &mut Parser) -> Result<Self> {
-        let version = parse!(parser, "version")?;
-        let create_time: SecondsSinceEpoch = parse!(parser, "create_time")?;
+    fn parse(p: &mut Parser) -> Result<Self> {
+        let version = parse!(p, "version")?;
+        let create_time: SecondsSinceEpoch = parse!(p, "create_time")?;
         // 0 means unknown (per `walletdb.h`)
         let create_time = if create_time.as_u64() == 0 { None } else { Some(create_time) };
         let hd_keypath: Option<String>;
         let seed_fp: Option<Blob32>;
         if version >= VERSION_WITH_HDDATA {
-            hd_keypath = Some(parse!(parser, "hd_keypath")?);
-            seed_fp = Some(parse!(parser, "seed_fp")?);
+            hd_keypath = Some(parse!(p, "hd_keypath")?);
+            seed_fp = Some(parse!(p, "seed_fp")?);
         } else {
             hd_keypath = None;
             seed_fp = None;

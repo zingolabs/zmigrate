@@ -34,8 +34,8 @@ impl From<u32> for SecondsSinceEpoch {
 }
 
 impl Parse for SecondsSinceEpoch {
-    fn parse(parser: &mut Parser) -> Result<Self> {
-        let seconds = parse!(parser, "seconds")?;
+    fn parse(p: &mut Parser) -> Result<Self> {
+        let seconds = parse!(p, "seconds")?;
         Ok(Self::from_u64(seconds))
     }
 }

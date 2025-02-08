@@ -47,8 +47,8 @@ impl Default for LockTime {
 }
 
 impl Parse for LockTime {
-    fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
-        let locktime = parse!(parser, "locktime")?;
+    fn parse(p: &mut Parser) -> Result<Self> where Self: Sized {
+        let locktime = parse!(p, "locktime")?;
         Ok(LockTime::from_u32(locktime))
     }
 }

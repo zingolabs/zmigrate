@@ -22,17 +22,17 @@ pub struct JoinSplitDesc {
 }
 
 impl JoinSplitDesc {
-    pub fn parse(parser: &mut Parser, use_groth: bool) -> Result<Self> {
-        let vpub_old = parse!(parser, "vpub_old")?;
-        let vpub_new = parse!(parser, "vpub_new")?;
-        let anchor = parse!(parser, "anchor")?;
-        let nullifiers = parse!(parser, "nullifiers")?;
-        let commitments = parse!(parser, "commitments")?;
-        let ephemeral_key = parse!(parser, "ephemeral_key")?;
-        let random_seed = parse!(parser, "random_seed")?;
-        let macs = parse!(parser, "macs")?;
-        let zkproof = SproutProof::parse(parser, use_groth).context("zkproof")?;
-        let ciphertexts = parse!(parser, "ciphertexts")?;
+    pub fn parse(p: &mut Parser, use_groth: bool) -> Result<Self> {
+        let vpub_old = parse!(p, "vpub_old")?;
+        let vpub_new = parse!(p, "vpub_new")?;
+        let anchor = parse!(p, "anchor")?;
+        let nullifiers = parse!(p, "nullifiers")?;
+        let commitments = parse!(p, "commitments")?;
+        let ephemeral_key = parse!(p, "ephemeral_key")?;
+        let random_seed = parse!(p, "random_seed")?;
+        let macs = parse!(p, "macs")?;
+        let zkproof = SproutProof::parse(p, use_groth).context("zkproof")?;
+        let ciphertexts = parse!(p, "ciphertexts")?;
 
         Ok(Self {
             vpub_old,

@@ -27,13 +27,13 @@ pub struct OutputV4 {
 }
 
 impl Parse for OutputV4 {
-    fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
-        let cv = parse!(parser, "cv")?;
-        let cmu = parse!(parser, "cmu")?;
-        let ephemeral_key = parse!(parser, "ephemeral_key")?;
-        let enc_ciphertext = parse!(parser, "enc_ciphertext")?;
-        let out_ciphertext = parse!(parser, "out_ciphertext")?;
-        let zkproof = parse!(parser, "zkproof")?;
+    fn parse(p: &mut Parser) -> Result<Self> where Self: Sized {
+        let cv = parse!(p, "cv")?;
+        let cmu = parse!(p, "cmu")?;
+        let ephemeral_key = parse!(p, "ephemeral_key")?;
+        let enc_ciphertext = parse!(p, "enc_ciphertext")?;
+        let out_ciphertext = parse!(p, "out_ciphertext")?;
+        let zkproof = parse!(p, "zkproof")?;
         Ok(Self {
             cv,
             cmu,

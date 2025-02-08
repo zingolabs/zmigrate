@@ -42,8 +42,8 @@ impl std::fmt::Debug for Amount {
 }
 
 impl Parse for Amount {
-    fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
-        let amount = parse!(parser, "amount")?;
+    fn parse(p: &mut Parser) -> Result<Self> where Self: Sized {
+        let amount = parse!(p, "amount")?;
         Ok(Self(amount))
     }
 }

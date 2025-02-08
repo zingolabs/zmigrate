@@ -20,8 +20,8 @@ impl AsRef<[u8]> for GrothProof {
 }
 
 impl Parse for GrothProof {
-    fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
-        let blob = parse!(parser, "GrothProof")?;
+    fn parse(p: &mut Parser) -> Result<Self> where Self: Sized {
+        let blob = parse!(p, "GrothProof")?;
         Ok(Self(blob))
     }
 }

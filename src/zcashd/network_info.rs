@@ -18,8 +18,8 @@ impl NetworkInfo {
 }
 
 impl Parse for NetworkInfo {
-    fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
-        let (zcash, identifier) = parse!(parser, "(zcash, identifier)")?;
+    fn parse(p: &mut Parser) -> Result<Self> where Self: Sized {
+        let (zcash, identifier) = parse!(p, "(zcash, identifier)")?;
         Ok(Self { zcash, identifier })
     }
 }

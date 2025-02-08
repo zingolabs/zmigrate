@@ -62,8 +62,8 @@ impl std::fmt::Debug for Language {
 }
 
 impl Parse for Language {
-    fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
-        let value = parse!(parser, "value")?;
+    fn parse(p: &mut Parser) -> Result<Self> where Self: Sized {
+        let value = parse!(p, "value")?;
         Language::from_u32(value)
     }
 }
@@ -105,9 +105,9 @@ impl std::fmt::Debug for MnemonicSeed {
 }
 
 impl Parse for MnemonicSeed {
-    fn parse(parser: &mut Parser) -> Result<Self> {
-        let language = parse!(parser, "language")?;
-        let mnemonic = parse!(parser, "mnemonic")?;
+    fn parse(p: &mut Parser) -> Result<Self> {
+        let language = parse!(p, "language")?;
+        let mnemonic = parse!(p, "mnemonic")?;
         Ok(Self { language, mnemonic, fingerprint: None })
     }
 }

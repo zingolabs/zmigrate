@@ -19,9 +19,9 @@ impl OutPoint {
 }
 
 impl Parse for OutPoint {
-    fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
-        let txid = parse!(parser, "out point txid")?;
-        let vout = parse!(parser, "out point vout")?;
+    fn parse(p: &mut Parser) -> Result<Self> where Self: Sized {
+        let txid = parse!(p, "out point txid")?;
+        let vout = parse!(p, "out point vout")?;
         Ok(Self {
             txid,
             vout,

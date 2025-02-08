@@ -18,15 +18,15 @@ pub struct PHGRProof {
 }
 
 impl Parse for PHGRProof {
-    fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
-        let g_a =       parse!(parser, "g_a")?;
-        let g_a_prime = parse!(parser, "g_a_prime")?;
-        let g_b =       parse!(parser, "g_b")?;
-        let g_b_prime = parse!(parser, "g_b_prime")?;
-        let g_c =       parse!(parser, "g_c")?;
-        let g_c_prime = parse!(parser, "g_c_prime")?;
-        let g_k =       parse!(parser, "g_k")?;
-        let g_h =       parse!(parser, "g_h")?;
+    fn parse(p: &mut Parser) -> Result<Self> where Self: Sized {
+        let g_a =       parse!(p, "g_a")?;
+        let g_a_prime = parse!(p, "g_a_prime")?;
+        let g_b =       parse!(p, "g_b")?;
+        let g_b_prime = parse!(p, "g_b_prime")?;
+        let g_c =       parse!(p, "g_c")?;
+        let g_c_prime = parse!(p, "g_c_prime")?;
+        let g_k =       parse!(p, "g_k")?;
+        let g_h =       parse!(p, "g_h")?;
         Ok(Self {
             g_a,
             g_a_prime,

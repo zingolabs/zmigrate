@@ -39,13 +39,13 @@ impl AsRef<[u8]> for PrivKey {
 }
 
 impl Parse for PrivKey {
-    fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
-        let length = parse_compact_size(parser).context("PrivKey size")?;
+    fn parse(p: &mut Parser) -> Result<Self> where Self: Sized {
+        let length = parse_compact_size(p).context("PrivKey size")?;
         if length != 214 && length != 279 {
             bail!("Invalid PrivKey size: {}", length);
         }
-        let data = parse!(parser, data length, "PrivKey")?;
-        let hash = parse!(parser, "PrivKey hash")?;
+        let data = parse!(p, data length, "PrivKey")?;
+        let hash = parse!(p, "PrivKey hash")?;
         Ok(Self { data, hash })
     }
 }

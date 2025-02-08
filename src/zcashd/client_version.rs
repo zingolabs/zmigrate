@@ -87,8 +87,8 @@ impl ClientVersion {
 }
 
 impl Parse for ClientVersion {
-    fn parse(parser: &mut Parser) -> Result<Self> {
-        let version: u32 = parse!(parser, "ClientVersion")?;
+    fn parse(p: &mut Parser) -> Result<Self> {
+        let version: u32 = parse!(p, "ClientVersion")?;
         Ok(ClientVersion::from_integer(version))
     }
 }

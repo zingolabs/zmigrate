@@ -30,8 +30,8 @@ impl AsRef<[u8]> for NoteEncryptionCiphertext {
 }
 
 impl Parse for NoteEncryptionCiphertext {
-    fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
-        let blob = parse!(parser, "NoteEncryptionCiphertext")?;
+    fn parse(p: &mut Parser) -> Result<Self> where Self: Sized {
+        let blob = parse!(p, "NoteEncryptionCiphertext")?;
         Ok(Self(blob))
     }
 }

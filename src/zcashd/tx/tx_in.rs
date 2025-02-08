@@ -26,10 +26,10 @@ impl TxIn {
 }
 
 impl Parse for TxIn {
-    fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
-        let prevout = parse!(parser, "txin prevout")?;
-        let script_sig = parse!(parser, "txin script_sig")?;
-        let sequence = parse!(parser, "txin sequence")?;
+    fn parse(p: &mut Parser) -> Result<Self> where Self: Sized {
+        let prevout = parse!(p, "txin prevout")?;
+        let script_sig = parse!(p, "txin script_sig")?;
+        let sequence = parse!(p, "txin sequence")?;
         Ok(Self {
             prevout,
             script_sig,

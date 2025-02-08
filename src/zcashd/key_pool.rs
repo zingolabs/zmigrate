@@ -25,10 +25,10 @@ impl KeyPoolEntry {
 }
 
 impl Parse for KeyPoolEntry {
-    fn parse(parser: &mut Parser) -> Result<Self> {
-        let version = parse!(parser, "version")?;
-        let timestamp = parse!(parser, "timestamp")?;
-        let key = parse!(parser, "key")?;
+    fn parse(p: &mut Parser) -> Result<Self> {
+        let version = parse!(p, "version")?;
+        let timestamp = parse!(p, "timestamp")?;
+        let key = parse!(p, "key")?;
         Ok(Self { version, timestamp, key })
     }
 }

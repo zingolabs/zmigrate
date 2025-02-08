@@ -48,15 +48,15 @@ impl MnemonicHDChain {
 }
 
 impl Parse for MnemonicHDChain {
-    fn parse(parser: &mut Parser) -> Result<Self> {
-        let version = parse!(parser, "version")?;
-        let seed_fp = parse!(parser, "seed_fp")?;
-        let create_time = parse!(parser, "create_time")?;
-        let account_counter = parse!(parser, "account_counter")?;
-        let legacy_tkey_external_counter = parse!(parser, "legacy_tkey_external_counter")?;
-        let legacy_tkey_internal_counter = parse!(parser, "legacy_tkey_internal_counter")?;
-        let legacy_sapling_key_counter = parse!(parser, "legacy_sapling_key_counter")?;
-        let mnemonic_seed_backup_confirmed = parse!(parser, "mnemonic_seed_backup_confirmed")?;
+    fn parse(p: &mut Parser) -> Result<Self> {
+        let version = parse!(p, "version")?;
+        let seed_fp = parse!(p, "seed_fp")?;
+        let create_time = parse!(p, "create_time")?;
+        let account_counter = parse!(p, "account_counter")?;
+        let legacy_tkey_external_counter = parse!(p, "legacy_tkey_external_counter")?;
+        let legacy_tkey_internal_counter = parse!(p, "legacy_tkey_internal_counter")?;
+        let legacy_sapling_key_counter = parse!(p, "legacy_sapling_key_counter")?;
+        let mnemonic_seed_backup_confirmed = parse!(p, "mnemonic_seed_backup_confirmed")?;
 
         Ok(Self {
             version,
