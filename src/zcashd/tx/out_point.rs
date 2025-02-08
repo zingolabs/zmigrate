@@ -1,6 +1,6 @@
 use anyhow::{Result, Context};
 
-use crate::{u256, Parse, Parser};
+use crate::{parse, u256, Parse, Parser};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct OutPoint {
@@ -20,10 +20,8 @@ impl OutPoint {
 
 impl Parse for OutPoint {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
-        let txid = Parse::parse(parser)
-            .context("out point txid")?;
-        let vout = Parse::parse(parser)
-            .context("out point vout")?;
+        let txid = parse!(parser, "out point txid")?;
+        let vout = parse!(parser, "out point vout")?;
         Ok(Self {
             txid,
             vout,

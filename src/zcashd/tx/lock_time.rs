@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use crate::{Parse, Parser, SecondsSinceEpoch};
+use crate::{parse, Parse, Parser, SecondsSinceEpoch};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum LockTime {
@@ -48,7 +48,7 @@ impl Default for LockTime {
 
 impl Parse for LockTime {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
-        let locktime = Parse::parse(parser)?;
+        let locktime = parse!(parser, "locktime")?;
         Ok(LockTime::from_u32(locktime))
     }
 }

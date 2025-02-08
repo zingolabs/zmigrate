@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use anyhow::{ bail, Result, Context };
 
-use crate::{ BDBDump, Data, Parse, Parser };
+use crate::{ parse, BDBDump, Data, Parse, Parser };
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct DBKey {
@@ -27,8 +27,7 @@ impl DBKey {
 
     pub fn parse_data(key_data: &Data) -> Result<Self> {
         let mut parser = Parser::new(&key_data);
-        let keyname = Parse::parse(&mut parser)
-            .context("keyname")?;
+        let keyname = parse!(&mut parser, "keyname")?;
         let data = parser.rest();
         parser.check_finished()?;
         Ok(Self { keyname, data })

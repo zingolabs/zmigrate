@@ -1,6 +1,6 @@
 use anyhow::{ Result, Context };
 
-use crate::{ Blob32, Parse, Parser };
+use crate::{ parse, Blob32, Parse, Parser };
 
 #[derive(Clone, PartialEq, Eq, Hash)]
 #[allow(non_camel_case_types)]
@@ -45,7 +45,7 @@ impl std::fmt::Debug for u256 {
 
 impl Parse for u256 {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
-        let blob = Parse::parse(parser).context("u256")?;
+        let blob = parse!(parser, "u256")?;
         Ok(Self(blob))
     }
 }

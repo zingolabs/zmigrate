@@ -1,6 +1,6 @@
 use anyhow::{ Result, Context };
 
-use crate::{ u256, Blob, Parse, Parser };
+use crate::{ parse, u256, Blob, Parse, Parser };
 
 use super::GrothProof;
 
@@ -16,12 +16,12 @@ pub struct SpendV4 {
 
 impl Parse for SpendV4 {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
-        let cv = Parse::parse(parser).context("cv")?;
-        let anchor = Parse::parse(parser).context("anchor")?;
-        let nullifier = Parse::parse(parser).context("nullifier")?;
-        let rk = Parse::parse(parser).context("rk")?;
-        let zkproof = Parse::parse(parser).context("zkproof")?;
-        let spend_auth_sig = Parse::parse(parser).context("spend_auth_sig")?;
+        let cv = parse!(parser, "cv")?;
+        let anchor = parse!(parser, "anchor")?;
+        let nullifier = parse!(parser, "nullifier")?;
+        let rk = parse!(parser, "rk")?;
+        let zkproof = parse!(parser, "zkproof")?;
+        let spend_auth_sig = parse!(parser, "spend_auth_sig")?;
         Ok(Self {
             cv,
             anchor,

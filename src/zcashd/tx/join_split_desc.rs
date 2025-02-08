@@ -1,6 +1,6 @@
 use anyhow::{ Result, Context };
 
-use crate::{ u256, Parse, Parser };
+use crate::{ parse, u256, Parse, Parser };
 
 use super::{ NoteEncryptionCiphertext, Amount, SproutProof };
 
@@ -23,16 +23,16 @@ pub struct JoinSplitDesc {
 
 impl JoinSplitDesc {
     pub fn parse(parser: &mut Parser, use_groth: bool) -> Result<Self> {
-        let vpub_old = Parse::parse(parser).context("vpub_old")?;
-        let vpub_new = Parse::parse(parser).context("vpub_new")?;
-        let anchor = Parse::parse(parser).context("anchor")?;
-        let nullifiers = Parse::parse(parser).context("nullifiers")?;
-        let commitments = Parse::parse(parser).context("commitments")?;
-        let ephemeral_key = Parse::parse(parser).context("ephemeral_key")?;
-        let random_seed = Parse::parse(parser).context("random_seed")?;
-        let macs = Parse::parse(parser).context("macs")?;
+        let vpub_old = parse!(parser, "vpub_old")?;
+        let vpub_new = parse!(parser, "vpub_new")?;
+        let anchor = parse!(parser, "anchor")?;
+        let nullifiers = parse!(parser, "nullifiers")?;
+        let commitments = parse!(parser, "commitments")?;
+        let ephemeral_key = parse!(parser, "ephemeral_key")?;
+        let random_seed = parse!(parser, "random_seed")?;
+        let macs = parse!(parser, "macs")?;
         let zkproof = SproutProof::parse(parser, use_groth).context("zkproof")?;
-        let ciphertexts = Parse::parse(parser).context("ciphertexts")?;
+        let ciphertexts = parse!(parser, "ciphertexts")?;
 
         Ok(Self {
             vpub_old,

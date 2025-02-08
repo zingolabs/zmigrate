@@ -1,6 +1,6 @@
 use anyhow::{ Result, Context };
 
-use crate::{ u256, Blob, Parse, Parser };
+use crate::{ parse, u256, Blob, Parse, Parser };
 
 use super::GrothProof;
 
@@ -28,12 +28,12 @@ pub struct OutputV4 {
 
 impl Parse for OutputV4 {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
-        let cv = Parse::parse(parser).context("cv")?;
-        let cmu = Parse::parse(parser).context("cmu")?;
-        let ephemeral_key = Parse::parse(parser).context("ephemeral_key")?;
-        let enc_ciphertext = Parse::parse(parser).context("enc_ciphertext")?;
-        let out_ciphertext = Parse::parse(parser).context("out_ciphertext")?;
-        let zkproof = Parse::parse(parser).context("zkproof")?;
+        let cv = parse!(parser, "cv")?;
+        let cmu = parse!(parser, "cmu")?;
+        let ephemeral_key = parse!(parser, "ephemeral_key")?;
+        let enc_ciphertext = parse!(parser, "enc_ciphertext")?;
+        let out_ciphertext = parse!(parser, "out_ciphertext")?;
+        let zkproof = parse!(parser, "zkproof")?;
         Ok(Self {
             cv,
             cmu,

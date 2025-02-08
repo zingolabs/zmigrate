@@ -1,6 +1,6 @@
-use anyhow::{ Result, Context };
+use anyhow::Result;
 
-use crate::{ Blob, Parse, Parser };
+use crate::{ parse, Blob, Parse, Parser };
 
 pub const GROTH_PROOF_SIZE: usize = 48 + 96 + 48;
 
@@ -21,7 +21,7 @@ impl AsRef<[u8]> for GrothProof {
 
 impl Parse for GrothProof {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
-        let blob = Parse::parse(parser).context("GrothProof")?;
+        let blob = parse!(parser, "GrothProof")?;
         Ok(Self(blob))
     }
 }
