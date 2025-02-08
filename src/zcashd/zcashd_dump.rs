@@ -25,9 +25,9 @@ impl DBKey {
         Self { keyname: keyname.into(), data: data.as_ref().clone() }
     }
 
-    pub fn parse(key_data: &Data) -> Result<Self> {
+    pub fn parse_data(key_data: &Data) -> Result<Self> {
         let mut parser = Parser::new(&key_data);
-        let keyname = String::parse(&mut parser)
+        let keyname = Parse::parse(&mut parser)
             .context("Parsing keyname")?;
         let data = parser.rest();
         parser.check_finished()?;
@@ -88,7 +88,7 @@ impl ZcashdDump {
         let mut records_by_keyname: HashMap<String, HashMap<DBKey, DBValue>> = HashMap::new();
 
         for (key_data, value_data) in berkeley_dump.data_records() {
-            let key = DBKey::parse(key_data)?;
+            let key = DBKey::parse_data(key_data)?;
             let value = DBValue::new(value_data.clone());
             records.insert(key.clone(), value.clone());
 
