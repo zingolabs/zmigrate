@@ -28,6 +28,12 @@ pub fn parse_pair<T: Parse, U: Parse>(parser: &mut Parser) -> Result<(T, U)> {
     Ok((first, second))
 }
 
+impl<T: Parse, U: Parse> Parse for (T, U) {
+    fn parse(parser: &mut Parser) -> Result<Self> {
+        parse_pair(parser)
+    }
+}
+
 pub fn parse_fixed_length_vec<T: Parse>(parser: &mut Parser, length: usize) -> Result<Vec<T>> {
     let mut items = Vec::with_capacity(length);
     for i in 0..length {
