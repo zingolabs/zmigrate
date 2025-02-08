@@ -4,24 +4,30 @@ use crate::Data;
 
 #[macro_export]
 macro_rules! parse {
-    ($type:ty, $parser:expr, $context:expr) => {{
+    ($type:ty, $parser:expr, $context:expr) => {
         ::anyhow::Context::with_context(
             <$type as $crate::Parse>::parse($parser),
             || format!("Parsing {}", $context)
         )
-    }};
-    (bytes $length:expr, $parser:expr, $context:expr) => {{
+    };
+    (bytes $length:expr, $parser:expr, $context:expr) => {
         ::anyhow::Context::with_context(
             $crate::Parser::next($parser, $length),
             || format!("Parsing {}", $context)
         )
-    }};
-    ($parser:expr, $context:expr) => {{
+    };
+    (data $length:expr, $parser:expr, $context:expr) => {
+        ::anyhow::Context::with_context(
+            $crate::Data::parse_len($parser, $length),
+            || format!("Parsing {}", $context)
+        )
+    };
+    ($parser:expr, $context:expr) => {
         ::anyhow::Context::with_context(
             $crate::Parse::parse($parser),
             || format!("Parsing {}", $context)
         )
-    }};
+    };
 }
 
 pub trait Parse {
@@ -77,6 +83,6 @@ impl<'a> Parser<'a> {
     }
 
     pub fn rest(&mut self) -> Data {
-        Data::parse_len(self.remaining(), self).unwrap()
+        Data::parse_len(self, self.remaining()).unwrap()
     }
 }

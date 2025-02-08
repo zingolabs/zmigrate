@@ -89,6 +89,6 @@ impl Parse for i64 {
 impl Parse for Data {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
         let len = parse_compact_size(parser).context("Parsing Data length")?;
-        Self::parse_len(len as usize, parser)
+        Self::parse_len(parser, len)
     }
 }

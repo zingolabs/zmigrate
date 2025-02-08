@@ -53,7 +53,7 @@ impl Data {
 }
 
 impl Data {
-    pub fn parse_len(len: usize, parser: &mut Parser) -> Result<Self> {
+    pub fn parse_len(parser: &mut Parser, len: usize) -> Result<Self> {
         let bytes = parser.next(len).context("Parsing Data")?;
         Ok(Self::from_slice(bytes))
     }

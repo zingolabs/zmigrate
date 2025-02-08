@@ -1,6 +1,6 @@
 use anyhow::{ Result, Context, bail };
 
-use crate::{ u256, Data, Parse, Parser };
+use crate::{ parse, u256, Data, Parse, Parser };
 
 use super::parse_compact_size;
 
@@ -44,7 +44,7 @@ impl Parse for PrivKey {
         if size != 214 && size != 279 {
             bail!("Invalid PrivKey size: {}", size);
         }
-        let data = Data::parse_len(size, parser).context("Parsing PrivKey")?;
+        let data = parse!(data size, parser, "Parsing PrivKey")?;
         let hash = u256::parse(parser).context("Parsing PrivKey hash")?;
         Ok(Self { data, hash })
     }
