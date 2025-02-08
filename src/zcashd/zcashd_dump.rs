@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use anyhow::{ bail, Result, Context };
 
-use crate::{ parse, BDBDump, Data, Parse, Parser };
+use crate::{ parse, BDBDump, Data, Parser };
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct DBKey {

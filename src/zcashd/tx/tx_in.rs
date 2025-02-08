@@ -1,6 +1,6 @@
-use anyhow::{Result, Context};
+use anyhow::Result;
 
-use crate::{Parse, Parser};
+use crate::{parse, Parse, Parser};
 
 use super::{OutPoint, Script};
 
@@ -27,12 +27,9 @@ impl TxIn {
 
 impl Parse for TxIn {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
-        let prevout = Parse::parse(parser)
-            .context("txin prevout")?;
-        let script_sig = Parse::parse(parser)
-            .context("txin script_sig")?;
-        let sequence = Parse::parse(parser)
-            .context("txin sequence")?;
+        let prevout = parse!(parser, "txin prevout")?;
+        let script_sig = parse!(parser, "txin script_sig")?;
+        let sequence = parse!(parser, "txin sequence")?;
         Ok(Self {
             prevout,
             script_sig,

@@ -1,4 +1,4 @@
-use anyhow::{ Result, Context };
+use anyhow::Result;
 
 use crate::{ parse, u256, Blob, Parse, Parser };
 

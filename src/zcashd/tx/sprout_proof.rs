@@ -1,6 +1,6 @@
-use anyhow::{ Result, Context };
+use anyhow::Result;
 
-use crate::{ Parse, Parser };
+use crate::{ parse, Parser };
 
 use super::{GrothProof, PHGRProof};
 
@@ -13,10 +13,10 @@ pub enum SproutProof {
 impl SproutProof {
     pub fn parse(parser: &mut Parser, use_groth: bool) -> Result<Self> where Self: Sized {
         if use_groth {
-            let groth_proof = Parse::parse(parser).context("groth proof")?;
+            let groth_proof = parse!(parser, "groth_proof")?;
             Ok(Self::GrothProof(groth_proof))
         } else {
-            let phgr_proof = Parse::parse(parser).context("phgr proof")?;
+            let phgr_proof = parse!(parser, "phgr_proof")?;
             Ok(Self::PHGRProof(phgr_proof))
         }
     }

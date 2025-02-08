@@ -1,6 +1,6 @@
 use anyhow::{Result, Context, bail};
 
-use crate::{Parse, Parser};
+use crate::{parse, Parse, Parser};
 
 use super::IntID;
 
@@ -61,8 +61,7 @@ impl Parse for TxVersion {
         let number = header & 0x7fffffff;
 
         let version_group_id = if overwintered {
-            Parse::parse(parser)
-                .context("Transaction version group ID")?
+            parse!(parser, "Transaction version group ID")?
         } else {
             IntID::default()
         };

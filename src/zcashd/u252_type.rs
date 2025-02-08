@@ -1,4 +1,4 @@
-use anyhow::{ Result, Context, bail };
+use anyhow::{ Result, bail };
 
 use crate::{ parse, Blob32, Parse, Parser };
 

@@ -1,6 +1,6 @@
-use anyhow::{ Result, Context };
+use anyhow::Result;
 
-use crate::{Parse, Parser};
+use crate::{parse, Parse, Parser};
 
 use super::{Amount, Script};
 
@@ -22,12 +22,8 @@ impl TxOut {
 
 impl Parse for TxOut {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
-        let value = Parse::parse(parser)
-            .context("transaction output value")?;
-
-        let script_pub_key = Parse::parse(parser)
-            .context("transaction output script")?;
-
+        let value = parse!(parser, "value")?;
+        let script_pub_key = parse!(parser, "script_pub_key")?;
         Ok(Self {
             value,
             script_pub_key,
