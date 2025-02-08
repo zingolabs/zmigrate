@@ -20,9 +20,9 @@ impl OutPoint {
 
 impl Parse for OutPoint {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
-        let txid = u256::parse(parser)
+        let txid = Parse::parse(parser)
             .context("Parsing out point txid")?;
-        let vout = u32::parse(parser)
+        let vout = Parse::parse(parser)
             .context("Parsing out point vout")?;
         Ok(Self {
             txid,

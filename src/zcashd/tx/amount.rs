@@ -43,7 +43,7 @@ impl std::fmt::Debug for Amount {
 
 impl Parse for Amount {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
-        let amount = u64::parse(parser).context("Parsing Amount")?;
+        let amount = Parse::parse(parser).context("Parsing Amount")?;
         Ok(Self(amount))
     }
 }
