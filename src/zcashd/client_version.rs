@@ -1,6 +1,6 @@
-use anyhow::{Result, Context};
+use anyhow::Result;
 
-use crate::{Parse, Parser};
+use crate::{ parse, Parse, Parser };
 
 #[derive(Clone)]
 pub struct ClientVersion {
@@ -88,8 +88,7 @@ impl ClientVersion {
 
 impl Parse for ClientVersion {
     fn parse(parser: &mut Parser) -> Result<Self> {
-        let version = u32::parse(parser)
-            .context("Parsing ClientVersion")?;
+        let version: u32 = parse!(parser, "ClientVersion")?;
         Ok(ClientVersion::from_integer(version))
     }
 }
@@ -98,38 +97,13 @@ impl Parse for ClientVersion {
 impl std::fmt::Display for ClientVersion {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         if self.build < 25 {
-            write!(
-                f,
-                "{}.{}.{}-beta{}",
-                self.major,
-                self.minor,
-                self.revision,
-                self.build + 1
-            )
+            write!(f, "{}.{}.{}-beta{}", self.major, self.minor, self.revision, self.build + 1)
         } else if self.build < 50 {
-            write!(
-                f,
-                "{}.{}.{}-rc{}",
-                self.major,
-                self.minor,
-                self.revision,
-                self.build - 24
-            )
+            write!(f, "{}.{}.{}-rc{}", self.major, self.minor, self.revision, self.build - 24)
         } else if self.build == 50 {
-            write!(
-                f,
-                "{}.{}.{}",
-                self.major, self.minor, self.revision
-            )
+            write!(f, "{}.{}.{}", self.major, self.minor, self.revision)
         } else {
-            write!(
-                f,
-                "{}.{}.{}-{}",
-                self.major,
-                self.minor,
-                self.revision,
-                self.build - 50
-            )
+            write!(f, "{}.{}.{}-{}", self.major, self.minor, self.revision, self.build - 50)
         }
     }
 }

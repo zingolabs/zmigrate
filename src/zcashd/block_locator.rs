@@ -1,8 +1,8 @@
-use anyhow::{ Result, Context };
+use anyhow::Result;
 
-use crate::{Parse, Parser};
+use crate::{ parse, Parse, Parser };
 
-use super::{ClientVersion, u256};
+use super::{ ClientVersion, u256 };
 
 /// Vector of block hashes
 #[derive(Debug, Clone, PartialEq)]
@@ -23,8 +23,8 @@ impl BlockLocator {
 
 impl Parse for BlockLocator {
     fn parse(parser: &mut Parser) -> Result<Self> {
-        let version = ClientVersion::parse(parser)?;
-        let blocks = Vec::parse(parser).context("Parsing BlockLocator")?;
+        let version = parse!(parser, "BlockLocator version")?;
+        let blocks = parse!(parser, "BlockLocator blocks")?;
         Ok(Self { version, blocks })
     }
 }

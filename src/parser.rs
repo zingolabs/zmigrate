@@ -2,6 +2,13 @@ use anyhow::{ Result, bail };
 
 use crate::Data;
 
+#[macro_export]
+macro_rules! parse {
+    ($parser:expr, $context:expr) => {{
+        ::anyhow::Context::context($crate::Parse::parse($parser), concat!("Parsing ", $context))
+    }};
+}
+
 pub trait Parse {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized;
 

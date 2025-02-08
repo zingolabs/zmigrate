@@ -1,5 +1,5 @@
-use anyhow::{ Result, Context };
-use crate::{ Blob, Blob32, Parse, Parser, SecondsSinceEpoch };
+use anyhow::Result;
+use crate::{ parse, Blob32, Parse, Parser, SecondsSinceEpoch };
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct MnemonicHDChain {
@@ -49,22 +49,14 @@ impl MnemonicHDChain {
 
 impl Parse for MnemonicHDChain {
     fn parse(parser: &mut Parser) -> Result<Self> {
-        let version = i32::parse(parser)
-            .context("Parsing MnemonicHDChain version")?;
-        let seed_fp = Blob::parse(parser)
-            .context("Parsing MnemonicHDChain seed_fp")?;
-        let create_time = SecondsSinceEpoch::parse(parser)
-            .context("Parsing MnemonicHDChain create_time")?;
-        let account_counter = u32::parse(parser)
-            .context("Parsing MnemonicHDChain account_counter")?;
-        let legacy_tkey_external_counter = u32::parse(parser)
-            .context("Parsing MnemonicHDChain legacy_tkey_external_counter")?;
-        let legacy_tkey_internal_counter = u32::parse(parser)
-            .context("Parsing MnemonicHDChain legacy_tkey_internal_counter")?;
-        let legacy_sapling_key_counter = u32::parse(parser)
-            .context("Parsing MnemonicHDChain legacy_sapling_key_counter")?;
-        let mnemonic_seed_backup_confirmed = bool::parse(parser)
-            .context("Parsing MnemonicHDChain mnemonic_seed_backup_confirmed")?;
+        let version = parse!(parser, "version")?;
+        let seed_fp = parse!(parser, "seed_fp")?;
+        let create_time = parse!(parser, "create_time")?;
+        let account_counter = parse!(parser, "account_counter")?;
+        let legacy_tkey_external_counter = parse!(parser, "legacy_tkey_external_counter")?;
+        let legacy_tkey_internal_counter = parse!(parser, "legacy_tkey_internal_counter")?;
+        let legacy_sapling_key_counter = parse!(parser, "legacy_sapling_key_counter")?;
+        let mnemonic_seed_backup_confirmed = parse!(parser, "mnemonic_seed_backup_confirmed")?;
 
         Ok(Self {
             version,
