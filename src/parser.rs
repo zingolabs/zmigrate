@@ -4,6 +4,12 @@ use crate::Data;
 
 #[macro_export]
 macro_rules! parse {
+    (buf $buf:expr, $type:ty, $context:expr) => {
+        ::anyhow::Context::with_context(
+            <$type as $crate::Parse>::parse_buf($buf),
+            || format!("Parsing {}", $context)
+        )
+    };
     ($parser:expr, $type:ty, $context:expr) => {
         ::anyhow::Context::with_context(
             <$type as $crate::Parse>::parse($parser),
@@ -22,18 +28,6 @@ macro_rules! parse {
             || format!("Parsing {}", $context)
         )
     };
-    (buf $buf:expr, $type:ty, $context:expr) => {
-        ::anyhow::Context::with_context(
-            <$type as $crate::Parse>::parse_buf($buf),
-            || format!("Parsing {}", $context)
-        )
-    };
-    // (buf $buf:expr, $context:expr) => {
-    //     ::anyhow::Context::with_context(
-    //         $crate::Parser::parse_buf($buf),
-    //         || format!("Parsing {}", $context)
-    //     )
-    // };
     ($parser:expr, $context:expr) => {
         ::anyhow::Context::with_context(
             $crate::Parse::parse($parser),

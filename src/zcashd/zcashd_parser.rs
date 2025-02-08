@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use anyhow::{ Context, Result, bail };
 
-use crate::{ parse, u256, Parse };
+use crate::{ parse, u256 };
 
 use super::{
     zcashd_dump::DBKey, Address, BlockLocator, ClientVersion, Key, KeyMetadata, KeyPoolEntry, Keys, MnemonicHDChain, MnemonicSeed, NetworkInfo, OrchardNoteCommitmentTree, PrivKey, PubKey, WalletTx, ZcashdDump, ZcashdWallet
@@ -187,11 +187,11 @@ impl<'a> ZcashdParser<'a> {
         }
         let mut keys_map = HashMap::new();
         for (key, value) in key_records {
-            let pubkey = PubKey::parse_buf(&key.data()).context("pubkey")?;
-            let privkey = PrivKey::parse_buf(&value.as_data()).context("privkey")?;
+            let pubkey = parse!(buf key.data(), PubKey, "pubkey")?;
+            let privkey = parse!(buf value.as_data(), PrivKey, "privkey")?;
             let metakey = DBKey::new("keymeta", key.data());
             let metadata_binary = self.dump.value_for_key(&metakey).context("Getting metadata")?;
-            let metadata = KeyMetadata::parse_buf(&metadata_binary).context("metadata")?;
+            let metadata = parse!(buf metadata_binary, KeyMetadata, "metadata")?;
             let keypair = Key::new(pubkey.clone(), privkey.clone(), metadata).context(
                 "Creating keypair"
             )?;
@@ -202,12 +202,12 @@ impl<'a> ZcashdParser<'a> {
 
     fn parse_default_key(&self) -> Result<PubKey> {
         let value = self.dump.value_for_keyname("defaultkey")?;
-        PubKey::parse_buf(value)
+        parse!(buf value, PubKey, "defaultkey")
     }
 
     fn parse_mnemonic_hd_chain(&self) -> Result<MnemonicHDChain> {
         let value = self.dump.value_for_keyname("mnemonichdchain")?;
-        MnemonicHDChain::parse_buf(value)
+        parse!(buf value, MnemonicHDChain, "mnemonichdchain")
     }
 
     fn parse_mnemonic_phrase(&self) -> Result<MnemonicSeed> {
@@ -215,8 +215,7 @@ impl<'a> ZcashdParser<'a> {
             .record_for_keyname("mnemonicphrase")
             .context("Getting 'mnemonicphrase' record")?;
         let fingerprint = parse!(buf key.data(), u256, "seed fingerprint")?;
-        let seed = MnemonicSeed::parse_buf(&value)
-            .context("mnemonic phrase")?
+        let seed = parse!(buf &value, MnemonicSeed, "mnemonic phrase")?
             .set_fingerprint(fingerprint);
         Ok(seed)
     }
@@ -225,8 +224,8 @@ impl<'a> ZcashdParser<'a> {
         let records = self.dump.records_for_keyname("name").context("Getting 'name' records")?;
         let mut address_names = HashMap::new();
         for (key, value) in records {
-            let address = Address::parse_buf(key.data()).context("address")?;
-            let name = String::parse_buf(value.as_data()).context("name")?;
+            let address = parse!(buf key.data(), Address, "address")?;
+            let name = parse!(buf value.as_data(), String, "name")?;
             if address_names.contains_key(&address) {
                 bail!("Duplicate address found: {}", address);
             }
@@ -239,8 +238,8 @@ impl<'a> ZcashdParser<'a> {
         let records = self.dump.records_for_keyname("purpose").context("Getting 'purpose' records")?;
         let mut address_purposes = HashMap::new();
         for (key, value) in records {
-            let address = Address::parse_buf(key.data()).context("address")?;
-            let purpose = String::parse_buf(value.as_data()).context("purpose")?;
+            let address = parse!(buf key.data(), Address, "address")?;
+            let purpose = parse!(buf value.as_data(), String, "purpose")?;
             if address_purposes.contains_key(&address) {
                 bail!("Duplicate address found: {}", address);
             }
@@ -253,9 +252,7 @@ impl<'a> ZcashdParser<'a> {
         let (_, value) = self.dump
             .record_for_keyname("networkinfo")
             .context("Getting 'networkinfo' record")?;
-        let network_info = NetworkInfo::parse_buf(value.as_data()).context(
-            "network info"
-        )?;
+        let network_info = parse!(buf value.as_data(), NetworkInfo, "network info")?;
         Ok(network_info)
     }
 
@@ -263,9 +260,7 @@ impl<'a> ZcashdParser<'a> {
         let (_, value) = self.dump
             .record_for_keyname("orchard_note_commitment_tree")
             .context("Getting 'orchard_note_commitment_tree' record")?;
-        let orchard_note_commitment_tree = OrchardNoteCommitmentTree::parse_buf(
-            value.as_data()
-        ).context("orchard note commitment tree")?;
+        let orchard_note_commitment_tree = parse!(buf value.as_data(), OrchardNoteCommitmentTree, "orchard note commitment tree")?;
         Ok(orchard_note_commitment_tree)
     }
 
@@ -273,10 +268,8 @@ impl<'a> ZcashdParser<'a> {
         let records = self.dump.records_for_keyname("pool").context("Getting 'pool' records")?;
         let mut key_pool = HashMap::new();
         for (key, value) in records {
-            let index = i64::parse_buf(key.data()).context("key pool index")?;
-            let entry = KeyPoolEntry::parse_buf(value.as_data()).context(
-                "key pool entry"
-            )?;
+            let index = parse!(buf key.data(), i64, "key pool index")?;
+            let entry = parse!(buf value.as_data(), KeyPoolEntry, "key pool entry")?;
             key_pool.insert(index, entry);
         }
         Ok(key_pool)
@@ -288,10 +281,8 @@ impl<'a> ZcashdParser<'a> {
         if self.dump.has_records_for_keyname("tx") {
             let records = self.dump.records_for_keyname("tx").context("Getting 'tx' records")?;
             for (key, value) in records {
-                let txid = u256::parse_buf(key.data()).context("transaction ID")?;
-                let transaction = WalletTx::parse_buf(value.as_data()).context(
-                    "transaction"
-                )?;
+                let txid = parse!(buf key.data(), u256, "transaction ID")?;
+                let transaction = parse!(buf value.as_data(), WalletTx, "transaction")?;
                 if transactions.contains_key(&txid) {
                     bail!("Duplicate transaction found: {:?}", txid);
                 }
