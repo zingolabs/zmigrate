@@ -12,7 +12,7 @@ impl OrchardNoteCommitmentTree {
 }
 
 impl Parse for OrchardNoteCommitmentTree {
-    fn parse(p: &mut Parser) -> Result<Self> where Self: Sized {
+    fn parse(p: &mut Parser) -> Result<Self> {
         let data = p.rest();
         Ok(Self(data))
     }

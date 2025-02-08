@@ -11,7 +11,7 @@ impl Address {
 }
 
 impl Parse for Address {
-    fn parse(p: &mut Parser) -> Result<Self> where Self: Sized {
+    fn parse(p: &mut Parser) -> Result<Self> {
         let address = parse!(p, "address")?;
         Ok(Self(address))
     }

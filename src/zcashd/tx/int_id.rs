@@ -29,7 +29,7 @@ impl std::fmt::Debug for IntID {
 }
 
 impl Parse for IntID {
-    fn parse(p: &mut Parser) -> Result<Self> where Self: Sized {
+    fn parse(p: &mut Parser) -> Result<Self> {
         let id = parse!(p, "IntID")?;
         Ok(Self(id))
     }

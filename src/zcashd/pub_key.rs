@@ -32,7 +32,7 @@ impl AsRef<[u8]> for PubKey {
 }
 
 impl Parse for PubKey {
-    fn parse(p: &mut Parser) -> Result<Self> where Self: Sized {
+    fn parse(p: &mut Parser) -> Result<Self> {
         let size = parse_compact_size(p).context("PubKey size")?;
         if size != 33 && size != 65 {
             bail!("Invalid PubKey size: {}", size);

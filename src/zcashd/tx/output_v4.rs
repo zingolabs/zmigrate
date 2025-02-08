@@ -27,7 +27,7 @@ pub struct OutputV4 {
 }
 
 impl Parse for OutputV4 {
-    fn parse(p: &mut Parser) -> Result<Self> where Self: Sized {
+    fn parse(p: &mut Parser) -> Result<Self> {
         let cv = parse!(p, "cv")?;
         let cmu = parse!(p, "cmu")?;
         let ephemeral_key = parse!(p, "ephemeral_key")?;

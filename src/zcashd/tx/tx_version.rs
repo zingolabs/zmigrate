@@ -55,7 +55,7 @@ impl TxVersion {
 }
 
 impl Parse for TxVersion {
-    fn parse(p: &mut Parser) -> Result<Self> where Self: Sized {
+    fn parse(p: &mut Parser) -> Result<Self> {
         let header = u32::parse(p).context("Transaction header")?;
         let overwintered = (header >> 31) == 1;
         let number = header & 0x7fffffff;

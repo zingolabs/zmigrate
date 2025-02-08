@@ -22,7 +22,7 @@ impl SaplingBundle {
 }
 
 impl Parse for SaplingBundle {
-    fn parse(p: &mut Parser) -> Result<Self> where Self: Sized {
+    fn parse(p: &mut Parser) -> Result<Self> {
         let amount = parse!(p, "amount")?;
         let spends = parse!(p, "spends")?;
         let outputs = parse!(p, "outputs")?;

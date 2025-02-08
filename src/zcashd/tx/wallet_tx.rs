@@ -45,7 +45,7 @@ impl WalletTx {
 }
 
 impl Parse for WalletTx {
-    fn parse(p: &mut Parser) -> Result<Self> where Self: Sized {
+    fn parse(p: &mut Parser) -> Result<Self> {
         let version: TxVersion = parse!(p, "transaction version")?;
 
         let mut vin = Vec::new();

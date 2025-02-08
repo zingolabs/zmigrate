@@ -62,7 +62,7 @@ impl std::fmt::Debug for Language {
 }
 
 impl Parse for Language {
-    fn parse(p: &mut Parser) -> Result<Self> where Self: Sized {
+    fn parse(p: &mut Parser) -> Result<Self> {
         let value = parse!(p, "value")?;
         Language::from_u32(value)
     }

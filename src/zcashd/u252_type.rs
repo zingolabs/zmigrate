@@ -42,7 +42,7 @@ impl std::fmt::Debug for u252 {
 }
 
 impl Parse for u252 {
-    fn parse(p: &mut Parser) -> Result<Self> where Self: Sized {
+    fn parse(p: &mut Parser) -> Result<Self> {
         let blob = parse!(p, "u252")?;
         Self::from_blob(blob)
     }

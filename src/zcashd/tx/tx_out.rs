@@ -21,7 +21,7 @@ impl TxOut {
 }
 
 impl Parse for TxOut {
-    fn parse(p: &mut Parser) -> Result<Self> where Self: Sized {
+    fn parse(p: &mut Parser) -> Result<Self> {
         let value = parse!(p, "value")?;
         let script_pub_key = parse!(p, "script_pub_key")?;
         Ok(Self {

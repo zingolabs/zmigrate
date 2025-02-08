@@ -15,7 +15,7 @@ pub struct SpendV4 {
 }
 
 impl Parse for SpendV4 {
-    fn parse(p: &mut Parser) -> Result<Self> where Self: Sized {
+    fn parse(p: &mut Parser) -> Result<Self> {
         let cv = parse!(p, "cv")?;
         let anchor = parse!(p, "anchor")?;
         let nullifier = parse!(p, "nullifier")?;
