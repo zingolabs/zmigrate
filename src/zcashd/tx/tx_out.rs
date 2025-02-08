@@ -1,6 +1,6 @@
 use anyhow::{ Result, Context };
 
-use crate::{Parseable, Parser};
+use crate::{Parse, Parser};
 
 use super::{Amount, Script};
 
@@ -20,7 +20,7 @@ impl TxOut {
     }
 }
 
-impl Parseable for TxOut {
+impl Parse for TxOut {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
         let value = Amount::parse(parser)
             .context("Parsing transaction output value")?;

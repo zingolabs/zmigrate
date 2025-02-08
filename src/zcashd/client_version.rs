@@ -1,6 +1,6 @@
 use anyhow::{Result, Context};
 
-use crate::{Parseable, Parser};
+use crate::{Parse, Parser};
 
 #[derive(Clone)]
 pub struct ClientVersion {
@@ -86,7 +86,7 @@ impl ClientVersion {
     }
 }
 
-impl Parseable for ClientVersion {
+impl Parse for ClientVersion {
     fn parse(parser: &mut Parser) -> Result<Self> {
         let version = u32::parse(parser)
             .context("Parsing ClientVersion")?;

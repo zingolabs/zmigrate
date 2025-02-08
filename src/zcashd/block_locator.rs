@@ -1,6 +1,6 @@
 use anyhow::{ Result, Context };
 
-use crate::{Parseable, Parser};
+use crate::{Parse, Parser};
 
 use super::{ClientVersion, u256};
 
@@ -21,7 +21,7 @@ impl BlockLocator {
     }
 }
 
-impl Parseable for BlockLocator {
+impl Parse for BlockLocator {
     fn parse(parser: &mut Parser) -> Result<Self> {
         let version = ClientVersion::parse(parser)?;
         let blocks = Vec::parse(parser).context("Parsing BlockLocator")?;

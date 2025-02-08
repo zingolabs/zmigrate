@@ -2,7 +2,7 @@ use anyhow::{ Result, bail };
 
 use crate::Data;
 
-pub trait Parseable {
+pub trait Parse {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized;
 
     fn parse_binary(buffer: &dyn AsRef<[u8]>) -> Result<Self> where Self: Sized {

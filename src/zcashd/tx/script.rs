@@ -1,6 +1,6 @@
 use anyhow::{Result, Context};
 
-use crate::{Data, Parseable, Parser};
+use crate::{Data, Parse, Parser};
 
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct Script(Data);
@@ -23,7 +23,7 @@ impl Script {
     }
 }
 
-impl Parseable for Script {
+impl Parse for Script {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
         let data = Data::parse(parser)
             .context("Parsing script data")?;

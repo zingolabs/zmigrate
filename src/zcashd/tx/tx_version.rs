@@ -1,6 +1,6 @@
 use anyhow::{Result, Context, bail};
 
-use crate::{Parseable, Parser};
+use crate::{Parse, Parser};
 
 use super::IntID;
 
@@ -54,7 +54,7 @@ impl TxVersion {
     }
 }
 
-impl Parseable for TxVersion {
+impl Parse for TxVersion {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
         let header = u32::parse(parser).context("Parsing Transaction header")?;
         let overwintered = (header >> 31) == 1;

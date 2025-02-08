@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use anyhow::{ Context, Result, bail };
 
-use crate::{ u256, Parseable };
+use crate::{ u256, Parse };
 
 use super::{
     zcashd_dump::DBKey, Address, BlockLocator, ClientVersion, Key, KeyMetadata, KeyPoolEntry, Keys, MnemonicHDChain, MnemonicSeed, NetworkInfo, OrchardNoteCommitmentTree, PrivKey, PubKey, WalletTx, ZcashdDump, ZcashdWallet

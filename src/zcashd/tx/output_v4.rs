@@ -1,6 +1,6 @@
 use anyhow::{ Result, Context };
 
-use crate::{ u256, Blob, Parseable, Parser };
+use crate::{ u256, Blob, Parse, Parser };
 
 use super::GrothProof;
 
@@ -26,7 +26,7 @@ pub struct OutputV4 {
     zkproof: GrothProof,
 }
 
-impl Parseable for OutputV4 {
+impl Parse for OutputV4 {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
         let cv = u256::parse(parser).context("Parsing cv")?;
         let cmu = u256::parse(parser).context("Parsing cmu")?;

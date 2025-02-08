@@ -1,5 +1,5 @@
 use anyhow::Result;
-use crate::{Parseable, Parser, SecondsSinceEpoch};
+use crate::{Parse, Parser, SecondsSinceEpoch};
 
 use super::{ClientVersion, PubKey};
 
@@ -24,7 +24,7 @@ impl KeyPoolEntry {
     }
 }
 
-impl Parseable for KeyPoolEntry {
+impl Parse for KeyPoolEntry {
     fn parse(parser: &mut Parser) -> Result<Self> {
         let version = ClientVersion::parse(parser)?;
         let timestamp  = SecondsSinceEpoch::parse(parser)?;

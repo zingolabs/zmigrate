@@ -1,6 +1,6 @@
 use anyhow::{ Result, Context, bail };
 
-use crate::{ Data, Parseable, Parser };
+use crate::{ Data, Parse, Parser };
 
 use super::parse_compact_size;
 
@@ -31,7 +31,7 @@ impl AsRef<[u8]> for PubKey {
     }
 }
 
-impl Parseable for PubKey {
+impl Parse for PubKey {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
         let size = parse_compact_size(parser).context("Parsing PubKey size")?;
         if size != 33 && size != 65 {

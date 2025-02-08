@@ -1,6 +1,6 @@
 use anyhow::{ Result, Context };
 
-use crate::{ Parseable, Parser };
+use crate::{ Parse, Parser };
 
 use super::{GrothProof, PHGRProof};
 

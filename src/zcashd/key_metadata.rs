@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use crate::{ Blob, Blob32, Parseable, Parser, SecondsSinceEpoch };
+use crate::{ Blob, Blob32, Parse, Parser, SecondsSinceEpoch };
 
 const VERSION_WITH_HDDATA: i32 = 10;
 #[derive(Debug, Clone, PartialEq)]
@@ -43,7 +43,7 @@ impl KeyMetadata {
     }
 }
 
-impl Parseable for KeyMetadata {
+impl Parse for KeyMetadata {
     fn parse(parser: &mut Parser) -> Result<Self> {
         let version = i32::parse(parser)?;
         let create_time = SecondsSinceEpoch::parse(parser)?;

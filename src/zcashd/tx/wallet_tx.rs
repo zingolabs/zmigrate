@@ -1,5 +1,5 @@
 use anyhow::{ Result, Context };
-use crate::{ Data, Parseable, Parser };
+use crate::{ Data, Parse, Parser };
 
 use super::{ LockTime, SaplingBundle, TxIn, TxOut, TxVersion };
 
@@ -44,7 +44,7 @@ impl WalletTx {
     }
 }
 
-impl Parseable for WalletTx {
+impl Parse for WalletTx {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
         let version = TxVersion::parse(parser).context("Parsing transaction version")?;
 

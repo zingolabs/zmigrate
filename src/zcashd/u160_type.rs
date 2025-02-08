@@ -1,6 +1,6 @@
 use anyhow::{ Result, Context };
 
-use crate::{ Blob20, Parseable, Parser };
+use crate::{ Blob20, Parse, Parser };
 
 #[derive(Clone, PartialEq, Eq, Hash)]
 #[allow(non_camel_case_types)]
@@ -43,7 +43,7 @@ impl std::fmt::Debug for u160 {
     }
 }
 
-impl Parseable for u160 {
+impl Parse for u160 {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
         let blob = Blob20::parse(parser).context("Parsing u160")?;
         Ok(Self(blob))

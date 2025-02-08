@@ -1,4 +1,4 @@
-use crate::{Parseable, Parser};
+use crate::{Parse, Parser};
 
 use anyhow::Result;
 use chrono::{ TimeZone, Utc, SecondsFormat };
@@ -33,7 +33,7 @@ impl From<u32> for SecondsSinceEpoch {
     }
 }
 
-impl Parseable for SecondsSinceEpoch {
+impl Parse for SecondsSinceEpoch {
     fn parse(parser: &mut Parser) -> Result<Self> {
         let seconds = u64::parse(parser)?;
         Ok(Self::from_u64(seconds))

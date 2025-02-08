@@ -1,6 +1,6 @@
 use anyhow::{ Result, Context };
 
-use crate::{ u256, Blob, Parseable, Parser };
+use crate::{ u256, Blob, Parse, Parser };
 
 use super::GrothProof;
 
@@ -14,7 +14,7 @@ pub struct SpendV4 {
     spend_auth_sig: Blob<64>,
 }
 
-impl Parseable for SpendV4 {
+impl Parse for SpendV4 {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
         let cv = u256::parse(parser).context("Parsing cv")?;
         let anchor = u256::parse(parser).context("Parsing anchor")?;

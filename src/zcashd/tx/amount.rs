@@ -1,6 +1,6 @@
 use anyhow::{ Result, Context };
 
-use crate::{format_zec, Parseable, Parser};
+use crate::{format_zec, Parse, Parser};
 
 #[derive(Clone, PartialEq, Eq, Hash, Default)]
 pub struct Amount(u64);
@@ -41,7 +41,7 @@ impl std::fmt::Debug for Amount {
     }
 }
 
-impl Parseable for Amount {
+impl Parse for Amount {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
         let amount = u64::parse(parser).context("Parsing Amount")?;
         Ok(Self(amount))

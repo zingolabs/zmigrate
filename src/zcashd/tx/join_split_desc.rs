@@ -1,6 +1,6 @@
 use anyhow::{ Result, Context };
 
-use crate::{ u256, Parseable, Parser };
+use crate::{ u256, Parse, Parser };
 
 use super::{ note_encryption::Ciphertext, Amount, SproutProof };
 
@@ -23,16 +23,16 @@ pub struct JoinSplitDesc {
 
 impl JoinSplitDesc {
     pub fn parse(parser: &mut Parser, use_groth: bool) -> Result<Self> {
-        let vpub_old = Parseable::parse(parser).context("Parsing vpub_old")?;
-        let vpub_new = Parseable::parse(parser).context("Parsing vpub_new")?;
-        let anchor = Parseable::parse(parser).context("Parsing anchor")?;
-        let nullifiers = Parseable::parse(parser).context("Parsing nullifiers")?;
-        let commitments = Parseable::parse(parser).context("Parsing commitments")?;
-        let ephemeral_key = Parseable::parse(parser).context("Parsing ephemeral_key")?;
-        let random_seed = Parseable::parse(parser).context("Parsing random_seed")?;
-        let macs = Parseable::parse(parser).context("Parsing macs")?;
+        let vpub_old = Parse::parse(parser).context("Parsing vpub_old")?;
+        let vpub_new = Parse::parse(parser).context("Parsing vpub_new")?;
+        let anchor = Parse::parse(parser).context("Parsing anchor")?;
+        let nullifiers = Parse::parse(parser).context("Parsing nullifiers")?;
+        let commitments = Parse::parse(parser).context("Parsing commitments")?;
+        let ephemeral_key = Parse::parse(parser).context("Parsing ephemeral_key")?;
+        let random_seed = Parse::parse(parser).context("Parsing random_seed")?;
+        let macs = Parse::parse(parser).context("Parsing macs")?;
         let zkproof = SproutProof::parse(parser, use_groth).context("Parsing zkproof")?;
-        let ciphertexts = Parseable::parse(parser).context("Parsing ciphertexts")?;
+        let ciphertexts = Parse::parse(parser).context("Parsing ciphertexts")?;
 
         Ok(Self {
             vpub_old,

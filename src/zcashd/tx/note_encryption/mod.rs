@@ -1,6 +1,6 @@
 use anyhow::{ Result, Context };
 
-use crate::{ Blob, Parseable, Parser };
+use crate::{ Blob, Parse, Parser };
 
 pub const NOTEPLAINTEXT_LEADING: usize = 1;
 pub const SAPLING_DIVERSIFIER_SIZE: usize = 11;
@@ -29,7 +29,7 @@ impl AsRef<[u8]> for Ciphertext {
     }
 }
 
-impl Parseable for Ciphertext {
+impl Parse for Ciphertext {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
         let blob = Blob::parse(parser).context("Parsing Ciphertext")?;
         Ok(Self(blob))

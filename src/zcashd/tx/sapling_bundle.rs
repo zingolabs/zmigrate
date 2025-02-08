@@ -1,6 +1,6 @@
 use anyhow::{Result, Context};
 
-use crate::{Parseable, Parser};
+use crate::{Parse, Parser};
 
 use super::{Amount, OutputV4, SpendV4};
 
@@ -21,7 +21,7 @@ impl SaplingBundle {
     }
 }
 
-impl Parseable for SaplingBundle {
+impl Parse for SaplingBundle {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
         let amount = Amount::parse(parser)
             .context("Parsing SaplingBundle amount")?;

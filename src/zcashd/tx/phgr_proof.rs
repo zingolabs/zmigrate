@@ -1,6 +1,6 @@
 use anyhow::{ Result, Context };
 
-use crate::{ Blob, Parseable, Parser };
+use crate::{ Blob, Parse, Parser };
 
 // Initial bool || Fq
 pub type CompressedG1 = Blob<33>;
@@ -17,7 +17,7 @@ pub struct PHGRProof {
     g_h: CompressedG1,
 }
 
-impl Parseable for PHGRProof {
+impl Parse for PHGRProof {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
         let g_a = CompressedG1::parse(parser).context("Parsing g_a")?;
         let g_a_prime = CompressedG1::parse(parser).context("Parsing g_a_prime")?;

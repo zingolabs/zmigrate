@@ -1,6 +1,6 @@
 use crate::{Data, Parser};
 use anyhow::Result;
-use crate::Parseable;
+use crate::Parse;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct OrchardNoteCommitmentTree(Data);
@@ -11,7 +11,7 @@ impl OrchardNoteCommitmentTree {
     }
 }
 
-impl Parseable for OrchardNoteCommitmentTree {
+impl Parse for OrchardNoteCommitmentTree {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
         let data = parser.rest();
         Ok(Self(data))
