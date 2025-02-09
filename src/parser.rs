@@ -48,7 +48,7 @@ macro_rules! parse {
     };
     ($parser:expr, param $param:expr, $context:expr) => {
         ::anyhow::Context::with_context(
-            $crate::ParseWithParam::parse_with_param($parser, $param),
+            $crate::ParseWithParam::parse($parser, $param),
             || format!("Parsing {}", $context)
         )
     };
@@ -66,11 +66,11 @@ pub trait Parse {
 }
 
 pub trait ParseWithParam<P> {
-    fn parse_with_param(parser: &mut Parser, param: P) -> Result<Self> where Self: Sized;
+    fn parse(parser: &mut Parser, param: P) -> Result<Self> where Self: Sized;
 
-    fn parse_buf_with_param(buf: &dyn AsRef<[u8]>, param: P) -> Result<Self> where Self: Sized {
+    fn parse_buf(buf: &dyn AsRef<[u8]>, param: P) -> Result<Self> where Self: Sized {
         let mut parser = Parser::new(&buf);
-        let result = Self::parse_with_param(&mut parser, param)?;
+        let result = Self::parse(&mut parser, param)?;
         parser.check_finished()?;
         Ok(result)
     }

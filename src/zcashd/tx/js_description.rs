@@ -22,7 +22,7 @@ pub struct JSDescription {
 }
 
 impl ParseWithParam<bool> for JSDescription {
-    fn parse_with_param(p: &mut Parser, use_groth: bool) -> Result<Self> {
+    fn parse(p: &mut Parser, use_groth: bool) -> Result<Self> {
         let vpub_old = parse!(p, "vpub_old")?;
         let vpub_new = parse!(p, "vpub_new")?;
         let anchor = parse!(p, "anchor")?;

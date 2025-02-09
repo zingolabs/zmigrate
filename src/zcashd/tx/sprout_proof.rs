@@ -11,7 +11,7 @@ pub enum SproutProof {
 }
 
 impl ParseWithParam<bool> for SproutProof {
-    fn parse_with_param(p: &mut Parser, use_groth: bool) -> Result<Self> {
+    fn parse(p: &mut Parser, use_groth: bool) -> Result<Self> {
         if use_groth {
             let groth_proof = parse!(p, "groth_proof")?;
             Ok(Self::GrothProof(groth_proof))
