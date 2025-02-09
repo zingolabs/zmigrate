@@ -8,7 +8,7 @@ const ZC_NUM_JS_INPUTS: usize = 2;
 const ZC_NUM_JS_OUTPUTS: usize = 2;
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct JoinSplitDesc {
+pub struct JSDescription {
     pub vpub_old: Amount,
     pub vpub_new: Amount,
     pub anchor: u256,
@@ -21,7 +21,7 @@ pub struct JoinSplitDesc {
     pub ciphertexts: [NoteEncryptionCiphertext; ZC_NUM_JS_OUTPUTS],
 }
 
-impl JoinSplitDesc {
+impl JSDescription {
     pub fn parse(p: &mut Parser, use_groth: bool) -> Result<Self> {
         let vpub_old = parse!(p, "vpub_old")?;
         let vpub_new = parse!(p, "vpub_new")?;

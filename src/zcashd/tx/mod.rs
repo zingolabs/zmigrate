@@ -34,8 +34,8 @@ pub use spend_v4::*;
 mod output_v4;
 pub use output_v4::*;
 
-mod join_split_desc;
-pub use join_split_desc::*;
+mod js_description;
+pub use js_description::*;
 
 mod groth_proof;
 pub use groth_proof::*;
