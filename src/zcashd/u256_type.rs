@@ -2,7 +2,7 @@ use anyhow::{ Result, Context };
 
 use crate::{ parse, Blob32, Parse, Parser };
 
-#[derive(Clone, PartialEq, Eq, Hash)]
+#[derive(Clone, PartialEq, Eq, Hash, Default)]
 #[allow(non_camel_case_types)]
 pub struct u256(Blob32);
 

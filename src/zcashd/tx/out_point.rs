@@ -4,8 +4,8 @@ use crate::{parse, u256, Parse, Parser};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct OutPoint {
-    pub txid: u256,
-    pub vout: u32,
+    txid: u256,
+    vout: u32,
 }
 
 impl OutPoint {

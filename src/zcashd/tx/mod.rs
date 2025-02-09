@@ -60,3 +60,18 @@ pub use join_splits::*;
 
 pub mod expiry_height;
 pub use expiry_height::*;
+
+pub mod js_out_point;
+pub use js_out_point::*;
+
+pub mod sprout_payment_address;
+pub use sprout_payment_address::*;
+
+pub mod sprout_note_data;
+pub use sprout_note_data::*;
+
+pub mod incremental_merkle_tree;
+pub use incremental_merkle_tree::*;
+
+pub mod incremental_witness;
+pub use incremental_witness::*;

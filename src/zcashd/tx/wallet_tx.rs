@@ -1,11 +1,14 @@
-use anyhow::Result;
-use crate::{ parse, Data, Parse, Parser };
+use std::collections::HashMap;
 
-use super::{ ExpiryHeight, JoinSplits, LockTime, SaplingBundle, TxIn, TxOut, TxVersion, SAPLING_TX_VERSION };
+use anyhow::Result;
+use crate::{ parse, u256, Data, Parse, Parser };
+
+use super::{ ExpiryHeight, JSOutPoint, JoinSplits, LockTime, SaplingBundle, SproutNoteData, TxIn, TxOut, TxVersion, SAPLING_TX_VERSION };
 
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct WalletTx {
+    // CTransaction
     version: TxVersion,
     vin: Vec<TxIn>,
     vout: Vec<TxOut>,
@@ -13,6 +16,21 @@ pub struct WalletTx {
     expiry_height: Option<ExpiryHeight>,
     sapling_bundle: SaplingBundle,
     join_splits: Option<JoinSplits>,
+
+    // CMerkleTx
+    hash_block: u256,
+    merkle_branch: Vec<u256>,
+    index: i32,
+
+    // CWalletTx
+    map_value: HashMap<String, String>,
+    map_spout_note_data: HashMap<JSOutPoint, SproutNoteData>,
+    order_form: Vec<(String, String)>,
+    time_received_is_tx_time: i32,
+    time_received: i32,
+    from_me: bool,
+    is_spent: bool,
+
     rest: Data,
 }
 
@@ -48,6 +66,8 @@ impl WalletTx {
 
 impl Parse for WalletTx {
     fn parse(p: &mut Parser) -> Result<Self> {
+        // CTransaction
+
         let version: TxVersion = parse!(p, "transaction version")?;
 
         let mut vin = Vec::new();
@@ -56,6 +76,7 @@ impl Parse for WalletTx {
         let mut expiry_height = None;
         let mut sapling_bundle: SaplingBundle = SaplingBundle::default();
         let mut join_splits = None;
+
         if version.is_zip225() {
             // lock_time = parse!(p, "transaction lock time")?;
             // expiry_height = parse!(p, "transaction expiry height")?;
@@ -80,11 +101,28 @@ impl Parse for WalletTx {
                 join_splits = Some(parse!(p, param use_groth, "JoinSplits")?);
             }
 
-            // if (version.is_sapling() || version.is_future()) && sapling_bundle.have_actions() {
-            //     let binding_sig = parse!(p, "Sapling bundle signature")?;
-            //     sapling_bundle.set_binding_sig(binding_sig);
-            // }
+            if (version.is_sapling() || version.is_future()) && sapling_bundle.have_actions() {
+                let binding_sig = parse!(p, "Sapling bundle signature")?;
+                sapling_bundle.set_binding_sig(binding_sig);
+            }
         }
+
+        // CMerkleTx
+        let hash_block = parse!(p, "hash block")?;
+        let merkle_branch = parse!(p, "merkle branch")?;
+        let index = parse!(p, "index")?;
+
+        // CWalletTx
+        let unused: Vec<i32> = parse!(p, "unused")?;
+        assert!(unused.is_empty(), "unused field in CWalletTx is not empty");
+
+        let map_value = parse!(p, "map value")?;
+        let map_spout_note_data = parse!(p, "map sprout note data")?;
+        let order_form = parse!(p, "order form")?;
+        let time_received_is_tx_time = parse!(p, "time received is tx time")?;
+        let time_received = parse!(p, "time received")?;
+        let from_me = parse!(p, "from me")?;
+        let is_spent = parse!(p, "is spent")?;
 
         let rest = p.rest();
         Ok(Self {
@@ -95,6 +133,19 @@ impl Parse for WalletTx {
             expiry_height,
             sapling_bundle,
             join_splits,
+
+            hash_block,
+            merkle_branch,
+            index,
+
+            map_value,
+            map_spout_note_data,
+            order_form,
+            time_received_is_tx_time,
+            time_received,
+            from_me,
+            is_spent,
+
             rest,
         })
     }
