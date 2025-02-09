@@ -10,9 +10,9 @@ macro_rules! parse {
             || format!("Parsing {}", $context)
         )
     };
-    (buf $buf:expr, $type:ty, $param:expr, $context:expr) => {
+    (buf $buf:expr, $type:ty, param $param:expr, $context:expr) => {
         ::anyhow::Context::with_context(
-            <$type as $crate::ParseWithParam>::parse_buf_with_param($buf, $param),
+            $crate::ParseWithParam::parse_buf($buf, $param),
             || format!("Parsing {}", $context)
         )
     };
@@ -22,9 +22,9 @@ macro_rules! parse {
             || format!("Parsing {}", $context)
         )
     };
-    ($parser:expr, $type:ty, $param:expr, $context:expr) => {
+    ($parser:expr, $type:ty, param $param:expr, $context:expr) => {
         ::anyhow::Context::with_context(
-            <$type as $crate::ParseWithParam>::parse_with_param($parser, $param),
+            $crate::ParseWithParam::parse($parser, $param),
             || format!("Parsing {}", $context)
         )
     };

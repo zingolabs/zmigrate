@@ -2,7 +2,7 @@ use anyhow::Result;
 
 use crate::{parse, Parse, Parser, SecondsSinceEpoch};
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub enum LockTime {
     BlockHeight(u32),
     Timestamp(SecondsSinceEpoch),
@@ -11,9 +11,9 @@ pub enum LockTime {
 impl LockTime {
     pub fn from_u32(locktime: u32) -> Self {
         if locktime < 500_000_000 {
-            LockTime::BlockHeight(locktime)
+            Self::BlockHeight(locktime)
         } else {
-            LockTime::Timestamp(locktime.into())
+            Self::Timestamp(locktime.into())
         }
     }
 
@@ -38,11 +38,12 @@ impl LockTime {
             _ => None,
         }
     }
-}
 
-impl Default for LockTime {
-    fn default() -> Self {
-        LockTime::BlockHeight(0)
+    pub fn as_option(self) -> Option<Self> {
+        match self {
+            LockTime::BlockHeight(0) => None,
+            _ => Some(self),
+        }
     }
 }
 

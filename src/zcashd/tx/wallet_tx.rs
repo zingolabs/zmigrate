@@ -1,17 +1,18 @@
 use anyhow::Result;
 use crate::{ parse, Data, Parse, Parser };
 
-use super::{ JSDescription, LockTime, SaplingBundle, TxIn, TxOut, TxVersion };
+use super::{ ExpiryHeight, JoinSplits, LockTime, SaplingBundle, TxIn, TxOut, TxVersion, SAPLING_TX_VERSION };
+
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct WalletTx {
     version: TxVersion,
     vin: Vec<TxIn>,
     vout: Vec<TxOut>,
-    lock_time: LockTime,
-    expiry_height: u32,
+    lock_time: Option<LockTime>,
+    expiry_height: Option<ExpiryHeight>,
     sapling_bundle: SaplingBundle,
-    join_split: Option<Vec<JSDescription>>,
+    join_splits: Option<JoinSplits>,
     rest: Data,
 }
 
@@ -28,11 +29,11 @@ impl WalletTx {
         &self.vout
     }
 
-    pub fn lock_time(&self) -> &LockTime {
-        &self.lock_time
+    pub fn lock_time(&self) -> Option<LockTime> {
+        self.lock_time
     }
 
-    pub fn expiry_height(&self) -> u32 {
+    pub fn expiry_height(&self) -> Option<ExpiryHeight> {
         self.expiry_height
     }
 
@@ -49,38 +50,40 @@ impl Parse for WalletTx {
     fn parse(p: &mut Parser) -> Result<Self> {
         let version: TxVersion = parse!(p, "transaction version")?;
 
-        let vin;
-        let vout;
-        let lock_time;
-        let expiry_height;
-        let sapling_bundle: SaplingBundle;
-        let join_split = None;
+        let mut vin = Vec::new();
+        let mut vout = Vec::new();
+        let mut lock_time = None;
+        let mut expiry_height = None;
+        let mut sapling_bundle: SaplingBundle = SaplingBundle::default();
+        let mut join_splits = None;
         if version.is_zip225() {
-            todo!()
             // lock_time = parse!(p, "transaction lock time")?;
             // expiry_height = parse!(p, "transaction expiry height")?;
             // vin = parse!(p, "transaction inputs")?;
             // vout = parse!(p, "transaction outputs")?;
+            todo!()
         } else {
             vin = parse!(p, "transaction inputs")?;
             vout = parse!(p, "transaction outputs")?;
-            lock_time = parse!(p, "transaction lock time")?;
-            expiry_height = if version.is_overwinter() || version.is_sapling() || version.is_future() {
-                parse!(p, "transaction expiry height")?
-            } else {
-                0
-            };
-            if version.is_sapling() || version.is_future() {
-                // println!("✅ Sapling bundle");
-                sapling_bundle = parse!(p, "Sapling bundle")?;
-            } else {
-                // println!("❌ No Sapling bundle");
-                sapling_bundle = SaplingBundle::default();
+            lock_time = parse!(p, LockTime, "transaction lock time")?.as_option();
+            if version.is_overwinter() || version.is_sapling() || version.is_future() {
+                expiry_height = parse!(p, ExpiryHeight, "transaction expiry height")?.as_option();
             }
 
+            sapling_bundle = (version.is_sapling() || version.is_future())
+                .then(|| parse!(p, "Sapling bundle"))
+                .transpose()?
+                .unwrap_or_default();
+
             if version.number() >= 2 {
-                // join_split = Some(parse!(p, Vec<JSDescription>, "JoinSplit descriptions")?);
+                let use_groth = version.is_overwinter() && version.number >= SAPLING_TX_VERSION;
+                join_splits = Some(parse!(p, param use_groth, "JoinSplits")?);
             }
+
+            // if (version.is_sapling() || version.is_future()) && sapling_bundle.have_actions() {
+            //     let binding_sig = parse!(p, "Sapling bundle signature")?;
+            //     sapling_bundle.set_binding_sig(binding_sig);
+            // }
         }
 
         let rest = p.rest();
@@ -91,7 +94,7 @@ impl Parse for WalletTx {
             lock_time,
             expiry_height,
             sapling_bundle,
-            join_split,
+            join_splits,
             rest,
         })
     }

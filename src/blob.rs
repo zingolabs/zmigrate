@@ -41,6 +41,12 @@ impl<const N: usize> Blob<N> {
     }
 }
 
+impl<const N: usize> Default for Blob<N> {
+    fn default() -> Self {
+        Self([0u8; N])
+    }
+}
+
 impl<const N: usize> AsRef<[u8]> for Blob<N> {
     fn as_ref(&self) -> &[u8] {
         &self.0
@@ -86,3 +92,4 @@ impl<const N: usize> Parse for Blob<N> {
 
 pub type Blob20 = Blob<20>;
 pub type Blob32 = Blob<32>;
+pub type Blob64 = Blob<64>;

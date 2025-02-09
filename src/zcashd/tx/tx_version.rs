@@ -1,4 +1,4 @@
-use anyhow::{Result, Context, bail};
+use anyhow::{Result, bail};
 
 use crate::{parse, Parse, Parser};
 
@@ -7,7 +7,7 @@ use super::IntID;
 const OVERWINTER_VERSION_GROUP_ID: IntID = IntID::new(0x03c48270);
 const OVERWINTER_TX_VERSION: u32 = 3;
 const SAPLING_VERSION_GROUP_ID: IntID = IntID::new(0x892f2085);
-const SAPLING_TX_VERSION: u32 = 4;
+pub const SAPLING_TX_VERSION: u32 = 4;
 const ZIP225_VERSION_GROUP_ID: IntID = IntID::new(0x26a7270a);
 const ZIP225_TX_VERSION: u32 = 5;
 const ZFUTURE_VERSION_GROUP_ID: IntID = IntID::new(0xffffffff);
@@ -56,15 +56,14 @@ impl TxVersion {
 
 impl Parse for TxVersion {
     fn parse(p: &mut Parser) -> Result<Self> {
-        let header = u32::parse(p).context("Transaction header")?;
+        let header: u32 = parse!(p, "Transaction header")?;
         let overwintered = (header >> 31) == 1;
         let number = header & 0x7fffffff;
 
-        let version_group_id = if overwintered {
-            parse!(p, "Transaction version group ID")?
-        } else {
-            IntID::default()
-        };
+        let version_group_id = overwintered
+            .then(|| parse!(p, "Transaction version group ID"))
+            .transpose()?
+            .unwrap_or_default();
 
         let group = match (overwintered, version_group_id, number) {
             (false, _, _) => TxVersionGroup::PreOverwinter,

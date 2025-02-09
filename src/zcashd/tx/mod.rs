@@ -48,3 +48,15 @@ pub use sprout_proof::*;
 
 pub mod note_encryption_ciphertext;
 pub use note_encryption_ciphertext::*;
+
+pub mod ed25519_verification_key;
+pub use ed25519_verification_key::*;
+
+pub mod ed25519_signature;
+pub use ed25519_signature::*;
+
+pub mod join_splits;
+pub use join_splits::*;
+
+pub mod expiry_height;
+pub use expiry_height::*;

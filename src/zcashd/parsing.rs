@@ -1,17 +1,14 @@
 use std::collections::HashMap;
 
-use anyhow::{bail, Context, Result};
+use anyhow::{ bail, Context, Result };
 
-use crate::{parse, Parse, Parser};
+use crate::{ parse, Parse, ParseWithParam, Parser };
 
 pub fn parse_compact_size(p: &mut Parser) -> Result<usize> {
     match parse!(p, u8, "compact size")? {
-        0xfd =>
-            parse!(p, u16, "compact size").map(|n| n as usize),
-        0xfe =>
-            parse!(p, u32, "compact size").map(|n| n as usize),
-        0xff =>
-            parse!(p, u64, "compact size").map(|n| n as usize),
+        0xfd => parse!(p, u16, "compact size").map(|n| n as usize),
+        0xfe => parse!(p, u32, "compact size").map(|n| n as usize),
+        0xff => parse!(p, u64, "compact size").map(|n| n as usize),
         size => Ok(size as usize),
     }
 }
@@ -36,9 +33,33 @@ pub fn parse_fixed_length_vec<T: Parse>(p: &mut Parser, length: usize) -> Result
     Ok(items)
 }
 
+pub fn parse_fixed_length_vec_with_param<T: ParseWithParam<U>, U: Clone>(
+    p: &mut Parser,
+    length: usize,
+    param: U
+) -> Result<Vec<T>> {
+    let mut items = Vec::with_capacity(length);
+    for i in 0..length {
+        items.push(parse!(p, param param.clone(), format!("array item {} of {}", i, length - 1))?);
+    }
+    Ok(items)
+}
+
 pub fn parse_fixed_length_array<T: Parse, const N: usize>(p: &mut Parser) -> Result<[T; N]> {
     let items = parse_fixed_length_vec(p, N)?;
-    let array: [T; N] = items.try_into()
+    let array: [T; N] = items
+        .try_into()
+        .map_err(|_| anyhow::anyhow!("Failed to convert Vec to fixed length array"))?;
+    Ok(array)
+}
+
+pub fn parse_fixed_length_array_with_param<T: ParseWithParam<U>, U: Clone, const N: usize>(
+    p: &mut Parser,
+    param: U
+) -> Result<[T; N]> {
+    let items = parse_fixed_length_vec_with_param(p, N, param)?;
+    let array: [T; N] = items
+        .try_into()
         .map_err(|_| anyhow::anyhow!("Failed to convert Vec to fixed length array"))?;
     Ok(array)
 }
@@ -48,15 +69,32 @@ pub fn parse_vec<T: Parse>(p: &mut Parser) -> Result<Vec<T>> {
     parse_fixed_length_vec(p, length)
 }
 
+pub fn parse_vec_with_param<T: ParseWithParam<U>, U: Clone>(p: &mut Parser, param: U) -> Result<Vec<T>> {
+    let length = parse_compact_size(p).context("array length")?;
+    parse_fixed_length_vec_with_param(p, length, param)
+}
+
 impl<T: Parse, const N: usize> Parse for [T; N] {
     fn parse(p: &mut Parser) -> Result<Self> {
         parse_fixed_length_array(p)
     }
 }
 
+impl<T: ParseWithParam<U>, U: Clone, const N: usize> ParseWithParam<U> for [T; N] {
+    fn parse(p: &mut Parser, param: U) -> Result<Self> {
+        parse_fixed_length_array_with_param(p, param)
+    }
+}
+
 impl<T: Parse> Parse for Vec<T> {
     fn parse(p: &mut Parser) -> Result<Self> {
         parse_vec(p)
+    }
+}
+
+impl<T: ParseWithParam<U>, U: Clone> ParseWithParam<U> for Vec<T> {
+    fn parse(p: &mut Parser, param: U) -> Result<Self> {
+        parse_vec_with_param(p, param)
     }
 }
 
@@ -75,9 +113,7 @@ pub fn parse_hashmap<K, V: Parse>(p: &mut Parser) -> Result<HashMap<K, V>>
     Ok(parse_map::<K, V>(p)?.into_iter().collect())
 }
 
-impl<K: Parse, V: Parse> Parse for HashMap<K, V>
-    where K: Parse + Eq + std::hash::Hash
-{
+impl<K: Parse, V: Parse> Parse for HashMap<K, V> where K: Parse + Eq + std::hash::Hash {
     fn parse(p: &mut Parser) -> Result<Self> {
         parse_hashmap(p)
     }
