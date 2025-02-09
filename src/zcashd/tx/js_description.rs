@@ -1,6 +1,6 @@
-use anyhow::{ Result, Context };
+use anyhow::Result;
 
-use crate::{ parse, u256, Parser };
+use crate::{ parse, u256, ParseWithParam, Parser };
 
 use super::{ NoteEncryptionCiphertext, Amount, SproutProof };
 
@@ -21,8 +21,8 @@ pub struct JSDescription {
     pub ciphertexts: [NoteEncryptionCiphertext; ZC_NUM_JS_OUTPUTS],
 }
 
-impl JSDescription {
-    pub fn parse(p: &mut Parser, use_groth: bool) -> Result<Self> {
+impl ParseWithParam<bool> for JSDescription {
+    fn parse_with_param(p: &mut Parser, use_groth: bool) -> Result<Self> {
         let vpub_old = parse!(p, "vpub_old")?;
         let vpub_new = parse!(p, "vpub_new")?;
         let anchor = parse!(p, "anchor")?;
@@ -31,7 +31,7 @@ impl JSDescription {
         let ephemeral_key = parse!(p, "ephemeral_key")?;
         let random_seed = parse!(p, "random_seed")?;
         let macs = parse!(p, "macs")?;
-        let zkproof = SproutProof::parse(p, use_groth).context("zkproof")?;
+        let zkproof = parse!(p, param use_groth, "zkproof")?;
         let ciphertexts = parse!(p, "ciphertexts")?;
 
         Ok(Self {

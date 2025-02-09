@@ -1,8 +1,8 @@
 use anyhow::Result;
 
-use crate::{ parse, Parser };
+use crate::{ parse, ParseWithParam, Parser };
 
-use super::{GrothProof, PHGRProof};
+use super::{ GrothProof, PHGRProof };
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum SproutProof {
@@ -10,8 +10,8 @@ pub enum SproutProof {
     GrothProof(GrothProof),
 }
 
-impl SproutProof {
-    pub fn parse(p: &mut Parser, use_groth: bool) -> Result<Self> {
+impl ParseWithParam<bool> for SproutProof {
+    fn parse_with_param(p: &mut Parser, use_groth: bool) -> Result<Self> {
         if use_groth {
             let groth_proof = parse!(p, "groth_proof")?;
             Ok(Self::GrothProof(groth_proof))

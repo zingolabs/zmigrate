@@ -10,9 +10,21 @@ macro_rules! parse {
             || format!("Parsing {}", $context)
         )
     };
+    (buf $buf:expr, $type:ty, $param:expr, $context:expr) => {
+        ::anyhow::Context::with_context(
+            <$type as $crate::ParseWithParam>::parse_buf_with_param($buf, $param),
+            || format!("Parsing {}", $context)
+        )
+    };
     ($parser:expr, $type:ty, $context:expr) => {
         ::anyhow::Context::with_context(
             <$type as $crate::Parse>::parse($parser),
+            || format!("Parsing {}", $context)
+        )
+    };
+    ($parser:expr, $type:ty, $param:expr, $context:expr) => {
+        ::anyhow::Context::with_context(
+            <$type as $crate::ParseWithParam>::parse_with_param($parser, $param),
             || format!("Parsing {}", $context)
         )
     };
@@ -34,6 +46,12 @@ macro_rules! parse {
             || format!("Parsing {}", $context)
         )
     };
+    ($parser:expr, param $param:expr, $context:expr) => {
+        ::anyhow::Context::with_context(
+            $crate::ParseWithParam::parse_with_param($parser, $param),
+            || format!("Parsing {}", $context)
+        )
+    };
 }
 
 pub trait Parse {
@@ -42,6 +60,17 @@ pub trait Parse {
     fn parse_buf(buf: &dyn AsRef<[u8]>) -> Result<Self> where Self: Sized {
         let mut parser = Parser::new(&buf);
         let result = Self::parse(&mut parser)?;
+        parser.check_finished()?;
+        Ok(result)
+    }
+}
+
+pub trait ParseWithParam<P> {
+    fn parse_with_param(parser: &mut Parser, param: P) -> Result<Self> where Self: Sized;
+
+    fn parse_buf_with_param(buf: &dyn AsRef<[u8]>, param: P) -> Result<Self> where Self: Sized {
+        let mut parser = Parser::new(&buf);
+        let result = Self::parse_with_param(&mut parser, param)?;
         parser.check_finished()?;
         Ok(result)
     }
