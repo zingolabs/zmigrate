@@ -1,29 +1,45 @@
-use std::collections::HashMap;
+use std::{cell::RefCell, collections::{HashMap, HashSet}};
 
 use anyhow::{ Context, Result, bail };
 
 use crate::{ parse, u256 };
 
 use super::{
-    zcashd_dump::DBKey, Address, BlockLocator, ClientVersion, Key, KeyMetadata, KeyPoolEntry, Keys, MnemonicHDChain, MnemonicSeed, NetworkInfo, OrchardNoteCommitmentTree, PrivKey, PubKey, WalletTx, ZcashdDump, ZcashdWallet
+    zcashd_dump::DBKey, Address, BlockLocator, ClientVersion, DBValue, Key, KeyMetadata, KeyPoolEntry, Keys, MnemonicHDChain, MnemonicSeed, NetworkInfo, OrchardNoteCommitmentTree, PrivKey, PubKey, WalletTx, ZcashdDump, ZcashdWallet
 };
 
 #[derive(Debug)]
 pub struct ZcashdParser<'a> {
-    dump: &'a ZcashdDump,
+    pub dump: &'a ZcashdDump,
+    pub unparsed_keys: RefCell<HashSet<DBKey>>,
 }
 
 impl<'a> ZcashdParser<'a> {
-    pub fn parse_dump(dump: &ZcashdDump) -> Result<ZcashdWallet> {
+    pub fn parse_dump(dump: &ZcashdDump) -> Result<(ZcashdWallet, HashSet<DBKey>)> {
         let parser = ZcashdParser::new(dump);
         parser.parse()
     }
 
     fn new(dump: &'a ZcashdDump) -> Self {
-        Self { dump }
+        let unparsed_keys = RefCell::new(dump.records().keys().cloned().collect());
+        Self {
+            dump,
+            unparsed_keys,
+        }
     }
 
-    fn parse(&self) -> Result<ZcashdWallet> {
+    // Keep track of which keys have been parsed
+    fn mark_key_parsed(&self, key: &DBKey) {
+        self.unparsed_keys.borrow_mut().remove(key);
+    }
+
+    fn value_for_keyname(&self, keyname: &str) -> Result<&DBValue> {
+        let key = self.dump.key_for_keyname(keyname);
+        self.mark_key_parsed(&key);
+        self.dump.value_for_keyname(keyname)
+    }
+
+    fn parse(&self) -> Result<(ZcashdWallet, HashSet<DBKey>)> {
         //
         // Since version 3
         //
@@ -132,30 +148,30 @@ impl<'a> ZcashdParser<'a> {
         // **bestblock_nomerkle**
         let bestblock_nomerkle = self.parse_block_locator("bestblock_nomerkle")?;
 
-        Ok(
-            ZcashdWallet {
-                bestblock_nomerkle,
-                bestblock,
-                client_version,
-                default_key,
-                keys,
-                min_version,
-                mnemonic_hd_chain,
-                mnemonic_phrase,
-                address_names,
-                address_purposes,
-                network_info,
-                orchard_note_commitment_tree,
-                orderposnext,
-                witnesscachesize,
-                key_pool,
-                transactions,
-            }
-        )
+        let wallet = ZcashdWallet {
+            bestblock_nomerkle,
+            bestblock,
+            client_version,
+            default_key,
+            keys,
+            min_version,
+            mnemonic_hd_chain,
+            mnemonic_phrase,
+            address_names,
+            address_purposes,
+            network_info,
+            orchard_note_commitment_tree,
+            orderposnext,
+            witnesscachesize,
+            key_pool,
+            transactions,
+        };
+
+        Ok((wallet, self.unparsed_keys.borrow().clone()))
     }
 
     fn parse_i64(&self, keyname: &str) -> Result<i64> {
-        let value = self.dump.value_for_keyname(keyname)?;
+        let value = self.value_for_keyname(keyname)?;
         parse!(buf value, i64, format!("i64 for keyname: {}", keyname))
     }
 
@@ -168,12 +184,12 @@ impl<'a> ZcashdParser<'a> {
     }
 
     fn parse_client_version(&self, keyname: &str) -> Result<ClientVersion> {
-        let value = self.dump.value_for_keyname(keyname)?;
+        let value = self.value_for_keyname(keyname)?;
         parse!(buf value, ClientVersion, format!("client version for keyname: {}", keyname))
     }
 
     fn parse_block_locator(&self, keyname: &str) -> Result<BlockLocator> {
-        let value = self.dump.value_for_keyname(keyname)?;
+        let value = self.value_for_keyname(keyname)?;
         parse!(buf value, BlockLocator, format!("block locator for keyname: {}", keyname))
     }
 
@@ -196,17 +212,20 @@ impl<'a> ZcashdParser<'a> {
                 "Creating keypair"
             )?;
             keys_map.insert(pubkey, keypair);
+
+            self.mark_key_parsed(&key);
+            self.mark_key_parsed(&metakey);
         }
         Ok(Keys::new(keys_map))
     }
 
     fn parse_default_key(&self) -> Result<PubKey> {
-        let value = self.dump.value_for_keyname("defaultkey")?;
+        let value = self.value_for_keyname("defaultkey")?;
         parse!(buf value, PubKey, "defaultkey")
     }
 
     fn parse_mnemonic_hd_chain(&self) -> Result<MnemonicHDChain> {
-        let value = self.dump.value_for_keyname("mnemonichdchain")?;
+        let value = self.value_for_keyname("mnemonichdchain")?;
         parse!(buf value, MnemonicHDChain, "mnemonichdchain")
     }
 
@@ -217,6 +236,7 @@ impl<'a> ZcashdParser<'a> {
         let fingerprint = parse!(buf &key.data, u256, "seed fingerprint")?;
         let seed = parse!(buf &value, MnemonicSeed, "mnemonic phrase")?
             .set_fingerprint(fingerprint);
+        self.mark_key_parsed(&key);
         Ok(seed)
     }
 
@@ -230,6 +250,8 @@ impl<'a> ZcashdParser<'a> {
                 bail!("Duplicate address found: {}", address);
             }
             address_names.insert(address, name);
+
+            self.mark_key_parsed(&key);
         }
         Ok(address_names)
     }
@@ -244,21 +266,23 @@ impl<'a> ZcashdParser<'a> {
                 bail!("Duplicate address found: {}", address);
             }
             address_purposes.insert(address, purpose);
+
+            self.mark_key_parsed(&key);
         }
         Ok(address_purposes)
     }
 
     fn parse_network_info(&self) -> Result<NetworkInfo> {
-        let (_, value) = self.dump
-            .record_for_keyname("networkinfo")
+        let value = self
+            .value_for_keyname("networkinfo")
             .context("Getting 'networkinfo' record")?;
         let network_info = parse!(buf value.as_data(), NetworkInfo, "network info")?;
         Ok(network_info)
     }
 
     fn parse_orchard_note_commitment_tree(&self) -> Result<OrchardNoteCommitmentTree> {
-        let (_, value) = self.dump
-            .record_for_keyname("orchard_note_commitment_tree")
+        let value = self
+            .value_for_keyname("orchard_note_commitment_tree")
             .context("Getting 'orchard_note_commitment_tree' record")?;
         let orchard_note_commitment_tree = parse!(buf value.as_data(), OrchardNoteCommitmentTree, "orchard note commitment tree")?;
         Ok(orchard_note_commitment_tree)
@@ -271,6 +295,8 @@ impl<'a> ZcashdParser<'a> {
             let index = parse!(buf &key.data, i64, "key pool index")?;
             let entry = parse!(buf value.as_data(), KeyPoolEntry, "key pool entry")?;
             key_pool.insert(index, entry);
+
+            self.mark_key_parsed(&key);
         }
         Ok(key_pool)
     }
@@ -278,7 +304,7 @@ impl<'a> ZcashdParser<'a> {
     fn parse_transactions(&self) -> Result<HashMap<u256, WalletTx>> {
         let mut transactions = HashMap::new();
         // Some wallet files don't have any transactions
-        if self.dump.has_records_for_keyname("tx") {
+        if self.dump.has_keys_for_keyname("tx") {
             let records = self.dump.records_for_keyname("tx").context("Getting 'tx' records")?;
             for (key, value) in records {
                 let txid = parse!(buf &key.data, u256, "transaction ID")?;
@@ -287,6 +313,8 @@ impl<'a> ZcashdParser<'a> {
                     bail!("Duplicate transaction found: {:?}", txid);
                 }
                 transactions.insert(txid, transaction);
+
+                self.mark_key_parsed(&key);
             }
         }
         Ok(transactions)

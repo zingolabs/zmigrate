@@ -29,11 +29,22 @@ fn main() -> Result<()> {
     // println!("---");
     // zcashd_dump.print_keys();
 
-    let zcashd_wallet = ZcashdParser::parse_dump(&zcashd_dump)
+    let (zcashd_wallet, unparsed_keys) = ZcashdParser::parse_dump(&zcashd_dump)
         .context("Parsing Zcashd dump")?;
 
     println!("---");
     println!("{:#?}", zcashd_wallet);
+
+    if unparsed_keys.is_empty() {
+        println!("---");
+        println!("✅ All keys parsed successfully");
+    } else {
+        println!("---");
+        println!("🛑 Unparsed keys:");
+        for key in unparsed_keys {
+            println!("❌ {:?}", key);
+        }
+    }
 
     Ok(())
 }

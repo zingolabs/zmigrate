@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{ HashMap, HashSet };
 
 use anyhow::{ bail, Result, Context };
 
@@ -70,13 +70,13 @@ impl AsRef<[u8]> for DBValue {
 #[derive(Debug)]
 pub struct ZcashdDump {
     records: HashMap<DBKey, DBValue>,
-    records_by_keyname: HashMap<String, HashMap<DBKey, DBValue>>,
+    keys_by_keyname: HashMap<String, HashSet<DBKey>>,
 }
 
 impl ZcashdDump {
     pub fn from_bdb_dump(berkeley_dump: &BDBDump) -> Result<Self> {
         let mut records: HashMap<DBKey, DBValue> = HashMap::new();
-        let mut records_by_keyname: HashMap<String, HashMap<DBKey, DBValue>> = HashMap::new();
+        let mut keys_by_keyname: HashMap<String, HashSet<DBKey>> = HashMap::new();
 
         for (key_data, value_data) in &berkeley_dump.data_records {
             let key = DBKey::parse_data(key_data)?;
@@ -84,13 +84,13 @@ impl ZcashdDump {
             records.insert(key.clone(), value.clone());
 
             let keyname = key.keyname.to_string();
-            let keyname_records = records_by_keyname.entry(keyname).or_default();
-            keyname_records.insert(key, value);
+            let keyname_keys = keys_by_keyname.entry(keyname).or_default();
+            keyname_keys.insert(key);
         }
 
         Ok(ZcashdDump {
             records,
-            records_by_keyname,
+            keys_by_keyname,
         })
     }
 
@@ -105,56 +105,69 @@ impl ZcashdDump {
         }
     }
 
+    pub fn key_for_keyname(&self, keyname: &str) -> DBKey {
+        DBKey::new(keyname.to_string(), Data::new())
+    }
+
     pub fn value_for_keyname(&self, keyname: &str) -> Result<&DBValue> {
-        let key = DBKey::new(keyname.to_string(), Data::new());
-        self.value_for_key(&key)
-            .context(format!("No record found for keyname: {}", keyname))
+        let key = self.key_for_keyname(keyname);
+        self.value_for_key(&key).context(format!("No record found for keyname: {}", keyname))
     }
 
     pub fn has_value_for_keyname(&self, keyname: &str) -> bool {
-        let key = DBKey::new(keyname.to_string(), Data::new());
+        let key = self.key_for_keyname(keyname);
         self.records.contains_key(&key)
     }
 
-    pub fn records_by_keyname(&self) -> &HashMap<String, HashMap<DBKey, DBValue>> {
-        &self.records_by_keyname
+    pub fn keys_by_keyname(&self) -> &HashMap<String, HashSet<DBKey>> {
+        &self.keys_by_keyname
     }
 
-    pub fn records_for_keyname(&self, keyname: &str) -> Result<&HashMap<DBKey, DBValue>> {
-        match self.records_by_keyname.get(keyname) {
-            Some(records) => Ok(records),
-            None => bail!("No records found for keyname: {}", keyname),
+    pub fn records_for_keyname(&self, keyname: &str) -> Result<HashMap<DBKey, DBValue>> {
+        let keys = self.keys_by_keyname
+            .get(keyname)
+            .context(format!("No records found for keyname: {}", keyname))?;
+        let mut records = HashMap::new();
+        for key in keys {
+            let value = self.value_for_key(key)?;
+            records.insert(key.clone(), value.clone());
         }
+        Ok(records)
     }
 
-    pub fn has_records_for_keyname(&self, keyname: &str) -> bool {
-        self.records_by_keyname.contains_key(keyname)
+    pub fn has_keys_for_keyname(&self, keyname: &str) -> bool {
+        self.keys_by_keyname.contains_key(keyname)
     }
 
     pub fn record_for_keyname(&self, keyname: &str) -> Result<(DBKey, DBValue)> {
-        let records = self.records_for_keyname(keyname)?;
-        if records.len() != 1 {
+        let keys = self.keys_by_keyname
+            .get(keyname)
+            .context(format!("No records found for keyname: {}", keyname))?;
+        if keys.len() != 1 {
             bail!("Expected exactly one record for keyname: {}", keyname);
         }
-        match records.iter().next() {
-            Some((key, value)) => Ok((key.clone(), value.clone())),
+        match keys.iter().next() {
+            Some(key) => {
+                let value = self.value_for_key(key)?;
+                Ok((key.clone(), value.clone()))
+            }
             None => bail!("No record found for keyname: {}", keyname),
         }
     }
 
     fn sorted_key_names(&self) -> Vec<String> {
-        let mut keynames: Vec<String> = self.records_by_keyname.keys().cloned().collect();
+        let mut keynames: Vec<String> = self.keys_by_keyname.keys().cloned().collect();
         keynames.sort();
         keynames
     }
 
     pub fn print_keyname_summary(&self) {
         for keyname in self.sorted_key_names() {
-            let keys = self.records_by_keyname.get(&keyname).unwrap().keys();
+            let keys = self.keys_by_keyname.get(&keyname).unwrap();
             let mut min_value_size: usize = usize::MAX;
             let mut max_value_size: usize = 0;
             for key in keys.clone() {
-                let value = self.records_by_keyname.get(&keyname).unwrap().get(key).unwrap();
+                let value = self.records.get(&key).unwrap();
                 min_value_size = min_value_size.min(value.len());
                 max_value_size = max_value_size.max(value.len());
             }
@@ -171,16 +184,16 @@ impl ZcashdDump {
     pub fn print_keys(&self) {
         for keyname in self.sorted_key_names() {
             println!("{}", keyname);
-            let mut keys: Vec<DBKey> = self.records_by_keyname
+            let mut keys: Vec<DBKey> = self.keys_by_keyname
                 .get(&keyname)
                 .unwrap()
-                .keys()
+                .iter()
                 .cloned()
                 .collect();
             keys.sort();
             for key in keys {
                 println!("    {}", key);
-                let value = self.records_by_keyname.get(&keyname).unwrap().get(&key).unwrap();
+                let value = self.records.get(&key).unwrap();
                 println!("        {}: {}", value.len(), hex::encode(value));
                 println!();
             }
