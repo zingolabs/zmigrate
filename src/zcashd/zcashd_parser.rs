@@ -133,7 +133,7 @@ impl<'a> ZcashdParser<'a> {
         let bestblock_nomerkle = self.parse_block_locator("bestblock_nomerkle")?;
 
         Ok(
-            ZcashdWallet::new(
+            ZcashdWallet {
                 bestblock_nomerkle,
                 bestblock,
                 client_version,
@@ -150,7 +150,7 @@ impl<'a> ZcashdParser<'a> {
                 witnesscachesize,
                 key_pool,
                 transactions,
-            )
+            }
         )
     }
 

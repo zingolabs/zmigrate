@@ -14,15 +14,11 @@ pub struct SproutNoteData {
 
 impl Parse for SproutNoteData {
     fn parse(p: &mut Parser) -> Result<Self> {
-        let address = parse!(p, "sprout note data address")?;
-        let nullifer = parse!(p, "sprout note data nullifier")?;
-        let witnesses = parse!(p, "sprout note data witnesses")?;
-        let witness_height = parse!(p, "sprout note data witness height")?;
         Ok(Self {
-            address,
-            nullifer,
-            witnesses,
-            witness_height,
+            address: parse!(p, "address")?,
+            nullifer: parse!(p, "nullifer")?,
+            witnesses: parse!(p, "witnesses")?,
+            witness_height: parse!(p, "witness_height")?,
         })
     }
 }

@@ -1,7 +1,7 @@
 use anyhow::Result;
-use crate::{parse, Parse, Parser, SecondsSinceEpoch};
+use crate::{ parse, Parse, Parser, SecondsSinceEpoch };
 
-use super::{ClientVersion, PubKey};
+use super::{ ClientVersion, PubKey };
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct KeyPoolEntry {
@@ -12,9 +12,10 @@ pub struct KeyPoolEntry {
 
 impl Parse for KeyPoolEntry {
     fn parse(p: &mut Parser) -> Result<Self> {
-        let version = parse!(p, "version")?;
-        let timestamp = parse!(p, "timestamp")?;
-        let key = parse!(p, "key")?;
-        Ok(Self { version, timestamp, key })
+        Ok(Self {
+            version: parse!(p, "version")?,
+            timestamp: parse!(p, "timestamp")?,
+            key: parse!(p, "key")?
+        })
     }
 }

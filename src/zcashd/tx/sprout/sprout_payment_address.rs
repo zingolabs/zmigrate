@@ -10,11 +10,9 @@ pub struct SproutPaymentAddress {
 
 impl Parse for SproutPaymentAddress {
     fn parse(p: &mut Parser) -> Result<Self> {
-        let a_pk = parse!(p, "sprout payment address a_pk")?;
-        let pk_enc = parse!(p, "sprout payment address pk_enc")?;
         Ok(Self {
-            a_pk,
-            pk_enc,
+            a_pk: parse!(p, "sprout payment address a_pk")?,
+            pk_enc: parse!(p, "sprout payment address pk_enc")?,
         })
     }
 }

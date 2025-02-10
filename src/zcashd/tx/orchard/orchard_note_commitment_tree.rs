@@ -3,11 +3,14 @@ use anyhow::Result;
 use crate::Parse;
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct OrchardNoteCommitmentTree(pub Data);
+pub struct OrchardNoteCommitmentTree {
+    pub rest: Data
+}
 
 impl Parse for OrchardNoteCommitmentTree {
     fn parse(p: &mut Parser) -> Result<Self> {
-        let data = p.rest();
-        Ok(Self(data))
+        Ok(Self {
+            rest: p.rest()
+        })
     }
 }

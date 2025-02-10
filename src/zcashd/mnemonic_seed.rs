@@ -94,8 +94,10 @@ impl std::fmt::Debug for MnemonicSeed {
 
 impl Parse for MnemonicSeed {
     fn parse(p: &mut Parser) -> Result<Self> {
-        let language = parse!(p, "language")?;
-        let mnemonic = parse!(p, "mnemonic")?;
-        Ok(Self { language, mnemonic, fingerprint: None })
+        Ok(Self {
+            language: parse!(p, "language")?,
+            mnemonic: parse!(p, "mnemonic")?,
+            fingerprint: None
+        })
     }
 }

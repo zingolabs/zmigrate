@@ -5,16 +5,6 @@ use crate::{parse, Parse, Parser};
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub struct IntID(pub u32);
 
-impl IntID {
-    pub const fn new(id: u32) -> Self {
-        Self(id)
-    }
-
-    pub fn as_u32(&self) -> u32 {
-        self.0
-    }
-}
-
 impl std::fmt::Display for IntID {
     // Always display as hex with `0x` prefix
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
@@ -30,7 +20,6 @@ impl std::fmt::Debug for IntID {
 
 impl Parse for IntID {
     fn parse(p: &mut Parser) -> Result<Self> {
-        let id = parse!(p, "IntID")?;
-        Ok(Self(id))
+        Ok(Self(parse!(p, "IntID")?))
     }
 }

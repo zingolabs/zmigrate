@@ -7,7 +7,6 @@ pub struct SaplingIncomingViewingKey(pub u256);
 
 impl Parse for SaplingIncomingViewingKey {
     fn parse(p: &mut Parser) -> Result<Self> {
-        let ivk = parse!(p, "sapling incoming viewing key")?;
-        Ok(Self(ivk))
+        Ok(Self(parse!(p, "SaplingIncomingViewingKey")?))
     }
 }

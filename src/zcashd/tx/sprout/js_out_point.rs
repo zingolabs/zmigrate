@@ -11,13 +11,10 @@ pub struct JSOutPoint {
 
 impl Parse for JSOutPoint {
     fn parse(p: &mut Parser) -> Result<Self> {
-        let hash = parse!(p, "out point txid")?;
-        let js = parse!(p, "out point vout")?;
-        let n = parse!(p, "out point n")?;
         Ok(Self {
-            hash,
-            js,
-            n,
+            hash: parse!(p, "hash")?,
+            js: parse!(p, "js")?,
+            n: parse!(p, "n")?,
         })
     }
 }

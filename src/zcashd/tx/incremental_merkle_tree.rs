@@ -11,13 +11,10 @@ pub struct IncrementalMerkleTree {
 
 impl Parse for IncrementalMerkleTree {
     fn parse(p: &mut Parser) -> Result<Self> {
-        let left = parse!(p, "incremental merkle tree left")?;
-        let right = parse!(p, "incremental merkle tree right")?;
-        let parents = parse!(p, "incremental merkle tree parents")?;
         Ok(Self {
-            left,
-            right,
-            parents,
+            left: parse!(p, "left")?,
+            right: parse!(p, "right")?,
+            parents: parse!(p, "parents")?,
         })
     }
 }

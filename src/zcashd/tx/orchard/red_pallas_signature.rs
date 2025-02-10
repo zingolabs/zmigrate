@@ -11,8 +11,8 @@ pub struct RedPallasSignature {
 impl Parse for RedPallasSignature {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
         Ok(Self {
-            r_bytes: parse!(parser, "RedPallasSignature.r_bytes")?,
-            s_bytes: parse!(parser, "RedPallasSignature.s_bytes")?,
+            r_bytes: parse!(parser, "r_bytes")?,
+            s_bytes: parse!(parser, "s_bytes")?,
         })
     }
 }

@@ -3,21 +3,14 @@ use std::path::Path;
 
 use anyhow::{Result, bail, Context};
 
-mod bdb_dump;
-pub use bdb_dump::*;
-mod zcashd;
-pub use zcashd::*;
-mod blob;
-pub use blob::*;
-mod data;
-pub use data::*;
-mod digest;
-pub use digest::*;
-mod parser;
-pub use parser::*;
-mod string_utils;
-pub use string_utils::*;
+mod bdb_dump; pub use bdb_dump::*;
+mod blob; pub use blob::*;
+mod data; pub use data::*;
+mod digest_utils; pub use digest_utils::*;
 mod parse_macro;
+mod parser; pub use parser::*;
+mod string_utils; pub use string_utils::*;
+mod zcashd; pub use zcashd::*;
 
 fn main() -> Result<()> {
     let args: Vec<String> = env::args().collect();

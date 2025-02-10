@@ -25,7 +25,6 @@ impl ExpiryHeight {
 
 impl Parse for ExpiryHeight {
     fn parse(p: &mut Parser) -> Result<Self> {
-        let expiry_height = parse!(p, "expiry_height")?;
-        Ok(ExpiryHeight::from_u32(expiry_height))
+        Ok(ExpiryHeight::from_u32(parse!(p, "expiry_height")?))
     }
 }

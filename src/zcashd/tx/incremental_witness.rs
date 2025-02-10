@@ -13,13 +13,10 @@ pub struct IncrementalWitness<const DEPTH: usize, Hash> {
 
 impl<const DEPTH: usize, Hash: Parse> Parse for IncrementalWitness<DEPTH, Hash> {
     fn parse(p: &mut Parser) -> Result<Self> {
-        let tree = parse!(p, "incremental witness tree")?;
-        let filled = parse!(p, "incremental witness filled")?;
-        let cursor = parse!(p, "incremental witness cursor")?;
         Ok(Self {
-            tree,
-            filled,
-            cursor,
+            tree: parse!(p, "tree")?,
+            filled: parse!(p, "filled")?,
+            cursor: parse!(p, "cursor")?,
         })
     }
 }

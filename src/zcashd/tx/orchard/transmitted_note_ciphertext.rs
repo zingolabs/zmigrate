@@ -14,9 +14,9 @@ pub struct TransmittedNoteCiphertext {
 impl Parse for TransmittedNoteCiphertext {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
         Ok(Self {
-            epk_bytes: parse!(parser, "TransmittedNoteCiphertext.epk_bytes")?,
-            enc_ciphertext: parse!(parser, "TransmittedNoteCiphertext.enc_ciphertext")?,
-            out_ciphertext: parse!(parser, "TransmittedNoteCiphertext.out_ciphertext")?,
+            epk_bytes: parse!(parser, "epk_bytes")?,
+            enc_ciphertext: parse!(parser, "enc_ciphertext")?,
+            out_ciphertext: parse!(parser, "out_ciphertext")?,
         })
     }
 }

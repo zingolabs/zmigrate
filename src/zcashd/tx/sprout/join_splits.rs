@@ -12,14 +12,12 @@ pub struct JoinSplits {
 
 impl ParseWithParam<bool> for JoinSplits {
     fn parse(p: &mut Parser, use_groth: bool) -> Result<Self> {
-        let descriptions = parse!(p, Vec<JSDescription>, param use_groth, "JoinSplit descriptions")?;
+        let descriptions = parse!(p, Vec<JSDescription>, param use_groth, "descriptions")?;
         if !descriptions.is_empty() {
-            let pub_key = parse!(p, "JoinSplit public key")?;
-            let sig = parse!(p, "JoinSplit signature")?;
             Ok(Self {
                 descriptions,
-                pub_key: Some(pub_key),
-                sig: Some(sig),
+                pub_key: Some(parse!(p, "pub_key")?),
+                sig: Some(parse!(p, "sig")?),
             })
         } else {
             Ok(Self {

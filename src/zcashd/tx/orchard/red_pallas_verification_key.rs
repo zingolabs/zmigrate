@@ -13,8 +13,8 @@ pub struct RedPallasVerificationKey {
 impl Parse for RedPallasVerificationKey {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
         Ok(Self {
-            point: parse!(parser, "RedPallasVerificationKey.point")?,
-            bytes: parse!(parser, "RedPallasVerificationKey.bytes")?,
+            point: parse!(parser, "point")?,
+            bytes: parse!(parser, "bytes")?,
         })
     }
 }

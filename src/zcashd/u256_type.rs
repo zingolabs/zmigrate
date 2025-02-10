@@ -31,7 +31,7 @@ impl AsRef<[u8]> for u256 {
 
 impl std::fmt::Debug for u256 {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "U256({})", hex::encode(&self.0))
+        write!(f, "u256({})", hex::encode(&self.0))
     }
 }
 

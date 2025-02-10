@@ -14,9 +14,9 @@ pub struct Ep {
 impl Parse for Ep {
     fn parse(p: &mut Parser) -> Result<Self> where Self: Sized {
         Ok(Self {
-            x: parse!(p, "Ep.x")?,
-            y: parse!(p, "Ep.y")?,
-            z: parse!(p, "Ep.z")?,
+            x: parse!(p, "x")?,
+            y: parse!(p, "y")?,
+            z: parse!(p, "z")?,
         })
     }
 }

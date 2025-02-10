@@ -7,6 +7,7 @@ mod orchard_anchor; pub use orchard_anchor::*;
 mod orchard_authorized; pub use orchard_authorized::*;
 mod orchard_bundle; pub use orchard_bundle::*;
 mod orchard_flags; pub use orchard_flags::*;
+mod orchard_note_commitment_tree; pub use orchard_note_commitment_tree::*;
 mod orchard_signature; pub use orchard_signature::*;
 mod pallas_base; pub use pallas_base::*;
 mod pallas_point; pub use pallas_point::*;

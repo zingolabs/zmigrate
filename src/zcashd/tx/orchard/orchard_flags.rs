@@ -11,8 +11,8 @@ pub struct OrchardFlags {
 impl Parse for OrchardFlags  {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
         Ok(Self {
-            spends_enabled: parse!(parser, "OrchardFlags.spends_enabled")?,
-            outputs_enabled: parse!(parser, "OrchardFlags.outputs_enabled")?,
+            spends_enabled: parse!(parser, "spends_enabled")?,
+            outputs_enabled: parse!(parser, "outputs_enabled")?,
         })
     }
 }

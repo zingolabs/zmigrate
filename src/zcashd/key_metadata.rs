@@ -11,22 +11,6 @@ pub struct KeyMetadata {
     pub seed_fp: Option<Blob32>,
 }
 
-impl KeyMetadata {
-    pub fn new(
-        version: i32,
-        create_time: Option<SecondsSinceEpoch>,
-        hd_keypath: Option<String>,
-        seed_fp: Option<Blob32>
-    ) -> Self {
-        Self {
-            version,
-            create_time,
-            hd_keypath,
-            seed_fp,
-        }
-    }
-}
-
 impl Parse for KeyMetadata {
     fn parse(p: &mut Parser) -> Result<Self> {
         let version = parse!(p, "version")?;
@@ -42,6 +26,11 @@ impl Parse for KeyMetadata {
             hd_keypath = None;
             seed_fp = None;
         }
-        Ok(Self::new(version, create_time, hd_keypath, seed_fp))
+        Ok(Self {
+            version,
+            create_time,
+            hd_keypath,
+            seed_fp,
+        })
     }
 }

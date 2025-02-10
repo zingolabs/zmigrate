@@ -1,57 +1,52 @@
 use anyhow::Result;
 
-use crate::{parse, Blob, Blob32, Blob64, Parse, Parser};
+use crate::{ parse, Parse, Parser };
 
 use crate::ZatBalance;
 
-use super::{OrchardAction, OrchardAnchor, OrchardAuthorized, OrchardFlags};
+use super::{ OrchardAction, OrchardAnchor, OrchardAuthorized, OrchardFlags, Proof };
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct OrchardBundle {
-    actions: Vec<OrchardAction>,
-    flags: OrchardFlags,
-    balance: ZatBalance,
-    anchor: OrchardAnchor,
-    authorized: OrchardAuthorized,
-}
+pub struct OrchardBundle(pub Option<OrchardBundleInner>);
 
-
-impl OrchardBundle {
-    pub fn actions(&self) -> &[OrchardAction] {
-        &self.actions
-    }
-
-    pub fn flags(&self) -> &OrchardFlags {
-        &self.flags
-    }
-
-    pub fn balance(&self) -> &ZatBalance {
-        &self.balance
-    }
-
-    pub fn anchor(&self) -> &OrchardAnchor {
-        &self.anchor
-    }
-
-    pub fn authorized(&self) -> &OrchardAuthorized {
-        &self.authorized
-    }
+#[derive(Debug, Clone, PartialEq)]
+pub struct OrchardBundleInner {
+    pub actions: Vec<OrchardAction>,
+    pub flags: OrchardFlags,
+    pub balance: ZatBalance,
+    pub anchor: OrchardAnchor,
+    pub authorization: OrchardAuthorized,
 }
 
 impl Parse for OrchardBundle {
     fn parse(p: &mut Parser) -> Result<Self> {
-        let actions_without_auth: Vec<OrchardAction> = parse!(p, "orchard bundle actions")?;
-        // let actions = parse!(p, "orchard bundle actions")?;
-        let flags = parse!(p, "orchard bundle flags")?;
-        let balance = parse!(p, "orchard bundle balance")?;
-        let anchor = parse!(p, "orchard bundle anchor")?;
-        let authorized = parse!(p, "orchard bundle authorized")?;
-        Ok(Self {
+        let actions_without_auth = parse!(p, Vec<OrchardAction>, "actions_without_auth")?;
+        if actions_without_auth.is_empty() {
+            return Ok(Self(None));
+        }
+        let flags = parse!(p, "flags")?;
+        let balance = parse!(p, "balance")?;
+        let anchor = parse!(p, "anchor")?;
+        let proof_bytes = parse!(p, Vec<u8>, "proof")?;
+
+        let actions = actions_without_auth.into_iter().map(|mut action| {
+            let spend_auth_sig = parse!(p, "spend_auth_sig")?;
+            action.authorization = Some(spend_auth_sig);
+            Ok(action)
+        }).collect::<Result<Vec<OrchardAction>>>()?;
+
+        let binding_sig = parse!(p, "binding_sig")?;
+        let authorization = OrchardAuthorized {
+            proof: Proof(proof_bytes),
+            binding_signature: binding_sig,
+        };
+
+        Ok(Self(Some(OrchardBundleInner {
             actions,
             flags,
             balance,
             anchor,
-            authorized,
-        })
+            authorization,
+        })))
     }
 }

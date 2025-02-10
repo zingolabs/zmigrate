@@ -7,7 +7,7 @@ use crate::{SaplingIncomingViewingKey, SaplingWitness};
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SaplingNoteData {
     pub version: i32,
-    pub ivk: SaplingIncomingViewingKey,
+    pub incoming_viewing_key: SaplingIncomingViewingKey,
     pub nullifer: Option<u256>,
     pub witnesses: Vec<SaplingWitness>,
     pub witness_height: i32,
@@ -15,17 +15,12 @@ pub struct SaplingNoteData {
 
 impl Parse for SaplingNoteData {
     fn parse(p: &mut Parser) -> Result<Self> {
-        let version = parse!(p, "sapling note data version")?;
-        let ivk = parse!(p, "sapling note data ivk")?;
-        let nullifer = parse!(p, "sapling note data nullifier")?;
-        let witnesses = parse!(p, "sapling note data witnesses")?;
-        let witness_height = parse!(p, "sapling note data witness height")?;
         Ok(Self {
-            version,
-            ivk,
-            nullifer,
-            witnesses,
-            witness_height,
+            version: parse!(p, "version")?,
+            incoming_viewing_key: parse!(p, "incoming_viewing_key")?,
+            nullifer: parse!(p, "nullifer")?,
+            witnesses: parse!(p, "witnesses")?,
+            witness_height: parse!(p, "witness_height")?,
         })
     }
 }

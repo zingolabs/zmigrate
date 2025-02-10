@@ -18,15 +18,11 @@ impl SaplingBundle {
 
 impl Parse for SaplingBundle {
     fn parse(p: &mut Parser) -> Result<Self> {
-        let amount = parse!(p, "amount")?;
-        let spends = parse!(p, "spends")?;
-        let outputs = parse!(p, "outputs")?;
-        let binding_sig = None;
         Ok(Self {
-            amount,
-            spends,
-            outputs,
-            binding_sig,
+            amount: parse!(p, "amount")?,
+            spends: parse!(p, "spends")?,
+            outputs: parse!(p, "outputs")?,
+            binding_sig: None,
         })
     }
 }
