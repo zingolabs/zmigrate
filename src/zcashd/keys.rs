@@ -3,15 +3,11 @@ use std::collections::HashMap;
 use super::{Key, PubKey};
 
 #[derive(Clone, PartialEq)]
-pub struct Keys (HashMap<PubKey, Key>);
+pub struct Keys (pub HashMap<PubKey, Key>);
 
 impl Keys {
     pub fn new(map: HashMap<PubKey, Key>) -> Self {
         Self(map)
-    }
-
-    pub fn map(&self) -> &HashMap<PubKey, Key> {
-        &self.0
     }
 
     pub fn get(&self, pubkey: &PubKey) -> Option<&Key> {

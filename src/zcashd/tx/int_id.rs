@@ -3,7 +3,7 @@ use anyhow::Result;
 use crate::{parse, Parse, Parser};
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub struct IntID(u32);
+pub struct IntID(pub u32);
 
 impl IntID {
     pub const fn new(id: u32) -> Self {

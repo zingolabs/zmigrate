@@ -6,8 +6,8 @@ use crate::{ parse, BDBDump, Data, Parser };
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct DBKey {
-    keyname: String,
-    data: Data,
+    pub keyname: String,
+    pub data: Data,
 }
 
 impl std::fmt::Display for DBKey {
@@ -31,14 +31,6 @@ impl DBKey {
         let data = parser.rest();
         parser.check_finished()?;
         Ok(Self { keyname, data })
-    }
-
-    pub fn keyname(&self) -> &str {
-        &self.keyname
-    }
-
-    pub fn data(&self) -> &Data {
-        &self.data
     }
 }
 
@@ -86,12 +78,12 @@ impl ZcashdDump {
         let mut records: HashMap<DBKey, DBValue> = HashMap::new();
         let mut records_by_keyname: HashMap<String, HashMap<DBKey, DBValue>> = HashMap::new();
 
-        for (key_data, value_data) in berkeley_dump.data_records() {
-            let key = DBKey::parse_data(key_data)?;
+        for (key_data, value_data) in &berkeley_dump.data_records {
+            let key = DBKey::parse_data(&key_data)?;
             let value = DBValue::new(value_data.clone());
             records.insert(key.clone(), value.clone());
 
-            let keyname = key.keyname().to_string();
+            let keyname = key.keyname.to_string();
             let keyname_records = records_by_keyname.entry(keyname).or_default();
             keyname_records.insert(key, value);
         }

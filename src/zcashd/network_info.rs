@@ -3,18 +3,8 @@ use crate::{parse, Parse, Parser};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct NetworkInfo {
-    zcash: String,
-    identifier: String,
-}
-
-impl NetworkInfo {
-    pub fn zcash(&self) -> &str {
-        &self.zcash
-    }
-
-    pub fn identifier(&self) -> &str {
-        &self.identifier
-    }
+    pub zcash: String,
+    pub identifier: String,
 }
 
 impl Parse for NetworkInfo {

@@ -16,22 +16,22 @@ use super::{
 };
 
 pub struct ZcashdWallet {
-    bestblock_nomerkle: BlockLocator,
-    bestblock: BlockLocator,
-    client_version: ClientVersion,
-    default_key: PubKey,
-    keys: Keys,
-    min_version: ClientVersion,
-    mnemonic_hd_chain: MnemonicHDChain,
-    mnemonic_phrase: MnemonicSeed,
-    address_names: HashMap<Address, String>,
-    address_purposes: HashMap<Address, String>,
-    network_info: NetworkInfo,
-    orchard_note_commitment_tree: OrchardNoteCommitmentTree,
-    orderposnext: Option<i64>,
-    witnesscachesize: i64,
-    key_pool: HashMap<i64, KeyPoolEntry>,
-    transactions: HashMap<u256, WalletTx>,
+    pub bestblock_nomerkle: BlockLocator,
+    pub bestblock: BlockLocator,
+    pub client_version: ClientVersion,
+    pub default_key: PubKey,
+    pub keys: Keys,
+    pub min_version: ClientVersion,
+    pub mnemonic_hd_chain: MnemonicHDChain,
+    pub mnemonic_phrase: MnemonicSeed,
+    pub address_names: HashMap<Address, String>,
+    pub address_purposes: HashMap<Address, String>,
+    pub network_info: NetworkInfo,
+    pub orchard_note_commitment_tree: OrchardNoteCommitmentTree,
+    pub orderposnext: Option<i64>,
+    pub witnesscachesize: i64,
+    pub key_pool: HashMap<i64, KeyPoolEntry>,
+    pub transactions: HashMap<u256, WalletTx>,
 }
 
 impl std::fmt::Debug for ZcashdWallet {
@@ -95,65 +95,5 @@ impl ZcashdWallet {
             key_pool,
             transactions,
         }
-    }
-
-    pub fn best_block_nomerkle(&self) -> &BlockLocator {
-        &self.bestblock_nomerkle
-    }
-
-    pub fn best_block(&self) -> &BlockLocator {
-        &self.bestblock
-    }
-
-    pub fn client_version(&self) -> &ClientVersion {
-        &self.client_version
-    }
-
-    pub fn default_key(&self) -> &PubKey {
-        &self.default_key
-    }
-
-    pub fn keys(&self) -> &Keys {
-        &self.keys
-    }
-
-    pub fn min_version(&self) -> &ClientVersion {
-        &self.min_version
-    }
-
-    pub fn mnemonic_hd_chain(&self) -> &MnemonicHDChain {
-        &self.mnemonic_hd_chain
-    }
-
-    pub fn mnemonic_phrase(&self) -> &MnemonicSeed {
-        &self.mnemonic_phrase
-    }
-
-    pub fn address_names(&self) -> &HashMap<Address, String> {
-        &self.address_names
-    }
-
-    pub fn network_info(&self) -> &NetworkInfo {
-        &self.network_info
-    }
-
-    pub fn orchard_note_commitment_tree(&self) -> &OrchardNoteCommitmentTree {
-        &self.orchard_note_commitment_tree
-    }
-
-    pub fn orderposnext(&self) -> Option<i64> {
-        self.orderposnext
-    }
-
-    pub fn witnesscachesize(&self) -> i64 {
-        self.witnesscachesize
-    }
-
-    pub fn key_pool(&self) -> &HashMap<i64, KeyPoolEntry> {
-        &self.key_pool
-    }
-
-    pub fn transactions(&self) -> &HashMap<u256, WalletTx> {
-        &self.transactions
     }
 }

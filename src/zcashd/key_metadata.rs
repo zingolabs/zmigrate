@@ -5,10 +5,10 @@ use crate::{ parse, Blob32, Parse, Parser, SecondsSinceEpoch };
 const VERSION_WITH_HDDATA: i32 = 10;
 #[derive(Debug, Clone, PartialEq)]
 pub struct KeyMetadata {
-    version: i32,
-    create_time: Option<SecondsSinceEpoch>,
-    hd_keypath: Option<String>,
-    seed_fp: Option<Blob32>,
+    pub version: i32,
+    pub create_time: Option<SecondsSinceEpoch>,
+    pub hd_keypath: Option<String>,
+    pub seed_fp: Option<Blob32>,
 }
 
 impl KeyMetadata {
@@ -25,22 +25,6 @@ impl KeyMetadata {
             seed_fp,
         }
     }
-
-    pub fn version(&self) -> i32 {
-        self.version
-    }
-
-    pub fn create_time(&self) -> Option<&SecondsSinceEpoch> {
-        self.create_time.as_ref()
-    }
-
-    pub fn hd_keypath(&self) -> Option<&str> {
-        self.hd_keypath.as_deref()
-    }
-
-    pub fn seed_fp(&self) -> Option<&Blob32> {
-        self.seed_fp.as_ref()
-    }
 }
 
 impl Parse for KeyMetadata {
@@ -48,7 +32,7 @@ impl Parse for KeyMetadata {
         let version = parse!(p, "version")?;
         let create_time: SecondsSinceEpoch = parse!(p, "create_time")?;
         // 0 means unknown (per `walletdb.h`)
-        let create_time = if create_time.as_u64() == 0 { None } else { Some(create_time) };
+        let create_time = if create_time.is_zero() { None } else { Some(create_time) };
         let hd_keypath: Option<String>;
         let seed_fp: Option<Blob32>;
         if version >= VERSION_WITH_HDDATA {

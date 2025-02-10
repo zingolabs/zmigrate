@@ -1,9 +1,11 @@
 use anyhow::Result;
 
-use crate::{format_zec, parse, Parse, Parser};
+use crate::{format_zats_as_zec, parse, Parse, Parser};
+
+pub type ZatBalance = Amount;
 
 #[derive(Clone, PartialEq, Eq, Hash, Default)]
-pub struct Amount(u64);
+pub struct Amount(pub u64);
 
 impl Amount {
     pub fn as_u64(&self) -> u64 {
@@ -37,7 +39,7 @@ impl From<&u64> for Amount {
 
 impl std::fmt::Debug for Amount {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "Amount({})", format_zec(self))
+        write!(f, "Amount({})", format_zats_as_zec(self))
     }
 }
 

@@ -4,15 +4,11 @@ use crate::{Parse, Parser};
 
 /// A fixed-size byte array.
 #[derive(Clone, PartialEq, Eq, Hash)]
-pub struct Blob<const N: usize>([u8; N]);
+pub struct Blob<const N: usize>(pub [u8; N]);
 
 impl<const N: usize> Blob<N> {
     pub fn new(data: [u8; N]) -> Self {
         Self(data)
-    }
-
-    pub fn as_bytes(&self) -> &[u8] {
-        &self.0
     }
 
     pub fn len(&self) -> usize {

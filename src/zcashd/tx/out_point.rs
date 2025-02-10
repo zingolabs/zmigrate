@@ -2,20 +2,12 @@ use anyhow::Result;
 
 use crate::{parse, u256, Parse, Parser};
 
+pub type SaplingOutPoint = OutPoint;
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct OutPoint {
-    txid: u256,
-    vout: u32,
-}
-
-impl OutPoint {
-    pub fn txid(&self) -> &u256 {
-        &self.txid
-    }
-
-    pub fn vout(&self) -> u32 {
-        self.vout
-    }
+    pub txid: u256,
+    pub vout: u32,
 }
 
 impl Parse for OutPoint {

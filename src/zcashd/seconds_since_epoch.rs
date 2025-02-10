@@ -5,7 +5,7 @@ use chrono::{ TimeZone, Utc, SecondsFormat };
 
 /// Represents a number of seconds since the Unix epoch.
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct SecondsSinceEpoch(u64);
+pub struct SecondsSinceEpoch(pub u64);
 
 impl SecondsSinceEpoch {
     pub fn from_u64(seconds: u64) -> Self {
@@ -16,8 +16,8 @@ impl SecondsSinceEpoch {
         Self(seconds as u64)
     }
 
-    pub fn as_u64(&self) -> u64 {
-        self.0
+    pub fn is_zero(&self) -> bool {
+        self.0 == 0
     }
 }
 

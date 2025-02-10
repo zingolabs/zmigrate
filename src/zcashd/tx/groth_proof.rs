@@ -5,7 +5,7 @@ use crate::{ parse, Blob, Parse, Parser };
 pub const GROTH_PROOF_SIZE: usize = 48 + 96 + 48;
 
 #[derive(Clone, PartialEq)]
-pub struct GrothProof(Blob<GROTH_PROOF_SIZE>);
+pub struct GrothProof(pub Blob<GROTH_PROOF_SIZE>);
 
 impl AsRef<Blob<GROTH_PROOF_SIZE>> for GrothProof {
     fn as_ref(&self) -> &Blob<GROTH_PROOF_SIZE> {

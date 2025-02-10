@@ -12,7 +12,7 @@ pub fn format_with_underscores(amount: impl Into<u64>) -> String {
     result.chars().rev().collect()
 }
 
-pub fn format_zec(amount: impl Into<u64>) -> String {
+pub fn format_zats_as_zec(amount: impl Into<u64>) -> String {
     let amount = amount.into();
     let integer = amount / 100_000_000;
     let fraction = amount % 100_000_000;

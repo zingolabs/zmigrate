@@ -18,12 +18,12 @@ const OUT_CIPHERTEXT_SIZE: usize = OUT_PLAINTEXT_SIZE + AEAD_TAG_SIZE;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct OutputV4 {
-    cv: u256,
-    cmu: u256,
-    ephemeral_key: u256,
-    enc_ciphertext: Blob<ENC_CIPHERTEXT_SIZE>,
-    out_ciphertext: Blob<OUT_CIPHERTEXT_SIZE>,
-    zkproof: GrothProof,
+    pub cv: u256,
+    pub cmu: u256,
+    pub ephemeral_key: u256,
+    pub enc_ciphertext: Blob<ENC_CIPHERTEXT_SIZE>,
+    pub out_ciphertext: Blob<OUT_CIPHERTEXT_SIZE>,
+    pub zkproof: GrothProof,
 }
 
 impl Parse for OutputV4 {

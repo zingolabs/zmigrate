@@ -3,7 +3,7 @@ use anyhow::Result;
 use crate::{parse, Data, Parse, Parser};
 
 #[derive(Clone, PartialEq, Eq, Hash)]
-pub struct Script(Data);
+pub struct Script(pub Data);
 
 impl Script {
     pub fn len(&self) -> usize {
@@ -12,14 +12,6 @@ impl Script {
 
     pub fn is_empty(&self) -> bool {
         self.0.is_empty()
-    }
-
-    pub fn as_data(&self) -> &Data {
-        &self.0
-    }
-
-    pub fn as_bytes(&self) -> &[u8] {
-        self.0.as_bytes()
     }
 }
 
@@ -44,6 +36,6 @@ impl AsRef<Data> for Script {
 
 impl AsRef<[u8]> for Script {
     fn as_ref(&self) -> &[u8] {
-        self.0.as_bytes()
+        &self.0.0
     }
 }

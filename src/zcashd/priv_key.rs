@@ -6,23 +6,13 @@ use super::parse_compact_size;
 
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct PrivKey {
-    data: Data,
-    hash: u256,
+    pub data: Data,
+    pub hash: u256,
 }
 
 impl std::fmt::Debug for PrivKey {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "PrivKey({:?})", &self.data)
-    }
-}
-
-impl PrivKey {
-    pub fn data(&self) -> &Data {
-        &self.data
-    }
-
-    pub fn hash(&self) -> &u256 {
-        &self.hash
     }
 }
 

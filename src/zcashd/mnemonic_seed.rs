@@ -70,24 +70,12 @@ impl Parse for Language {
 
 #[derive(Clone, PartialEq)]
 pub struct MnemonicSeed {
-    language: Language,
-    mnemonic: String,
-    fingerprint: Option<u256>,
+    pub language: Language,
+    pub mnemonic: String,
+    pub fingerprint: Option<u256>,
 }
 
 impl MnemonicSeed {
-    pub fn language(&self) -> &Language {
-        &self.language
-    }
-
-    pub fn mnemonic(&self) -> &str {
-        &self.mnemonic
-    }
-
-    pub fn fingerprint(&self) -> &u256 {
-        self.fingerprint.as_ref().expect("Fingerprint not set")
-    }
-
     pub fn set_fingerprint(mut self, fingerprint: u256) -> Self {
         self.fingerprint = Some(fingerprint);
         self
@@ -99,7 +87,7 @@ impl std::fmt::Debug for MnemonicSeed {
         f.debug_struct("MnemonicSeed")
             .field("language", &self.language)
             .field("mnemonic", &self.mnemonic)
-            .field("fingerprint", self.fingerprint())
+            .field("fingerprint", &&self.fingerprint)
             .finish()
     }
 }

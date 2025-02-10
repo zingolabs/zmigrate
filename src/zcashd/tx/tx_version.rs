@@ -29,14 +29,6 @@ pub struct TxVersion {
 }
 
 impl TxVersion {
-    pub fn group(&self) -> &TxVersionGroup {
-        &self.group
-    }
-
-    pub fn number(&self) -> u32 {
-        self.number
-    }
-
     pub fn is_overwinter(&self) -> bool {
         self.group != TxVersionGroup::PreOverwinter
     }

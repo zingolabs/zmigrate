@@ -92,3 +92,9 @@ impl Parse for Data {
         Self::parse_len(p, len)
     }
 }
+
+impl Parse for () {
+    fn parse(_p: &mut Parser) -> Result<Self> {
+        Ok(())
+    }
+}

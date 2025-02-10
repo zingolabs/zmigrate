@@ -6,18 +6,8 @@ use super::{Amount, Script};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TxOut {
-    value: Amount,
-    script_pub_key: Script,
-}
-
-impl TxOut {
-    pub fn value(&self) -> &Amount {
-        &self.value
-    }
-
-    pub fn script_pub_key(&self) -> &Script {
-        &self.script_pub_key
-    }
+    pub value: Amount,
+    pub script_pub_key: Script,
 }
 
 impl Parse for TxOut {

@@ -17,6 +17,7 @@ mod parser;
 pub use parser::*;
 mod string_utils;
 pub use string_utils::*;
+mod parse_macro;
 
 fn main() -> Result<()> {
     let args: Vec<String> = env::args().collect();

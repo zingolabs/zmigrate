@@ -6,12 +6,12 @@ use super::GrothProof;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct SpendV4 {
-    cv: u256,
-    anchor: u256,
-    nullifier: u256,
-    rk: u256,
-    zkproof: GrothProof,
-    spend_auth_sig: Blob<64>,
+    pub cv: u256,
+    pub anchor: u256,
+    pub nullifier: u256,
+    pub rk: u256,
+    pub zkproof: GrothProof,
+    pub spend_auth_sig: Blob<64>,
 }
 
 impl Parse for SpendV4 {

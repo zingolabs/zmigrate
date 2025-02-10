@@ -4,7 +4,7 @@ use crate::Parser;
 
 #[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 /// A variable-size byte array.
-pub struct Data(Vec<u8>);
+pub struct Data(pub Vec<u8>);
 
 impl Data {
     pub fn new() -> Self {
@@ -13,10 +13,6 @@ impl Data {
 
     pub fn from_bytes(data: impl AsRef<[u8]>) -> Self {
         Self(data.as_ref().to_vec())
-    }
-
-    pub fn as_bytes(&self) -> &[u8] {
-        &self.0
     }
 
     pub fn len(&self) -> usize {

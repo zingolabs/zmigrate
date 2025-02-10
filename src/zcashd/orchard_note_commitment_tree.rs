@@ -3,13 +3,7 @@ use anyhow::Result;
 use crate::Parse;
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct OrchardNoteCommitmentTree(Data);
-
-impl OrchardNoteCommitmentTree {
-    pub fn data(&self) -> &Data {
-        &self.0
-    }
-}
+pub struct OrchardNoteCommitmentTree(pub Data);
 
 impl Parse for OrchardNoteCommitmentTree {
     fn parse(p: &mut Parser) -> Result<Self> {

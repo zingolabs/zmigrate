@@ -1,33 +1,17 @@
 use anyhow::Result;
 
-use crate::{parse, u256, Parse, Parser};
+use crate::{parse, Parse, Parser};
 
 use super::IncrementalMerkleTree;
 
-pub type SproutWitness = IncrementalWitness;
-
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct IncrementalWitness {
-    tree: IncrementalMerkleTree,
-    filled: Vec<u256>,
-    cursor: Option<IncrementalMerkleTree>,
+pub struct IncrementalWitness<const DEPTH: usize, Hash> {
+    pub tree: IncrementalMerkleTree,
+    pub filled: Vec<Hash>,
+    pub cursor: Option<IncrementalMerkleTree>,
 }
 
-impl IncrementalWitness {
-    pub fn tree(&self) -> &IncrementalMerkleTree {
-        &self.tree
-    }
-
-    pub fn filled(&self) -> &[u256] {
-        &self.filled
-    }
-
-    pub fn cursor(&self) -> Option<&IncrementalMerkleTree> {
-        self.cursor.as_ref()
-    }
-}
-
-impl Parse for IncrementalWitness {
+impl<const DEPTH: usize, Hash: Parse> Parse for IncrementalWitness<DEPTH, Hash> {
     fn parse(p: &mut Parser) -> Result<Self> {
         let tree = parse!(p, "incremental witness tree")?;
         let filled = parse!(p, "incremental witness filled")?;

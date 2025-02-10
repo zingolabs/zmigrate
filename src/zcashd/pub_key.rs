@@ -5,17 +5,11 @@ use crate::{ Data, Parse, Parser };
 use super::parse_compact_size;
 
 #[derive(Clone, PartialEq, Eq, Hash)]
-pub struct PubKey(Data);
+pub struct PubKey(pub Data);
 
 impl std::fmt::Debug for PubKey {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "PubKey({:?})", &self.0)
-    }
-}
-
-impl PubKey {
-    pub fn as_data(&self) -> &Data {
-        &self.0
     }
 }
 

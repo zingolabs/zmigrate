@@ -187,9 +187,9 @@ impl<'a> ZcashdParser<'a> {
         }
         let mut keys_map = HashMap::new();
         for (key, value) in key_records {
-            let pubkey = parse!(buf key.data(), PubKey, "pubkey")?;
+            let pubkey = parse!(buf &key.data, PubKey, "pubkey")?;
             let privkey = parse!(buf value.as_data(), PrivKey, "privkey")?;
-            let metakey = DBKey::new("keymeta", key.data());
+            let metakey = DBKey::new("keymeta", &key.data);
             let metadata_binary = self.dump.value_for_key(&metakey).context("Getting metadata")?;
             let metadata = parse!(buf metadata_binary, KeyMetadata, "metadata")?;
             let keypair = Key::new(pubkey.clone(), privkey.clone(), metadata).context(
@@ -214,7 +214,7 @@ impl<'a> ZcashdParser<'a> {
         let (key, value) = self.dump
             .record_for_keyname("mnemonicphrase")
             .context("Getting 'mnemonicphrase' record")?;
-        let fingerprint = parse!(buf key.data(), u256, "seed fingerprint")?;
+        let fingerprint = parse!(buf &key.data, u256, "seed fingerprint")?;
         let seed = parse!(buf &value, MnemonicSeed, "mnemonic phrase")?
             .set_fingerprint(fingerprint);
         Ok(seed)
@@ -224,7 +224,7 @@ impl<'a> ZcashdParser<'a> {
         let records = self.dump.records_for_keyname("name").context("Getting 'name' records")?;
         let mut address_names = HashMap::new();
         for (key, value) in records {
-            let address = parse!(buf key.data(), Address, "address")?;
+            let address = parse!(buf &key.data, Address, "address")?;
             let name = parse!(buf value.as_data(), String, "name")?;
             if address_names.contains_key(&address) {
                 bail!("Duplicate address found: {}", address);
@@ -238,7 +238,7 @@ impl<'a> ZcashdParser<'a> {
         let records = self.dump.records_for_keyname("purpose").context("Getting 'purpose' records")?;
         let mut address_purposes = HashMap::new();
         for (key, value) in records {
-            let address = parse!(buf key.data(), Address, "address")?;
+            let address = parse!(buf &key.data, Address, "address")?;
             let purpose = parse!(buf value.as_data(), String, "purpose")?;
             if address_purposes.contains_key(&address) {
                 bail!("Duplicate address found: {}", address);
@@ -268,7 +268,7 @@ impl<'a> ZcashdParser<'a> {
         let records = self.dump.records_for_keyname("pool").context("Getting 'pool' records")?;
         let mut key_pool = HashMap::new();
         for (key, value) in records {
-            let index = parse!(buf key.data(), i64, "key pool index")?;
+            let index = parse!(buf &key.data, i64, "key pool index")?;
             let entry = parse!(buf value.as_data(), KeyPoolEntry, "key pool entry")?;
             key_pool.insert(index, entry);
         }
@@ -281,7 +281,7 @@ impl<'a> ZcashdParser<'a> {
         if self.dump.has_records_for_keyname("tx") {
             let records = self.dump.records_for_keyname("tx").context("Getting 'tx' records")?;
             for (key, value) in records {
-                let txid = parse!(buf key.data(), u256, "transaction ID")?;
+                let txid = parse!(buf &key.data, u256, "transaction ID")?;
                 let transaction = parse!(buf value.as_data(), WalletTx, "transaction")?;
                 if transactions.contains_key(&txid) {
                     bail!("Duplicate transaction found: {:?}", txid);

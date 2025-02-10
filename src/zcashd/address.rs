@@ -2,7 +2,7 @@ use anyhow::Result;
 use crate::{parse, Parse, Parser};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct Address(String);
+pub struct Address(pub String);
 
 impl Address {
     pub fn new(address: impl Into<String>) -> Self {

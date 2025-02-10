@@ -5,19 +5,11 @@ use anyhow::{ Result, bail, anyhow };
 use crate::Data;
 
 pub struct BDBDump {
-    header_records: HashMap<String, String>,
-    data_records: HashMap<Data, Data>,
+    pub header_records: HashMap<String, String>,
+    pub data_records: HashMap<Data, Data>,
 }
 
 impl BDBDump {
-    pub fn header_records(&self) -> &HashMap<String, String> {
-        &self.header_records
-    }
-
-    pub fn data_records(&self) -> &HashMap<Data, Data> {
-        &self.data_records
-    }
-
     pub fn from_file(filepath: &Path) -> Result<Self> {
         // Execute the `db_dump` utility
         let output = Command::new("db_dump")
