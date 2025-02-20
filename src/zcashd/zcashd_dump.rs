@@ -4,7 +4,7 @@ use anyhow::{ bail, Result, Context };
 
 use crate::{ parse, BDBDump, Data, Parser };
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct DBKey {
     pub keyname: String,
     pub data: Data,
@@ -17,6 +17,12 @@ impl std::fmt::Display for DBKey {
         } else {
             write!(f, "{}-{}", self.keyname, hex::encode(&self.data))
         }
+    }
+}
+
+impl std::fmt::Debug for DBKey {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "DBKey({})", self)
     }
 }
 
@@ -52,6 +58,12 @@ impl DBValue {
 
     pub fn is_empty(&self) -> bool {
         self.0.is_empty()
+    }
+}
+
+impl std::fmt::Display for DBValue {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{:?}", self.0)
     }
 }
 

@@ -65,7 +65,18 @@ impl<'a> Parser<'a> {
         Ok(bytes)
     }
 
+    pub fn peek(&self, n: usize) -> Result<&'a [u8]> {
+        if self.offset + n > self.buffer.len() {
+            bail!("Buffer underflow at offset {}, needed {} bytes, only {} remaining", self.offset, n, self.remaining());
+        }
+        Ok(&self.buffer[self.offset..self.offset + n])
+    }
+
     pub fn rest(&mut self) -> Data {
         Data::parse_len(self, self.remaining()).unwrap()
+    }
+
+    pub fn peek_rest(&self) -> Data {
+        Data::from_slice(&self.buffer[self.offset..])
     }
 }

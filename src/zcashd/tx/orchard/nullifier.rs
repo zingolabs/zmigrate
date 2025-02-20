@@ -5,7 +5,7 @@ use crate::{parse, Parse, Parser};
 use super::Fp;
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct Nullifier(Fp);
+pub struct Nullifier(pub Fp);
 
 impl Parse for Nullifier {
     fn parse(p: &mut Parser) -> Result<Self> where Self: Sized {

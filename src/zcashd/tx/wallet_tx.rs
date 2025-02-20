@@ -1,9 +1,9 @@
 use std::collections::HashMap;
 
 use anyhow::Result;
-use crate::{ parse, u256, Data, Parse, Parser };
+use crate::{ parse, u256, BranchId, Data, Parse, Parser, SaplingBundleV5 };
 
-use super::{ ExpiryHeight, JSOutPoint, JoinSplits, LockTime, OrchardBundle, SaplingBundle, SaplingNoteData, SaplingOutPoint, SproutNoteData, TxIn, TxOut, TxVersion, SAPLING_TX_VERSION };
+use super::{ ExpiryHeight, JSOutPoint, JoinSplits, LockTime, OrchardBundle, SaplingBundle, SaplingBundleV4, SaplingNoteData, SaplingOutPoint, SproutNoteData, TxIn, TxOut, TxVersion, SAPLING_TX_VERSION };
 
 
 #[derive(Debug, Clone, PartialEq)]
@@ -11,7 +11,7 @@ pub struct WalletTx {
     // CTransaction
     pub version: TxVersion,
 
-    pub consensus_branch_id: Option<u32>,
+    pub consensus_branch_id: Option<BranchId>,
 
     pub vin: Vec<TxIn>,
     pub vout: Vec<TxOut>,
@@ -51,18 +51,20 @@ impl Parse for WalletTx {
         let vout;
         let lock_time;
         let mut expiry_height = None;
-        let mut sapling_bundle: SaplingBundle;
+        let sapling_bundle: SaplingBundle;
         let mut join_splits = None;
         let mut consensus_branch_id = None;
         let mut orchard_bundle = OrchardBundle(None);
 
         if version.is_zip225() {
-            consensus_branch_id = parse!(p, "consensus_branch_id")?;
-            lock_time = parse!(p, "lock_time")?;
-            expiry_height = parse!(p, "expiry_height")?;
+            consensus_branch_id = Some(parse!(p, BranchId, "consensus_branch_id")?);
+            lock_time = parse!(p, LockTime, "lock_time")?.as_option();
+            expiry_height = parse!(p, ExpiryHeight, "expiry_height")?.as_option();
             vin = parse!(p, "vin")?;
             vout = parse!(p, "vout")?;
-            sapling_bundle = parse!(p, "sapling_bundle")?;
+            let sapling_bundle_v5: SaplingBundleV5 = parse!(p, "sapling_bundle")?;
+            sapling_bundle = SaplingBundle::V5(sapling_bundle_v5);
+
             orchard_bundle = parse!(p, "orchard_bundle")?;
         } else {
             vin = parse!(p, "vin")?;
@@ -72,7 +74,7 @@ impl Parse for WalletTx {
                 expiry_height = parse!(p, ExpiryHeight, "expiry_height")?.as_option();
             }
 
-            sapling_bundle = (version.is_sapling() || version.is_future())
+            let mut sapling_bundle_v4: SaplingBundleV4 = (version.is_sapling() || version.is_future())
                 .then(|| parse!(p, "sapling_bundle"))
                 .transpose()?
                 .unwrap_or_default();
@@ -82,10 +84,12 @@ impl Parse for WalletTx {
                 join_splits = Some(parse!(p, param use_groth, "join_splits")?);
             }
 
-            if (version.is_sapling() || version.is_future()) && sapling_bundle.have_actions() {
+            if (version.is_sapling() || version.is_future()) && sapling_bundle_v4.have_actions() {
                 let binding_sig = parse!(p, "binding_sig")?;
-                sapling_bundle.binding_sig = binding_sig;
+                sapling_bundle_v4.binding_sig = binding_sig;
             }
+
+            sapling_bundle = SaplingBundle::V4(sapling_bundle_v4);
         }
 
         // CMerkleTx

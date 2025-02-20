@@ -12,7 +12,19 @@ mod parser; pub use parser::*;
 mod string_utils; pub use string_utils::*;
 mod zcashd; pub use zcashd::*;
 
-fn main() -> Result<()> {
+fn main() {
+    if let Err(e) = inner_main() {
+        println!("---");
+        println!("🔴 Error: {}\n", e);
+        // Print the error context chain
+        for cause in e.chain().skip(1) {
+            println!("Caused by: {}", cause);
+        }
+        std::process::exit(1);
+    }
+}
+
+fn inner_main() -> Result<()> {
     let args: Vec<String> = env::args().collect();
     if args.len() != 2 {
         bail!("Usage: {} <berkeleydb_file>", args[0]);
@@ -42,7 +54,8 @@ fn main() -> Result<()> {
         println!("---");
         println!("🛑 Unparsed keys:");
         for key in unparsed_keys {
-            println!("❌ {:?}", key);
+            let value = zcashd_dump.value_for_key(&key).unwrap();
+            println!("❌ key: {}\n\tvalue: {}", key, value);
         }
     }
 

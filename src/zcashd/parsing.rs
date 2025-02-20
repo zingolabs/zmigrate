@@ -124,7 +124,7 @@ pub fn parse_optional<T: Parse>(p: &mut Parser) -> Result<Option<T>> {
     match parse!(p, u8, "optional discriminant")? {
         0x00 => Ok(None),
         0x01 => Ok(Some(parse!(p, "optional value")?)),
-        discriminant => bail!("Invalid optional discriminant: {}", discriminant),
+        discriminant => bail!("Invalid optional discriminant: 0x{:02x}", discriminant),
     }
 }
 

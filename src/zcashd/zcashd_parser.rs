@@ -5,7 +5,7 @@ use anyhow::{ Context, Result, bail };
 use crate::{ parse, u256 };
 
 use super::{
-    zcashd_dump::DBKey, Address, BlockLocator, ClientVersion, DBValue, Key, KeyMetadata, KeyPoolEntry, Keys, MnemonicHDChain, MnemonicSeed, NetworkInfo, OrchardNoteCommitmentTree, PrivKey, PubKey, WalletTx, ZcashdDump, ZcashdWallet
+    u252, zcashd_dump::DBKey, Address, BlockLocator, ClientVersion, DBValue, Key, KeyMetadata, KeyPoolEntry, Keys, MnemonicHDChain, MnemonicSeed, NetworkInfo, OrchardNoteCommitmentTree, PrivKey, PubKey, SproutKeys, SproutPaymentAddress, SproutSpendingKey, WalletTx, ZcashdDump, ZcashdWallet
 };
 
 #[derive(Debug)]
@@ -112,8 +112,8 @@ impl<'a> ZcashdParser<'a> {
         // wkey
 
         // zkey
-
         // zkeymeta
+        let sprout_keys = self.parse_sprout_keys()?;
 
         //
         // Since version 5
@@ -146,7 +146,7 @@ impl<'a> ZcashdParser<'a> {
         //
 
         // **bestblock_nomerkle**
-        let bestblock_nomerkle = self.parse_block_locator("bestblock_nomerkle")?;
+        let bestblock_nomerkle = self.parse_opt_block_locator("bestblock_nomerkle")?;
 
         let wallet = ZcashdWallet {
             bestblock_nomerkle,
@@ -154,6 +154,7 @@ impl<'a> ZcashdParser<'a> {
             client_version,
             default_key,
             keys,
+            sprout_keys,
             min_version,
             mnemonic_hd_chain,
             mnemonic_phrase,
@@ -193,6 +194,14 @@ impl<'a> ZcashdParser<'a> {
         parse!(buf value, BlockLocator, format!("block locator for keyname: {}", keyname))
     }
 
+    fn parse_opt_block_locator(&self, keyname: &str) -> Result<Option<BlockLocator>> {
+        if self.dump.has_value_for_keyname(keyname) {
+            self.parse_block_locator(keyname).map(Some)
+        } else {
+            Ok(None)
+        }
+    }
+
     fn parse_keys(&self) -> Result<Keys> {
         let key_records = self.dump.records_for_keyname("key").context("Getting 'key' records")?;
         let keymeta_records = self.dump
@@ -217,6 +226,33 @@ impl<'a> ZcashdParser<'a> {
             self.mark_key_parsed(&metakey);
         }
         Ok(Keys::new(keys_map))
+    }
+
+    fn parse_sprout_keys(&self) -> Result<Option<SproutKeys>> {
+        if !self.dump.has_keys_for_keyname("zkey") {
+            return Ok(None);
+        }
+        let zkey_records = self.dump.records_for_keyname("zkey").context("Getting 'zkey' records")?;
+        let zkeymeta_records = self.dump
+            .records_for_keyname("zkeymeta")
+            .context("Getting 'zkeymeta' records")?;
+        if zkey_records.len() != zkeymeta_records.len() {
+            bail!("Mismatched zkey and zkeymeta records");
+        }
+        let mut zkeys_map = HashMap::new();
+        for (key, value) in zkey_records {
+            let payment_address = parse!(buf &key.data, SproutPaymentAddress, "payment_address")?;
+            let spending_key = parse!(buf value.as_data(), u252, "spending_key")?;
+            let metakey = DBKey::new("zkeymeta", &key.data);
+            let metadata_binary = self.dump.value_for_key(&metakey).context("Getting metadata")?;
+            let metadata = parse!(buf metadata_binary, KeyMetadata, "metadata")?;
+            let keypair = SproutSpendingKey::new(spending_key, metadata);
+            zkeys_map.insert(payment_address, keypair);
+
+            self.mark_key_parsed(&key);
+            self.mark_key_parsed(&metakey);
+        }
+        Ok(Some(SproutKeys::new(zkeys_map)))
     }
 
     fn parse_default_key(&self) -> Result<PubKey> {

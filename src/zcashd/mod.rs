@@ -1,5 +1,6 @@
 mod address; pub use address::*;
 mod block_locator; pub use block_locator::*;
+mod branch_id; pub use branch_id::*;
 mod client_version; pub use client_version::*;
 mod key_metadata; pub use key_metadata::*;
 mod key_pool; pub use key_pool::*;
@@ -13,6 +14,8 @@ mod parsing; pub use parsing::*;
 mod priv_key; pub use priv_key::*;
 mod pub_key; pub use pub_key::*;
 mod seconds_since_epoch; pub use seconds_since_epoch::*;
+mod sprout_keys; pub use sprout_keys::*;
+mod sprout_spending_key; pub use sprout_spending_key::*;
 mod tx; pub use tx::*;
 mod u160_type; pub use u160_type::*;
 mod u252_type; pub use u252_type::*;
