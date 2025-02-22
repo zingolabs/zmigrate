@@ -35,6 +35,11 @@ impl<const N: usize> Blob<N> {
     pub fn from_vec(data: Vec<u8>) -> Result<Self> {
         Self::from_slice(&data)
     }
+
+    pub fn from_hex(hex: &str) -> Self {
+        let data = hex::decode(hex).expect("Decoding hex string");
+        Self::from_vec(data).expect("Creating Blob from hex")
+    }
 }
 
 impl<const N: usize> Default for Blob<N> {

@@ -1,10 +1,12 @@
 use std::collections::HashMap;
 
+use crate::{parse, parse_compact_size, u256, BranchId, Data, OrchardTxMeta, Parse, Parser, SaplingBundleV5, ZIP225_TX_VERSION};
 use anyhow::Result;
-use crate::{ parse, u256, BranchId, Data, Parse, Parser, SaplingBundleV5 };
 
-use super::{ ExpiryHeight, JSOutPoint, JoinSplits, LockTime, OrchardBundle, SaplingBundle, SaplingBundleV4, SaplingNoteData, SaplingOutPoint, SproutNoteData, TxIn, TxOut, TxVersion, SAPLING_TX_VERSION };
-
+use super::{
+    ExpiryHeight, JSOutPoint, JoinSplits, LockTime, OrchardBundle, SaplingBundle, SaplingBundleV4,
+    SaplingNoteData, SaplingOutPoint, SproutNoteData, TxIn, TxOut, TxVersion, SAPLING_TX_VERSION,
+};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct WalletTx {
@@ -36,7 +38,8 @@ pub struct WalletTx {
     pub time_received: i32,
     pub from_me: bool,
     pub is_spent: bool,
-    pub sapling_note_data: HashMap<SaplingOutPoint, SaplingNoteData>,
+    pub sapling_note_data: Option<HashMap<SaplingOutPoint, SaplingNoteData>>,
+    pub orchard_tx_meta: Option<OrchardTxMeta>,
 
     pub unparsed_data: Data,
 }
@@ -74,10 +77,11 @@ impl Parse for WalletTx {
                 expiry_height = parse!(p, ExpiryHeight, "expiry_height")?.as_option();
             }
 
-            let mut sapling_bundle_v4: SaplingBundleV4 = (version.is_sapling() || version.is_future())
-                .then(|| parse!(p, "sapling_bundle"))
-                .transpose()?
-                .unwrap_or_default();
+            let mut sapling_bundle_v4: SaplingBundleV4 = (version.is_sapling()
+                || version.is_future())
+            .then(|| parse!(p, "sapling_bundle"))
+            .transpose()?
+            .unwrap_or_default();
 
             if version.number >= 2 {
                 let use_groth = version.is_overwinter() && version.number >= SAPLING_TX_VERSION;
@@ -98,8 +102,11 @@ impl Parse for WalletTx {
         let index = parse!(p, "index")?;
 
         // CWalletTx
-        let unused: Vec<i32> = parse!(p, "unused")?;
-        assert!(unused.is_empty(), "unused field in CWalletTx is not empty");
+        let unused_vt_prev = parse_compact_size(p)?;
+        assert!(
+            unused_vt_prev == 0,
+            "unused field in CWalletTx is not empty"
+        );
 
         let map_value = parse!(p, "map_value")?;
         let map_sprout_note_data = parse!(p, "map_sprout_note_data")?;
@@ -108,9 +115,22 @@ impl Parse for WalletTx {
         let time_received = parse!(p, "time_received")?;
         let from_me = parse!(p, "from_me")?;
         let is_spent = parse!(p, "is_spent")?;
-        let sapling_note_data = parse!(p, "sapling_note_data")?;
+
+        let mut sapling_note_data = None;
+        if version.is_overwinter() && version.number >= SAPLING_TX_VERSION {
+            sapling_note_data = parse!(p, "sapling_note_data")?;
+        }
+
+        let mut orchard_tx_meta: Option<OrchardTxMeta> = None;
+        if version.is_overwinter() && version.number >= ZIP225_TX_VERSION {
+            let meta = parse!(p, "orchard_tx_meta")?;
+            orchard_tx_meta = Some(meta);
+        }
 
         let unparsed_data = p.rest();
+        if !unparsed_data.is_empty() {
+            println!("💔 unparsed_data: {:?}", unparsed_data);
+        }
         assert!(unparsed_data.is_empty(), "unparsed_data in CWalletTx is not empty");
 
         Ok(Self {
@@ -139,6 +159,7 @@ impl Parse for WalletTx {
             from_me,
             is_spent,
             sapling_note_data,
+            orchard_tx_meta,
 
             unparsed_data,
         })

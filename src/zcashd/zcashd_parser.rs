@@ -342,9 +342,16 @@ impl<'a> ZcashdParser<'a> {
         // Some wallet files don't have any transactions
         if self.dump.has_keys_for_keyname("tx") {
             let records = self.dump.records_for_keyname("tx").context("Getting 'tx' records")?;
-            for (key, value) in records {
+            let mut sorted_records: Vec<_> = records.into_iter().collect();
+            sorted_records.sort_by(|(key1, _), (key2, _)| key1.data.cmp(&key2.data));
+            for (key, value) in sorted_records {
                 let txid = parse!(buf &key.data, u256, "transaction ID")?;
-                let transaction = parse!(buf value.as_data(), WalletTx, "transaction")?;
+                // let trace = txid == u256::from_hex("2727577862fd0eae69a2c51cb43fd2866fb6f16253de3db0cacbbc22f49270b6");
+                // if trace {
+                //     println!("🔵 Transaction ID: {:?}", txid);
+                // }
+                let trace = false;
+                let transaction = parse!(buf value.as_data(), WalletTx, "transaction", trace)?;
                 if transactions.contains_key(&txid) {
                     bail!("Duplicate transaction found: {:?}", txid);
                 }

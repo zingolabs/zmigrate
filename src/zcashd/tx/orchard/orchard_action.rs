@@ -1,27 +1,32 @@
 use anyhow::Result;
 
-use crate::{parse, Parse, Parser};
+use crate::{parse, Blob32, Parse, Parser};
 
-use super::{ExtractedNoteCommitment, Nullifier, OrchardSignature, RedPallasVerificationKey, TransmittedNoteCiphertext, ValueCommitment};
+use super::{OrchardSignature, TransmittedNoteCiphertext};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct OrchardAction {
-    pub nf: Nullifier,
-    pub rk: RedPallasVerificationKey,
-    pub cmx: ExtractedNoteCommitment,
+    pub cv_net: Blob32,
+    pub nf_old: Blob32,
+    pub rk: Blob32,
+    pub cmx: Blob32,
     pub encrypted_note: TransmittedNoteCiphertext,
-    pub cv_net: ValueCommitment,
     pub authorization: Option<OrchardSignature>,
 }
 
 impl Parse for OrchardAction {
     fn parse(p: &mut Parser) -> Result<Self> where Self: Sized {
+        let cv_net = parse!(p, "cv_net")?;
+        let nf_old = parse!(p, "nf")?;
+        let rk = parse!(p, "rk")?;
+        let cmx = parse!(p, "cmx")?;
+        let encrypted_note = parse!(p, "encrypted_note")?;
         Ok(Self {
-            nf: parse!(p, "nf")?,
-            rk: parse!(p, "rk")?,
-            cmx: parse!(p, "cmx")?,
-            encrypted_note: parse!(p, "encrypted_note")?,
-            cv_net: parse!(p, "cv_net")?,
+            cv_net,
+            nf_old,
+            rk,
+            cmx,
+            encrypted_note,
             authorization: None,
         })
     }

@@ -1,10 +1,10 @@
 use anyhow::Result;
 
-use crate::{ parse, Parse, Parser };
+use crate::{ parse, Blob32, Data, Parse, Parser };
 
 use crate::ZatBalance;
 
-use super::{ OrchardAction, OrchardAnchor, OrchardAuthorized, OrchardFlags, Proof };
+use super::{ OrchardAction, OrchardAuthorized, OrchardFlags };
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct OrchardBundle(pub Option<OrchardBundleInner>);
@@ -13,8 +13,8 @@ pub struct OrchardBundle(pub Option<OrchardBundleInner>);
 pub struct OrchardBundleInner {
     pub actions: Vec<OrchardAction>,
     pub flags: OrchardFlags,
-    pub balance: ZatBalance,
-    pub anchor: OrchardAnchor,
+    pub value_balance: ZatBalance,
+    pub anchor: Blob32,
     pub authorization: OrchardAuthorized,
 }
 
@@ -25,9 +25,9 @@ impl Parse for OrchardBundle {
             return Ok(Self(None));
         }
         let flags = parse!(p, "flags")?;
-        let balance = parse!(p, "balance")?;
+        let value_balance = parse!(p, "balance")?;
         let anchor = parse!(p, "anchor")?;
-        let proof_bytes = parse!(p, Vec<u8>, "proof")?;
+        let proof_bytes = parse!(p, Data, "proof")?;
 
         let actions = actions_without_auth.into_iter().map(|mut action| {
             let spend_auth_sig = parse!(p, "spend_auth_sig")?;
@@ -37,14 +37,14 @@ impl Parse for OrchardBundle {
 
         let binding_sig = parse!(p, "binding_sig")?;
         let authorization = OrchardAuthorized {
-            proof: Proof(proof_bytes),
+            proof: proof_bytes,
             binding_signature: binding_sig,
         };
 
         Ok(Self(Some(OrchardBundleInner {
             actions,
             flags,
-            balance,
+            value_balance,
             anchor,
             authorization,
         })))

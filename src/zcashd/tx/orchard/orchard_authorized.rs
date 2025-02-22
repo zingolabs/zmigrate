@@ -1,12 +1,12 @@
 use anyhow::Result;
 
-use crate::{parse, Parse, Parser};
+use crate::{parse, Data, Parse, Parser};
 
-use super::{Proof, RedPallasSignature};
+use super::RedPallasSignature;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct OrchardAuthorized {
-    pub proof: Proof,
+    pub proof: Data,
     pub binding_signature: RedPallasSignature,
 }
 

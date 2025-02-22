@@ -15,6 +15,11 @@ impl u256 {
         let blob = Blob32::from_slice(bytes).context("Creating U256 from slice")?;
         Ok(Self(blob))
     }
+
+    pub fn from_hex(hex: &str) -> Self {
+        let blob = Blob32::from_hex(hex);
+        Self(blob)
+    }
 }
 
 impl AsRef<Blob32> for u256 {
