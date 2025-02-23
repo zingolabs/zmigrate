@@ -8,10 +8,7 @@ use anyhow::{bail, Context, Result};
 use crate::{parse, u256};
 
 use super::{
-    u252, zcashd_dump::DBKey, Address, BlockLocator, ClientVersion, DBValue, Key, KeyMetadata,
-    KeyPoolEntry, Keys, MnemonicHDChain, MnemonicSeed, NetworkInfo, OrchardNoteCommitmentTree,
-    PrivKey, PubKey, SaplingIncomingViewingKey, SaplingZPaymentAddress, SproutKeys,
-    SproutPaymentAddress, SproutSpendingKey, WalletTx, ZcashdDump, ZcashdWallet,
+    u252, zcashd_dump::DBKey, Address, BlockLocator, ClientVersion, DBValue, Key, KeyMetadata, KeyPoolEntry, Keys, MnemonicHDChain, MnemonicSeed, NetworkInfo, OrchardNoteCommitmentTree, PrivKey, PubKey, SaplingExtendedSpendingKey, SaplingIncomingViewingKey, SaplingKey, SaplingKeys, SaplingZPaymentAddress, SproutKeys, SproutPaymentAddress, SproutSpendingKey, WalletTx, ZcashdDump, ZcashdWallet
 };
 
 #[derive(Debug)]
@@ -99,6 +96,7 @@ impl<'a> ZcashdParser<'a> {
         // sapextfvk
 
         // sapzkey
+        let sapling_keys = self.parse_sapling_keys()?;
 
         // tx
         let transactions = self.parse_transactions()?;
@@ -167,6 +165,7 @@ impl<'a> ZcashdParser<'a> {
             network_info,
             orchard_note_commitment_tree,
             orderposnext,
+            sapling_keys,
             sapling_z_addresses,
             sprout_keys,
             transactions,
@@ -237,6 +236,38 @@ impl<'a> ZcashdParser<'a> {
             self.mark_key_parsed(&metakey);
         }
         Ok(Keys::new(keys_map))
+    }
+
+    fn parse_sapling_keys(&self) -> Result<SaplingKeys> {
+        let key_records = self
+            .dump
+            .records_for_keyname("sapzkey")
+            .context("Getting 'sapzkey' records")?;
+        let keymeta_records = self
+            .dump
+            .records_for_keyname("sapzkeymeta")
+            .context("Getting 'sapzkeymeta' records")?;
+        if key_records.len() != keymeta_records.len() {
+            bail!("Mismatched sapzkey and sapzkeymeta records");
+        }
+        let mut keys_map = HashMap::new();
+        for (key, value) in key_records {
+            let ivk = parse!(buf & key.data, SaplingIncomingViewingKey, "ivk")?;
+            let spending_key = parse!(buf value.as_data(), SaplingExtendedSpendingKey, "spending_key")?;
+            let metakey = DBKey::new("sapzkeymeta", &key.data);
+            let metadata_binary = self
+                .dump
+                .value_for_key(&metakey)
+                .context("Getting sapzkeymeta metadata")?;
+            let metadata = parse!(buf metadata_binary, KeyMetadata, "sapzkeymeta metadata")?;
+            let keypair =
+                SaplingKey::new(ivk.clone(), spending_key.clone(), metadata).context("Creating keypair")?;
+            keys_map.insert(ivk, keypair);
+
+            self.mark_key_parsed(&key);
+            self.mark_key_parsed(&metakey);
+        }
+        Ok(SaplingKeys::new(keys_map))
     }
 
     fn parse_sprout_keys(&self) -> Result<Option<SproutKeys>> {

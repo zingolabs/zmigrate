@@ -1,9 +1,7 @@
 use std::collections::HashMap;
 
 use super::{
-    u256, Address, BlockLocator, ClientVersion, KeyPoolEntry, Keys, MnemonicHDChain, MnemonicSeed,
-    NetworkInfo, OrchardNoteCommitmentTree, PubKey, SaplingIncomingViewingKey,
-    SaplingZPaymentAddress, SproutKeys, WalletTx,
+    u256, Address, BlockLocator, ClientVersion, KeyPoolEntry, Keys, MnemonicHDChain, MnemonicSeed, NetworkInfo, OrchardNoteCommitmentTree, PubKey, SaplingIncomingViewingKey, SaplingKeys, SaplingZPaymentAddress, SproutKeys, WalletTx
 };
 
 pub struct ZcashdWallet {
@@ -21,6 +19,7 @@ pub struct ZcashdWallet {
     pub network_info: NetworkInfo,
     pub orchard_note_commitment_tree: OrchardNoteCommitmentTree,
     pub orderposnext: Option<i64>,
+    pub sapling_keys: SaplingKeys,
     pub sapling_z_addresses: HashMap<SaplingZPaymentAddress, SaplingIncomingViewingKey>,
     pub sprout_keys: Option<SproutKeys>,
     pub transactions: HashMap<u256, WalletTx>,
@@ -44,6 +43,7 @@ impl std::fmt::Debug for ZcashdWallet {
             .field("network_info", &self.network_info)
             .field("orchard_note_commitment_tree", &self.orchard_note_commitment_tree)
             .field("orderposnext", &self.orderposnext)
+            .field("sapling_keys", &self.sapling_keys)
             .field("sprout_keys", &self.sprout_keys)
             .field("transactions", &self.transactions)
             .field("witnesscachesize", &self.witnesscachesize)
