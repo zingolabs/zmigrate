@@ -1,11 +1,17 @@
-use std::{cell::RefCell, collections::{HashMap, HashSet}};
+use std::{
+    cell::RefCell,
+    collections::{HashMap, HashSet},
+};
 
-use anyhow::{ Context, Result, bail };
+use anyhow::{bail, Context, Result};
 
-use crate::{ parse, u256 };
+use crate::{parse, u256};
 
 use super::{
-    u252, zcashd_dump::DBKey, Address, BlockLocator, ClientVersion, DBValue, Key, KeyMetadata, KeyPoolEntry, Keys, MnemonicHDChain, MnemonicSeed, NetworkInfo, OrchardNoteCommitmentTree, PrivKey, PubKey, SproutKeys, SproutPaymentAddress, SproutSpendingKey, WalletTx, ZcashdDump, ZcashdWallet
+    u252, zcashd_dump::DBKey, Address, BlockLocator, ClientVersion, DBValue, Key, KeyMetadata,
+    KeyPoolEntry, Keys, MnemonicHDChain, MnemonicSeed, NetworkInfo, OrchardNoteCommitmentTree,
+    PrivKey, PubKey, SaplingIncomingViewingKey, SaplingZPaymentAddress, SproutKeys,
+    SproutPaymentAddress, SproutSpendingKey, WalletTx, ZcashdDump, ZcashdWallet,
 };
 
 #[derive(Debug)]
@@ -22,10 +28,7 @@ impl<'a> ZcashdParser<'a> {
 
     fn new(dump: &'a ZcashdDump) -> Self {
         let unparsed_keys = RefCell::new(dump.records().keys().cloned().collect());
-        Self {
-            dump,
-            unparsed_keys,
-        }
+        Self { dump, unparsed_keys }
     }
 
     // Keep track of which keys have been parsed
@@ -91,6 +94,7 @@ impl<'a> ZcashdParser<'a> {
         let address_purposes = self.parse_address_purposes()?;
 
         // sapzaddr
+        let sapling_z_addresses = self.parse_sapling_z_addresses()?;
 
         // sapextfvk
 
@@ -149,23 +153,24 @@ impl<'a> ZcashdParser<'a> {
         let bestblock_nomerkle = self.parse_opt_block_locator("bestblock_nomerkle")?;
 
         let wallet = ZcashdWallet {
+            address_names,
+            address_purposes,
             bestblock_nomerkle,
             bestblock,
             client_version,
             default_key,
+            key_pool,
             keys,
-            sprout_keys,
             min_version,
             mnemonic_hd_chain,
             mnemonic_phrase,
-            address_names,
-            address_purposes,
             network_info,
             orchard_note_commitment_tree,
             orderposnext,
-            witnesscachesize,
-            key_pool,
+            sapling_z_addresses,
+            sprout_keys,
             transactions,
+            witnesscachesize,
         };
 
         Ok((wallet, self.unparsed_keys.borrow().clone()))
@@ -203,8 +208,12 @@ impl<'a> ZcashdParser<'a> {
     }
 
     fn parse_keys(&self) -> Result<Keys> {
-        let key_records = self.dump.records_for_keyname("key").context("Getting 'key' records")?;
-        let keymeta_records = self.dump
+        let key_records = self
+            .dump
+            .records_for_keyname("key")
+            .context("Getting 'key' records")?;
+        let keymeta_records = self
+            .dump
             .records_for_keyname("keymeta")
             .context("Getting 'keymeta' records")?;
         if key_records.len() != keymeta_records.len() {
@@ -212,14 +221,16 @@ impl<'a> ZcashdParser<'a> {
         }
         let mut keys_map = HashMap::new();
         for (key, value) in key_records {
-            let pubkey = parse!(buf &key.data, PubKey, "pubkey")?;
+            let pubkey = parse!(buf & key.data, PubKey, "pubkey")?;
             let privkey = parse!(buf value.as_data(), PrivKey, "privkey")?;
             let metakey = DBKey::new("keymeta", &key.data);
-            let metadata_binary = self.dump.value_for_key(&metakey).context("Getting metadata")?;
+            let metadata_binary = self
+                .dump
+                .value_for_key(&metakey)
+                .context("Getting metadata")?;
             let metadata = parse!(buf metadata_binary, KeyMetadata, "metadata")?;
-            let keypair = Key::new(pubkey.clone(), privkey.clone(), metadata).context(
-                "Creating keypair"
-            )?;
+            let keypair =
+                Key::new(pubkey.clone(), privkey.clone(), metadata).context("Creating keypair")?;
             keys_map.insert(pubkey, keypair);
 
             self.mark_key_parsed(&key);
@@ -232,8 +243,12 @@ impl<'a> ZcashdParser<'a> {
         if !self.dump.has_keys_for_keyname("zkey") {
             return Ok(None);
         }
-        let zkey_records = self.dump.records_for_keyname("zkey").context("Getting 'zkey' records")?;
-        let zkeymeta_records = self.dump
+        let zkey_records = self
+            .dump
+            .records_for_keyname("zkey")
+            .context("Getting 'zkey' records")?;
+        let zkeymeta_records = self
+            .dump
             .records_for_keyname("zkeymeta")
             .context("Getting 'zkeymeta' records")?;
         if zkey_records.len() != zkeymeta_records.len() {
@@ -241,10 +256,13 @@ impl<'a> ZcashdParser<'a> {
         }
         let mut zkeys_map = HashMap::new();
         for (key, value) in zkey_records {
-            let payment_address = parse!(buf &key.data, SproutPaymentAddress, "payment_address")?;
+            let payment_address = parse!(buf & key.data, SproutPaymentAddress, "payment_address")?;
             let spending_key = parse!(buf value.as_data(), u252, "spending_key")?;
             let metakey = DBKey::new("zkeymeta", &key.data);
-            let metadata_binary = self.dump.value_for_key(&metakey).context("Getting metadata")?;
+            let metadata_binary = self
+                .dump
+                .value_for_key(&metakey)
+                .context("Getting metadata")?;
             let metadata = parse!(buf metadata_binary, KeyMetadata, "metadata")?;
             let keypair = SproutSpendingKey::new(spending_key, metadata);
             zkeys_map.insert(payment_address, keypair);
@@ -266,21 +284,25 @@ impl<'a> ZcashdParser<'a> {
     }
 
     fn parse_mnemonic_phrase(&self) -> Result<MnemonicSeed> {
-        let (key, value) = self.dump
+        let (key, value) = self
+            .dump
             .record_for_keyname("mnemonicphrase")
             .context("Getting 'mnemonicphrase' record")?;
-        let fingerprint = parse!(buf &key.data, u256, "seed fingerprint")?;
-        let seed = parse!(buf &value, MnemonicSeed, "mnemonic phrase")?
-            .set_fingerprint(fingerprint);
+        let fingerprint = parse!(buf & key.data, u256, "seed fingerprint")?;
+        let seed =
+            parse!(buf & value, MnemonicSeed, "mnemonic phrase")?.set_fingerprint(fingerprint);
         self.mark_key_parsed(&key);
         Ok(seed)
     }
 
     fn parse_address_names(&self) -> Result<HashMap<Address, String>> {
-        let records = self.dump.records_for_keyname("name").context("Getting 'name' records")?;
+        let records = self
+            .dump
+            .records_for_keyname("name")
+            .context("Getting 'name' records")?;
         let mut address_names = HashMap::new();
         for (key, value) in records {
-            let address = parse!(buf &key.data, Address, "address")?;
+            let address = parse!(buf & key.data, Address, "address")?;
             let name = parse!(buf value.as_data(), String, "name")?;
             if address_names.contains_key(&address) {
                 bail!("Duplicate address found: {}", address);
@@ -293,10 +315,13 @@ impl<'a> ZcashdParser<'a> {
     }
 
     fn parse_address_purposes(&self) -> Result<HashMap<Address, String>> {
-        let records = self.dump.records_for_keyname("purpose").context("Getting 'purpose' records")?;
+        let records = self
+            .dump
+            .records_for_keyname("purpose")
+            .context("Getting 'purpose' records")?;
         let mut address_purposes = HashMap::new();
         for (key, value) in records {
-            let address = parse!(buf &key.data, Address, "address")?;
+            let address = parse!(buf & key.data, Address, "address")?;
             let purpose = parse!(buf value.as_data(), String, "purpose")?;
             if address_purposes.contains_key(&address) {
                 bail!("Duplicate address found: {}", address);
@@ -306,6 +331,29 @@ impl<'a> ZcashdParser<'a> {
             self.mark_key_parsed(&key);
         }
         Ok(address_purposes)
+    }
+
+    fn parse_sapling_z_addresses(
+        &self,
+    ) -> Result<HashMap<SaplingZPaymentAddress, SaplingIncomingViewingKey>> {
+        let records = self
+            .dump
+            .records_for_keyname("sapzaddr")
+            .context("Getting 'sapzaddr' records")?;
+        let mut sapling_z_addresses = HashMap::new();
+        for (key, value) in records {
+            let payment_address =
+                parse!(buf & key.data, SaplingZPaymentAddress, "payment address")?;
+            let viewing_key =
+                parse!(buf value.as_data(), SaplingIncomingViewingKey, "viewing key")?;
+            if sapling_z_addresses.contains_key(&payment_address) {
+                bail!("Duplicate payment address found: {:?}", payment_address);
+            }
+            sapling_z_addresses.insert(payment_address, viewing_key);
+
+            self.mark_key_parsed(&key);
+        }
+        Ok(sapling_z_addresses)
     }
 
     fn parse_network_info(&self) -> Result<NetworkInfo> {
@@ -320,15 +368,19 @@ impl<'a> ZcashdParser<'a> {
         let value = self
             .value_for_keyname("orchard_note_commitment_tree")
             .context("Getting 'orchard_note_commitment_tree' record")?;
-        let orchard_note_commitment_tree = parse!(buf value.as_data(), OrchardNoteCommitmentTree, "orchard note commitment tree")?;
+        let orchard_note_commitment_tree =
+            parse!(buf value.as_data(), OrchardNoteCommitmentTree, "orchard note commitment tree")?;
         Ok(orchard_note_commitment_tree)
     }
 
     fn parse_key_pool(&self) -> Result<HashMap<i64, KeyPoolEntry>> {
-        let records = self.dump.records_for_keyname("pool").context("Getting 'pool' records")?;
+        let records = self
+            .dump
+            .records_for_keyname("pool")
+            .context("Getting 'pool' records")?;
         let mut key_pool = HashMap::new();
         for (key, value) in records {
-            let index = parse!(buf &key.data, i64, "key pool index")?;
+            let index = parse!(buf & key.data, i64, "key pool index")?;
             let entry = parse!(buf value.as_data(), KeyPoolEntry, "key pool entry")?;
             key_pool.insert(index, entry);
 
@@ -341,11 +393,14 @@ impl<'a> ZcashdParser<'a> {
         let mut transactions = HashMap::new();
         // Some wallet files don't have any transactions
         if self.dump.has_keys_for_keyname("tx") {
-            let records = self.dump.records_for_keyname("tx").context("Getting 'tx' records")?;
+            let records = self
+                .dump
+                .records_for_keyname("tx")
+                .context("Getting 'tx' records")?;
             let mut sorted_records: Vec<_> = records.into_iter().collect();
             sorted_records.sort_by(|(key1, _), (key2, _)| key1.data.cmp(&key2.data));
             for (key, value) in sorted_records {
-                let txid = parse!(buf &key.data, u256, "transaction ID")?;
+                let txid = parse!(buf & key.data, u256, "transaction ID")?;
                 // let trace = txid == u256::from_hex("2727577862fd0eae69a2c51cb43fd2866fb6f16253de3db0cacbbc22f49270b6");
                 // if trace {
                 //     println!("🔵 Transaction ID: {:?}", txid);

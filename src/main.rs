@@ -1,16 +1,23 @@
 use std::env;
 use std::path::Path;
 
-use anyhow::{Result, bail, Context};
+use anyhow::{bail, Context, Result};
 
-mod bdb_dump; pub use bdb_dump::*;
-mod blob; pub use blob::*;
-mod data; pub use data::*;
-mod digest_utils; pub use digest_utils::*;
+mod bdb_dump;
+pub use bdb_dump::*;
+mod blob;
+pub use blob::*;
+mod data;
+pub use data::*;
+mod digest_utils;
+pub use digest_utils::*;
 mod parse_macro;
-mod parser; pub use parser::*;
-mod string_utils; pub use string_utils::*;
-mod zcashd; pub use zcashd::*;
+mod parser;
+pub use parser::*;
+mod string_utils;
+pub use string_utils::*;
+mod zcashd;
+pub use zcashd::*;
 
 fn main() {
     if let Err(e) = inner_main() {
@@ -30,19 +37,17 @@ fn inner_main() -> Result<()> {
         bail!("Usage: {} <berkeleydb_file>", args[0]);
     }
 
-    let db_dump = BDBDump::from_file(Path::new(&args[1]))
-        .context("Parsing BerkeleyDB file")?;
+    let db_dump = BDBDump::from_file(Path::new(&args[1])).context("Parsing BerkeleyDB file")?;
 
-    let zcashd_dump = ZcashdDump::from_bdb_dump(&db_dump)
-        .context("Parsing Zcashd dump")?;
+    let zcashd_dump = ZcashdDump::from_bdb_dump(&db_dump).context("Parsing Zcashd dump")?;
 
     zcashd_dump.print_keyname_summary();
 
     // println!("---");
     // zcashd_dump.print_keys();
 
-    let (zcashd_wallet, unparsed_keys) = ZcashdParser::parse_dump(&zcashd_dump)
-        .context("Parsing Zcashd dump")?;
+    let (zcashd_wallet, unparsed_keys) =
+        ZcashdParser::parse_dump(&zcashd_dump).context("Parsing Zcashd dump")?;
 
     println!("---");
     println!("{:#?}", zcashd_wallet);
@@ -53,7 +58,17 @@ fn inner_main() -> Result<()> {
     } else {
         println!("---");
         println!("🛑 Unparsed keys:");
-        for key in unparsed_keys {
+        let mut sorted_keys: Vec<_> = unparsed_keys.into_iter().collect();
+        sorted_keys.sort();
+        let mut last_keyname: Option<String> = None;
+        for key in sorted_keys {
+            if let Some(ref last_keyname) = last_keyname {
+                if *last_keyname != key.keyname {
+                    println!();
+                }
+            }
+            last_keyname = Some(key.keyname.to_string());
+
             let value = zcashd_dump.value_for_key(&key).unwrap();
             println!("❌ key: {}\n\tvalue: {}", key, value);
         }
