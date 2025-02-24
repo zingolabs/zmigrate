@@ -1,41 +1,48 @@
 # Survey of Keys in `zcashd` Wallets
 
-## Appearing in `wallet0.dat`
+## Appearing in `zcash-wallet-formats` repository
 
 ### Single
 
-- [x] witnesscachesize: 1 (8)
-- [x] orderposnext: 1 (8)
-- [x] orchard_note_commitment_tree: 1 (20)
-- [x] networkinfo: 1 (14)
-- [x] bestblock_nomerkle: 1 (613)
-- [x] bestblock: 1 (5)
-- [x] defaultkey: 1 (34)
-- [x] minversion: 1 (4)
-- [x] mnemonichdchain: 1 (61)
-- [x] mnemonicphrase: 1 (168)
-- [x] version: 1 (4)
+- [x] bestblock_nomerkle
+- [x] bestblock
+- [x] defaultkey
+- [x] minversion
+- [x] mnemonichdchain
+- [x] mnemonicphrase
+- [x] networkinfo
+- [x] orchard_note_commitment_tree
+- [x] orderposnext
+- [x] version
+- [x] witnesscachesize
 
 ### Multiple
 
-- [x] tx: 50 (229...231)
-- [x] purpose: 1 (8)
-- [x] pool: 1 (46)
-- [x] name: 1 (1)
-- [x] key: 52 (247)
-- [x] keymeta: 52 (69...70)
+- [x] key
+- [x] keymeta
+- [x] name
+- [x] pool
+- [x] purpose
+- [x] recipientmapping
+- [x] sapzaddr
+- [x] sapzkey
+- [x] tx
+- [x] unifiedaccount
+- [x] unifiedaddrmeta
+- [x] unifiedfvk
+- [x] zkey
+- [x] zkeymeta
 
-### Not Appearing in `wallet0.dat`
+## Not Appearing in `zcash-wallet-formats` repository
 
-## Single
+### Single
 
 - [ ] chdseed
 - [ ] cmnemonicphrase
 - [ ] hdchain
 - [ ] mkey
-- [ ] orchard_note_commitment_tree
 
-## Multiple
+### Multiple
 
 - [ ] ckey
 - [ ] csapzkey
@@ -43,18 +50,10 @@
 - [ ] czkey
 - [ ] destdata
 - [ ] hdseed
-- [ ] recipientmapping
 - [ ] sapextfvk
-- [ ] sapzaddr
-- [ ] sapzkey
-- [ ] unifiedaccount
-- [ ] unifiedaddrmeta
-- [ ] unifiedfvk
 - [ ] vkey
 - [ ] watchs
 - [ ] wkey
-- [ ] zkey
-- [ ] zkeymeta
 
 ## Removed
 

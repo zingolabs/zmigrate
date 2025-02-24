@@ -44,17 +44,13 @@ cargo install --path .
 
 ### What's working
 
-- Parses `wallet0.dat` through `wallet7.dat` files in the `zcash-wallet-formats` repo.
+- Parses all zcashd wallet files in the `zcash-wallet-formats` repo as of 2025-02-24.
 - The parsing framework is designed to be extensible to other wallet formats, and uses a single `parse!` macro to flexibly parse fields of various structures using type inference wherever possible, but also allows the specification of types where necessary.
 - The parsing framework handles deeply-nested structures, and is designed to give useful context when errors occur.
 - The `zcashd` directory contains specializations of the parsing framework for the way that `zcashd` structures are serialized in `wallet.dat` files. These may or may not ultimately be shared with other wallet formats.
 - The in-memory structures are currently all `zcashd`-specific, and as we add other formats, we expect to create higher-level abstract structures that can will used to translate between formats.
 
-### What may not be working
-
-- May not work with shielded transactions or other wallet features not present in the `wallet.dat` files in the `zcash-wallet-formats` repo. The code is currently parsing these structures but has not been tested with them.
-
-### What's definitely not working
+### What's not working
 
 - No decryption of encrypted fields in the `zcash` wallet format is performed yet. This will be necessary to fully parse the wallet into in-memory structures that can be written to a wallet interchange format or other wallet formats.
 - Not all documented keys in the `zcashd` wallet format have implementations. A survey of which keys are currently being parsed is available in the [src/zcashd/KEYS.md](src/zcashd/KEYS.md) file.
