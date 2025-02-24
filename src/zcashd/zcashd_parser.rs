@@ -5,10 +5,10 @@ use std::{
 
 use anyhow::{bail, Context, Result};
 
-use crate::{parse, u256};
+use crate::{parse, u256, Parser, RecipientAddress};
 
 use super::{
-    u252, zcashd_dump::DBKey, Address, BlockLocator, ClientVersion, DBValue, Key, KeyMetadata, KeyPoolEntry, Keys, MnemonicHDChain, MnemonicSeed, NetworkInfo, OrchardNoteCommitmentTree, PrivKey, PubKey, SaplingExtendedSpendingKey, SaplingIncomingViewingKey, SaplingKey, SaplingKeys, SaplingZPaymentAddress, SproutKeys, SproutPaymentAddress, SproutSpendingKey, UnifiedAccountMetadata, UnifiedAccounts, UnifiedAddressMetadata, WalletTx, ZcashdDump, ZcashdWallet
+    u252, zcashd_dump::DBKey, Address, BlockLocator, ClientVersion, DBValue, Key, KeyMetadata, KeyPoolEntry, Keys, MnemonicHDChain, MnemonicSeed, NetworkInfo, OrchardNoteCommitmentTree, PrivKey, PubKey, RecipientMapping, SaplingExtendedSpendingKey, SaplingIncomingViewingKey, SaplingKey, SaplingKeys, SaplingZPaymentAddress, SproutKeys, SproutPaymentAddress, SproutSpendingKey, UnifiedAccountMetadata, UnifiedAccounts, UnifiedAddressMetadata, WalletTx, ZcashdDump, ZcashdWallet
 };
 
 #[derive(Debug)]
@@ -143,6 +143,7 @@ impl<'a> ZcashdParser<'a> {
         let mnemonic_hd_chain = self.parse_mnemonic_hd_chain()?;
 
         // recipientmapping
+        let send_recipients = self.parse_send_recipients()?;
 
         //
         // Since version 6
@@ -168,6 +169,7 @@ impl<'a> ZcashdParser<'a> {
             orderposnext,
             sapling_keys,
             sapling_z_addresses,
+            send_recipients,
             sprout_keys,
             transactions,
             unified_accounts,
@@ -241,6 +243,10 @@ impl<'a> ZcashdParser<'a> {
     }
 
     fn parse_sapling_keys(&self) -> Result<SaplingKeys> {
+        let mut keys_map = HashMap::new();
+        if !self.dump.has_keys_for_keyname("sapzkey") {
+            return Ok(SaplingKeys::new(keys_map));
+        }
         let key_records = self
             .dump
             .records_for_keyname("sapzkey")
@@ -252,7 +258,6 @@ impl<'a> ZcashdParser<'a> {
         if key_records.len() != keymeta_records.len() {
             bail!("Mismatched sapzkey and sapzkeymeta records");
         }
-        let mut keys_map = HashMap::new();
         for (key, value) in key_records {
             let ivk = parse!(buf & key.data, SaplingIncomingViewingKey, "ivk")?;
             let spending_key = parse!(buf value.as_data(), SaplingExtendedSpendingKey, "spending_key")?;
@@ -316,7 +321,33 @@ impl<'a> ZcashdParser<'a> {
         parse!(buf value, MnemonicHDChain, "mnemonichdchain")
     }
 
+    fn parse_send_recipients(&self) -> Result<HashMap<u256, Vec<RecipientMapping>>> {
+        let mut send_recipients: HashMap<u256, Vec<RecipientMapping>> = HashMap::new();
+        if !self.dump.has_keys_for_keyname("recipientmapping") {
+            return Ok(send_recipients);
+        }
+        let records = self
+            .dump
+            .records_for_keyname("recipientmapping")
+            .context("Getting 'recipientmapping' records")?;
+        for (key, value) in records {
+            let mut p = Parser::new(&key.data);
+            let txid = parse!(&mut p, u256, "txid")?;
+            let recipient_address = parse!(&mut p, RecipientAddress, "recipient_address")?;
+            p.check_finished()?;
+            let unified_address = parse!(buf &value, String, "unified_address")?;
+            let recipient_mapping = RecipientMapping::new(recipient_address, unified_address);
+            send_recipients.entry(txid).or_default().push(recipient_mapping);
+            self.mark_key_parsed(&key);
+        }
+
+        Ok(send_recipients)
+    }
+
     fn parse_unified_accounts(&self) -> Result<Option<UnifiedAccounts>> {
+        if !self.dump.has_keys_for_keyname("unifiedaddrmeta") {
+            return Ok(None);
+        }
         let address_metadata_records = self.dump.records_for_keyname("unifiedaddrmeta")?;
         let mut address_metadata: HashMap<u256, UnifiedAddressMetadata> = HashMap::new();
         for (key, value) in address_metadata_records {
@@ -409,11 +440,14 @@ impl<'a> ZcashdParser<'a> {
     fn parse_sapling_z_addresses(
         &self,
     ) -> Result<HashMap<SaplingZPaymentAddress, SaplingIncomingViewingKey>> {
+        let mut sapling_z_addresses = HashMap::new();
+        if !self.dump.has_keys_for_keyname("sapzaddr") {
+            return Ok(sapling_z_addresses);
+        }
         let records = self
             .dump
             .records_for_keyname("sapzaddr")
             .context("Getting 'sapzaddr' records")?;
-        let mut sapling_z_addresses = HashMap::new();
         for (key, value) in records {
             let payment_address =
                 parse!(buf & key.data, SaplingZPaymentAddress, "payment address")?;

@@ -1,9 +1,7 @@
 use std::collections::HashMap;
 
 use super::{
-    u256, Address, BlockLocator, ClientVersion, KeyPoolEntry, Keys, MnemonicHDChain, MnemonicSeed,
-    NetworkInfo, OrchardNoteCommitmentTree, PubKey, SaplingIncomingViewingKey, SaplingKeys,
-    SaplingZPaymentAddress, SproutKeys, UnifiedAccounts, WalletTx,
+    u256, Address, BlockLocator, ClientVersion, KeyPoolEntry, Keys, MnemonicHDChain, MnemonicSeed, NetworkInfo, OrchardNoteCommitmentTree, PubKey, RecipientMapping, SaplingIncomingViewingKey, SaplingKeys, SaplingZPaymentAddress, SproutKeys, UnifiedAccounts, WalletTx
 };
 
 pub struct ZcashdWallet {
@@ -23,6 +21,7 @@ pub struct ZcashdWallet {
     pub orderposnext: Option<i64>,
     pub sapling_keys: SaplingKeys,
     pub sapling_z_addresses: HashMap<SaplingZPaymentAddress, SaplingIncomingViewingKey>,
+    pub send_recipients: HashMap<u256, Vec<RecipientMapping>>,
     pub sprout_keys: Option<SproutKeys>,
     pub transactions: HashMap<u256, WalletTx>,
     pub unified_accounts: Option<UnifiedAccounts>,
@@ -51,6 +50,7 @@ impl std::fmt::Debug for ZcashdWallet {
             .field("orderposnext", &self.orderposnext)
             .field("sapling_keys", &self.sapling_keys)
             .field("sapling_z_addresses", &self.sapling_z_addresses)
+            .field("send_recipients", &self.send_recipients)
             .field("sprout_keys", &self.sprout_keys)
             .field("transactions", &self.transactions)
             .field("unified_accounts", &self.unified_accounts)
