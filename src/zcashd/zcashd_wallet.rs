@@ -1,7 +1,9 @@
 use std::collections::HashMap;
 
 use super::{
-    u256, Address, BlockLocator, ClientVersion, KeyPoolEntry, Keys, MnemonicHDChain, MnemonicSeed, NetworkInfo, OrchardNoteCommitmentTree, PubKey, SaplingIncomingViewingKey, SaplingKeys, SaplingZPaymentAddress, SproutKeys, WalletTx
+    u256, Address, BlockLocator, ClientVersion, KeyPoolEntry, Keys, MnemonicHDChain, MnemonicSeed,
+    NetworkInfo, OrchardNoteCommitmentTree, PubKey, SaplingIncomingViewingKey, SaplingKeys,
+    SaplingZPaymentAddress, SproutKeys, UnifiedAccounts, WalletTx,
 };
 
 pub struct ZcashdWallet {
@@ -23,6 +25,7 @@ pub struct ZcashdWallet {
     pub sapling_z_addresses: HashMap<SaplingZPaymentAddress, SaplingIncomingViewingKey>,
     pub sprout_keys: Option<SproutKeys>,
     pub transactions: HashMap<u256, WalletTx>,
+    pub unified_accounts: Option<UnifiedAccounts>,
     pub witnesscachesize: i64,
 }
 
@@ -41,13 +44,17 @@ impl std::fmt::Debug for ZcashdWallet {
             .field("mnemonic_hd_chain", &self.mnemonic_hd_chain)
             .field("mnemonic_phrase", &self.mnemonic_phrase)
             .field("network_info", &self.network_info)
-            .field("orchard_note_commitment_tree", &self.orchard_note_commitment_tree)
+            .field(
+                "orchard_note_commitment_tree",
+                &self.orchard_note_commitment_tree,
+            )
             .field("orderposnext", &self.orderposnext)
             .field("sapling_keys", &self.sapling_keys)
+            .field("sapling_z_addresses", &self.sapling_z_addresses)
             .field("sprout_keys", &self.sprout_keys)
             .field("transactions", &self.transactions)
+            .field("unified_accounts", &self.unified_accounts)
             .field("witnesscachesize", &self.witnesscachesize)
-            .field("sapling_z_addresses", &self.sapling_z_addresses)
             .finish()
     }
 }

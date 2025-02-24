@@ -8,7 +8,7 @@ use anyhow::{bail, Context, Result};
 use crate::{parse, u256};
 
 use super::{
-    u252, zcashd_dump::DBKey, Address, BlockLocator, ClientVersion, DBValue, Key, KeyMetadata, KeyPoolEntry, Keys, MnemonicHDChain, MnemonicSeed, NetworkInfo, OrchardNoteCommitmentTree, PrivKey, PubKey, SaplingExtendedSpendingKey, SaplingIncomingViewingKey, SaplingKey, SaplingKeys, SaplingZPaymentAddress, SproutKeys, SproutPaymentAddress, SproutSpendingKey, WalletTx, ZcashdDump, ZcashdWallet
+    u252, zcashd_dump::DBKey, Address, BlockLocator, ClientVersion, DBValue, Key, KeyMetadata, KeyPoolEntry, Keys, MnemonicHDChain, MnemonicSeed, NetworkInfo, OrchardNoteCommitmentTree, PrivKey, PubKey, SaplingExtendedSpendingKey, SaplingIncomingViewingKey, SaplingKey, SaplingKeys, SaplingZPaymentAddress, SproutKeys, SproutPaymentAddress, SproutSpendingKey, UnifiedAccountMetadata, UnifiedAccounts, UnifiedAddressMetadata, WalletTx, ZcashdDump, ZcashdWallet
 };
 
 #[derive(Debug)]
@@ -132,6 +132,7 @@ impl<'a> ZcashdParser<'a> {
         // unifiedfvk
 
         // unifiedaddrmeta
+        let unified_accounts = self.parse_unified_accounts()?;
 
         // **mnemonicphrase**
         let mnemonic_phrase = self.parse_mnemonic_phrase()?;
@@ -169,6 +170,7 @@ impl<'a> ZcashdParser<'a> {
             sapling_z_addresses,
             sprout_keys,
             transactions,
+            unified_accounts,
             witnesscachesize,
         };
 
@@ -314,6 +316,46 @@ impl<'a> ZcashdParser<'a> {
         parse!(buf value, MnemonicHDChain, "mnemonichdchain")
     }
 
+    fn parse_unified_accounts(&self) -> Result<Option<UnifiedAccounts>> {
+        let address_metadata_records = self.dump.records_for_keyname("unifiedaddrmeta")?;
+        let mut address_metadata: HashMap<u256, UnifiedAddressMetadata> = HashMap::new();
+        for (key, value) in address_metadata_records {
+            let metadata = parse!(buf & key.data, UnifiedAddressMetadata, "UnifiedAddressMetadata key")?;
+            address_metadata.insert(metadata.key_id.clone(), metadata);
+            let v: u32 = parse!(buf value.as_data(), u32, "UnifiedAddressMetadata value")?;
+            if v != 0 {
+                bail!("Unexpected value for UnifiedAddressMetadata: 0x{:08x}", v);
+            }
+            self.mark_key_parsed(&key);
+        }
+
+        let account_metadata_records = self.dump.records_for_keyname("unifiedaccount")?;
+        let mut account_metadata: HashMap<u256, UnifiedAccountMetadata> = HashMap::new();
+        for (key, value) in account_metadata_records {
+            let metadata = parse!(buf & key.data, UnifiedAccountMetadata, "UnifiedAccountMetadata key")?;
+            account_metadata.insert(metadata.key_id.clone(), metadata);
+            let v: u32 = parse!(buf value.as_data(), u32, "UnifiedAccountMetadata value")?;
+            if v != 0 {
+                bail!("Unexpected value for UnifiedAccountMetadata: 0x{:08x}", v);
+            }
+            self.mark_key_parsed(&key);
+        }
+
+        let full_viewing_keys_records = self.dump.records_for_keyname("unifiedfvk")?;
+        let mut full_viewing_keys: HashMap<u256, String> = HashMap::new();
+        for (key, value) in full_viewing_keys_records {
+            let key_id = parse!(buf & key.data, u256, "UnifiedFullViewingKey key")?;
+            let fvk = parse!(buf value.as_data(), String, "UnifiedFullViewingKey value")?;
+            full_viewing_keys.insert(key_id, fvk);
+            self.mark_key_parsed(&key);
+        }
+
+        if address_metadata.is_empty() || full_viewing_keys.is_empty() || account_metadata.is_empty() {
+            return Ok(None);
+        }
+
+        Ok(Some(UnifiedAccounts::new(address_metadata, full_viewing_keys, account_metadata)))
+    }
     fn parse_mnemonic_phrase(&self) -> Result<MnemonicSeed> {
         let (key, value) = self
             .dump

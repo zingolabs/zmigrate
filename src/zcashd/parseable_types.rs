@@ -7,7 +7,8 @@ use super::parse_compact_size;
 impl Parse for String {
     /// 1 byte (length) + bytes of the string
     fn parse(p: &mut Parser) -> Result<Self> {
-        let length = parse!(p, u8, "string length")? as usize;
+        // let length = parse!(p, u8, "string length")? as usize;
+        let length = parse_compact_size(p).context("String length")?;
         let bytes = parse!(p, bytes length, "string")?;
         String::from_utf8(bytes.to_vec()).context("string")
     }
