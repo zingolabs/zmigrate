@@ -1,15 +1,62 @@
 use std::collections::HashMap;
 
-use anyhow::{ bail, Context, Result };
+use anyhow::{bail, Context, Result};
 
-use crate::{ parse, Parse, ParseWithParam, Parser };
+use crate::{parse, Parse, ParseWithParam, Parser};
 
 pub fn parse_compact_size(p: &mut Parser) -> Result<usize> {
     match parse!(p, u8, "compact size")? {
-        0xfd => parse!(p, u16, "compact size").map(|n| n as usize),
-        0xfe => parse!(p, u32, "compact size").map(|n| n as usize),
-        0xff => parse!(p, u64, "compact size").map(|n| n as usize),
+        0xfd => {
+            let n = parse!(p, u16, "compact size")?;
+            if n < 253 {
+                bail!("Compact size with 0xfd prefix must be >= 253, got {}", n);
+            }
+            Ok(n as usize)
+        }
+        0xfe => {
+            let n = parse!(p, u32, "compact size")?;
+            if n < 0x10000 {
+                bail!(
+                    "Compact size with 0xfe prefix must be >= 0x10000, got {}",
+                    n
+                );
+            }
+            Ok(n as usize)
+        }
+        0xff => {
+            let n = parse!(p, u64, "compact size")?;
+            if n < 0x100000000 {
+                bail!(
+                    "Compact size with 0xff prefix must be >= 0x100000000, got {}",
+                    n
+                );
+            }
+            Ok(n as usize)
+        }
         size => Ok(size as usize),
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct CompactSize(pub usize);
+
+impl std::fmt::Display for CompactSize {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
+impl Parse for CompactSize {
+    fn parse(p: &mut Parser) -> Result<Self> {
+        parse_compact_size(p).map(CompactSize)
+    }
+}
+
+impl std::ops::Deref for CompactSize {
+    type Target = usize;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
     }
 }
 
@@ -36,7 +83,7 @@ pub fn parse_fixed_length_vec<T: Parse>(p: &mut Parser, length: usize) -> Result
 pub fn parse_fixed_length_vec_with_param<T: ParseWithParam<U>, U: Clone>(
     p: &mut Parser,
     length: usize,
-    param: U
+    param: U,
 ) -> Result<Vec<T>> {
     let mut items = Vec::with_capacity(length);
     for i in 0..length {
@@ -55,7 +102,7 @@ pub fn parse_fixed_length_array<T: Parse, const N: usize>(p: &mut Parser) -> Res
 
 pub fn parse_fixed_length_array_with_param<T: ParseWithParam<U>, U: Clone, const N: usize>(
     p: &mut Parser,
-    param: U
+    param: U,
 ) -> Result<[T; N]> {
     let items = parse_fixed_length_vec_with_param(p, N, param)?;
     let array: [T; N] = items
@@ -65,12 +112,15 @@ pub fn parse_fixed_length_array_with_param<T: ParseWithParam<U>, U: Clone, const
 }
 
 pub fn parse_vec<T: Parse>(p: &mut Parser) -> Result<Vec<T>> {
-    let length = parse_compact_size(p).context("array length")?;
+    let length = *parse!(p, CompactSize, "array length")?;
     parse_fixed_length_vec(p, length)
 }
 
-pub fn parse_vec_with_param<T: ParseWithParam<U>, U: Clone>(p: &mut Parser, param: U) -> Result<Vec<T>> {
-    let length = parse_compact_size(p).context("array length")?;
+pub fn parse_vec_with_param<T: ParseWithParam<U>, U: Clone>(
+    p: &mut Parser,
+    param: U,
+) -> Result<Vec<T>> {
+    let length = *parse!(p, CompactSize, "array length")?;
     parse_fixed_length_vec_with_param(p, length, param)
 }
 
@@ -99,7 +149,7 @@ impl<T: ParseWithParam<U>, U: Clone> ParseWithParam<U> for Vec<T> {
 }
 
 pub fn parse_map<K: Parse, V: Parse>(p: &mut Parser) -> Result<Vec<(K, V)>> {
-    let length = parse_compact_size(p).context("map length")?;
+    let length = *parse!(p, CompactSize, "map length")?;
     let mut items = Vec::with_capacity(length);
     for _ in 0..length {
         items.push(parse_pair::<K, V>(p).context("map item")?);
@@ -108,12 +158,16 @@ pub fn parse_map<K: Parse, V: Parse>(p: &mut Parser) -> Result<Vec<(K, V)>> {
 }
 
 pub fn parse_hashmap<K, V: Parse>(p: &mut Parser) -> Result<HashMap<K, V>>
-    where K: Parse + Eq + std::hash::Hash
+where
+    K: Parse + Eq + std::hash::Hash,
 {
     Ok(parse_map::<K, V>(p)?.into_iter().collect())
 }
 
-impl<K: Parse, V: Parse> Parse for HashMap<K, V> where K: Parse + Eq + std::hash::Hash {
+impl<K: Parse, V: Parse> Parse for HashMap<K, V>
+where
+    K: Parse + Eq + std::hash::Hash,
+{
     fn parse(p: &mut Parser) -> Result<Self> {
         parse_hashmap(p)
     }

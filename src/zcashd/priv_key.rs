@@ -1,8 +1,8 @@
-use anyhow::{ Result, Context, bail };
+use anyhow::{bail, Result};
 
-use crate::{ parse, u256, Data, Parse, Parser };
+use crate::{parse, u256, Data, Parse, Parser};
 
-use super::parse_compact_size;
+use super::CompactSize;
 
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct PrivKey {
@@ -30,7 +30,7 @@ impl AsRef<[u8]> for PrivKey {
 
 impl Parse for PrivKey {
     fn parse(p: &mut Parser) -> Result<Self> {
-        let length = parse_compact_size(p).context("PrivKey size")?;
+        let length = *parse!(p, CompactSize, "PrivKey size")?;
         if length != 214 && length != 279 {
             bail!("Invalid PrivKey size: {}", length);
         }

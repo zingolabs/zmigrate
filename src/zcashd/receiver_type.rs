@@ -1,8 +1,8 @@
 use anyhow::Result;
 
-use crate::{Parse, Parser};
+use crate::{parse, Parse, Parser};
 
-use super::parse_compact_size;
+use super::CompactSize;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[repr(u8)]
@@ -15,7 +15,7 @@ pub enum ReceiverType {
 
 impl Parse for ReceiverType {
     fn parse(p: &mut Parser) -> Result<Self> {
-        let byte = parse_compact_size(p)?;
+        let byte = *parse!(p, CompactSize, "ReceiverType")?;
         match byte {
             0x00 => Ok(ReceiverType::P2PKH),
             0x01 => Ok(ReceiverType::P2SH),

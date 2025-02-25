@@ -1,15 +1,14 @@
-use anyhow::{ Result, Context, bail };
+use anyhow::{bail, Context, Result};
 
 use crate::{parse, Data, Parse, Parser};
 
-use super::parse_compact_size;
+use super::CompactSize;
 
 impl Parse for String {
     /// 1 byte (length) + bytes of the string
     fn parse(p: &mut Parser) -> Result<Self> {
-        // let length = parse!(p, u8, "string length")? as usize;
-        let length = parse_compact_size(p).context("String length")?;
-        let bytes = parse!(p, bytes length, "string")?;
+        let length = parse!(p, CompactSize, "String length")?;
+        let bytes = parse!(p, bytes * length, "string")?;
         String::from_utf8(bytes.to_vec()).context("string")
     }
 }
@@ -89,8 +88,8 @@ impl Parse for i64 {
 
 impl Parse for Data {
     fn parse(p: &mut Parser) -> Result<Self> {
-        let len = parse_compact_size(p).context("Data length")?;
-        Self::parse_len(p, len)
+        let len = parse!(p, CompactSize, "Data length")?;
+        Self::parse_len(p, *len)
     }
 }
 

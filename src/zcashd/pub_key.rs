@@ -1,8 +1,8 @@
-use anyhow::{ Result, Context, bail };
+use anyhow::{bail, Context, Result};
 
-use crate::{ Data, Parse, Parser };
+use crate::{parse, Data, Parse, Parser};
 
-use super::parse_compact_size;
+use super::CompactSize;
 
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct PubKey(pub Data);
@@ -27,7 +27,7 @@ impl AsRef<[u8]> for PubKey {
 
 impl Parse for PubKey {
     fn parse(p: &mut Parser) -> Result<Self> {
-        let size = parse_compact_size(p).context("PubKey size")?;
+        let size = *parse!(p, CompactSize, "PubKey size")?;
         if size != 33 && size != 65 {
             bail!("Invalid PubKey size: {}", size);
         }

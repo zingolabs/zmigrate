@@ -1,6 +1,9 @@
 use std::collections::HashMap;
 
-use crate::{parse, parse_compact_size, u256, BranchId, Data, OrchardTxMeta, Parse, Parser, SaplingBundleV5, ZIP225_TX_VERSION};
+use crate::{
+    parse, u256, BranchId, CompactSize, Data, OrchardTxMeta, Parse, Parser, SaplingBundleV5,
+    ZIP225_TX_VERSION,
+};
 use anyhow::Result;
 
 use super::{
@@ -102,7 +105,7 @@ impl Parse for WalletTx {
         let index = parse!(p, "index")?;
 
         // CWalletTx
-        let unused_vt_prev = parse_compact_size(p)?;
+        let unused_vt_prev = *parse!(p, CompactSize, "unused_vt_prev")?;
         assert!(
             unused_vt_prev == 0,
             "unused field in CWalletTx is not empty"
@@ -131,7 +134,10 @@ impl Parse for WalletTx {
         if !unparsed_data.is_empty() {
             println!("💔 unparsed_data: {:?}", unparsed_data);
         }
-        assert!(unparsed_data.is_empty(), "unparsed_data in CWalletTx is not empty");
+        assert!(
+            unparsed_data.is_empty(),
+            "unparsed_data in CWalletTx is not empty"
+        );
 
         Ok(Self {
             // CTransaction
