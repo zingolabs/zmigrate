@@ -12,7 +12,7 @@ The zmigrate crate is the start of a framework for the universal translation of 
 
 Currently it parses the `zcashd` format into memory, and outputs a the debug representation of the parsed data.
 
-## Prerequesites
+## Prerequisites
 
 You will need a `zcashd` wallet.dat file to test with. Some `wallet.dat` files may be found in the `zcash-wallet-formats` repo [here](https://github.com/zingolabs/zcash-wallet-formats/tree/master/zcashd/dat_files).
 
