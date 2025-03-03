@@ -1,6 +1,8 @@
 use anyhow::Result;
 
-use crate::{parse, u256, Blob64, GrothProof, Parse, Parser};
+use crate::{parse, u256, Blob64, Parse, Parser};
+
+use super::super::GrothProof;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct SpendV5 {

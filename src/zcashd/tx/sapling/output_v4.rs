@@ -1,6 +1,8 @@
 use anyhow::Result;
 
-use crate::{parse, u256, Blob, GrothProof, Parse, Parser};
+use crate::{parse, u256, Blob, Parse, Parser};
+
+use super::super::GrothProof;
 
 const COMPACT_NOTE_SIZE: usize = 1 + // version
     11 + // diversifier

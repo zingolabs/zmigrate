@@ -1,8 +1,9 @@
-use std::collections::{ HashMap, HashSet };
+use std::collections::{HashMap, HashSet};
+use std::fmt::Write;
 
-use anyhow::{ bail, Result, Context };
+use anyhow::{bail, Context, Result};
 
-use crate::{ parse, BDBDump, Data, Parser };
+use crate::{parse, BDBDump, Data, Parser};
 
 #[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct DBKey {
@@ -28,7 +29,10 @@ impl std::fmt::Debug for DBKey {
 
 impl DBKey {
     pub fn new(keyname: impl Into<String>, data: impl AsRef<Data>) -> Self {
-        Self { keyname: keyname.into(), data: data.as_ref().clone() }
+        Self {
+            keyname: keyname.into(),
+            data: data.as_ref().clone(),
+        }
     }
 
     pub fn parse_data(key_data: &Data) -> Result<Self> {
@@ -54,10 +58,6 @@ impl DBValue {
 
     pub fn len(&self) -> usize {
         self.0.len()
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.0.is_empty()
     }
 }
 
@@ -100,10 +100,7 @@ impl ZcashdDump {
             keyname_keys.insert(key);
         }
 
-        Ok(ZcashdDump {
-            records,
-            keys_by_keyname,
-        })
+        Ok(ZcashdDump { records, keys_by_keyname })
     }
 
     pub fn records(&self) -> &HashMap<DBKey, DBValue> {
@@ -123,7 +120,8 @@ impl ZcashdDump {
 
     pub fn value_for_keyname(&self, keyname: &str) -> Result<&DBValue> {
         let key = self.key_for_keyname(keyname);
-        self.value_for_key(&key).context(format!("No record found for keyname: {}", keyname))
+        self.value_for_key(&key)
+            .context(format!("No record found for keyname: {}", keyname))
     }
 
     pub fn has_value_for_keyname(&self, keyname: &str) -> bool {
@@ -131,12 +129,14 @@ impl ZcashdDump {
         self.records.contains_key(&key)
     }
 
+    #[allow(dead_code)]
     pub fn keys_by_keyname(&self) -> &HashMap<String, HashSet<DBKey>> {
         &self.keys_by_keyname
     }
 
     pub fn records_for_keyname(&self, keyname: &str) -> Result<HashMap<DBKey, DBValue>> {
-        let keys = self.keys_by_keyname
+        let keys = self
+            .keys_by_keyname
             .get(keyname)
             .context(format!("No records found for keyname: {}", keyname))?;
         let mut records = HashMap::new();
@@ -152,7 +152,8 @@ impl ZcashdDump {
     }
 
     pub fn record_for_keyname(&self, keyname: &str) -> Result<(DBKey, DBValue)> {
-        let keys = self.keys_by_keyname
+        let keys = self
+            .keys_by_keyname
             .get(keyname)
             .context(format!("No records found for keyname: {}", keyname))?;
         if keys.len() != 1 {
@@ -173,7 +174,8 @@ impl ZcashdDump {
         keynames
     }
 
-    pub fn print_keyname_summary(&self) {
+    pub fn keyname_summary(&self) -> String {
+        let mut output = String::new();
         for keyname in self.sorted_key_names() {
             let keys = self.keys_by_keyname.get(&keyname).unwrap();
             let mut min_value_size: usize = usize::MAX;
@@ -189,14 +191,18 @@ impl ZcashdDump {
             } else {
                 format!("{}...{}", min_value_size, max_value_size)
             };
-            println!("{}: {} ({})", keyname, keys.len(), s);
+            writeln!(output, "{}: {} ({})", keyname, keys.len(), s).unwrap();
         }
+        output
     }
 
-    pub fn print_keys(&self) {
+    #[allow(dead_code)]
+    pub fn dump_keys(&self) -> String {
+        let mut output = String::new();
         for keyname in self.sorted_key_names() {
-            println!("{}", keyname);
-            let mut keys: Vec<DBKey> = self.keys_by_keyname
+            writeln!(output, "{}", keyname).unwrap();
+            let mut keys: Vec<DBKey> = self
+                .keys_by_keyname
                 .get(&keyname)
                 .unwrap()
                 .iter()
@@ -204,11 +210,12 @@ impl ZcashdDump {
                 .collect();
             keys.sort();
             for key in keys {
-                println!("    {}", key);
+                writeln!(output, "    {}", key).unwrap();
                 let value = self.records.get(&key).unwrap();
-                println!("        {}: {}", value.len(), hex::encode(value));
-                println!();
+                writeln!(output, "        {}: {}", value.len(), hex::encode(value)).unwrap();
+                writeln!(output).unwrap();
             }
         }
+        output
     }
 }

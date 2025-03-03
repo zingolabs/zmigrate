@@ -1,7 +1,11 @@
 use std::collections::HashMap;
 
+use crate::u256;
+
 use super::{
-    u256, Address, BlockLocator, ClientVersion, KeyPoolEntry, Keys, MnemonicHDChain, MnemonicSeed, NetworkInfo, OrchardNoteCommitmentTree, PubKey, RecipientMapping, SaplingIncomingViewingKey, SaplingKeys, SaplingZPaymentAddress, SproutKeys, UnifiedAccounts, WalletTx
+    Address, BlockLocator, ClientVersion, KeyPoolEntry, Keys, MnemonicHDChain, MnemonicSeed,
+    NetworkInfo, OrchardNoteCommitmentTree, PubKey, RecipientMapping, SaplingIncomingViewingKey,
+    SaplingKeys, SaplingZPaymentAddress, SproutKeys, UnifiedAccounts, WalletTx,
 };
 
 pub struct ZcashdWallet {

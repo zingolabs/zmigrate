@@ -1,4 +1,6 @@
-use super::{u252, KeyMetadata};
+use crate::u252;
+
+use super::KeyMetadata;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct SproutSpendingKey {

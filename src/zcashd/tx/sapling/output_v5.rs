@@ -1,6 +1,8 @@
 use anyhow::Result;
 
-use crate::{parse, u256, Blob, GrothProof, Parse, Parser};
+use crate::{parse, u256, Blob, Parse, Parser};
+
+use super::super::GrothProof;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct OutputV5 {
@@ -12,10 +14,7 @@ pub struct OutputV5 {
 }
 
 impl OutputV5 {
-    pub fn into_output_description(
-        self,
-        zkproof: GrothProof,
-    ) -> OutputDescription {
+    pub fn into_output_description(self, zkproof: GrothProof) -> OutputDescription {
         OutputDescription {
             cv: self.cv,
             cmu: self.cmu,

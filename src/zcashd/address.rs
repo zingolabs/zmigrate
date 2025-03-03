@@ -1,14 +1,9 @@
 use anyhow::Result;
+
 use crate::{parse, Parse, Parser};
 
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct Address(pub String);
-
-impl Address {
-    pub fn new(address: impl Into<String>) -> Self {
-        Self(address.into())
-    }
-}
 
 impl Parse for Address {
     fn parse(p: &mut Parser) -> Result<Self> {

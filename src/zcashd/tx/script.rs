@@ -19,6 +19,6 @@ impl std::fmt::Debug for Script {
 
 impl AsRef<[u8]> for Script {
     fn as_ref(&self) -> &[u8] {
-        &self.0.0
+        &self.0 .0
     }
 }

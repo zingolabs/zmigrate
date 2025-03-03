@@ -1,8 +1,8 @@
 use anyhow::Result;
 
-use crate::{ parse, Parse, Parser };
+use crate::{parse, u256, Parse, Parser};
 
-use super::{ ClientVersion, u256 };
+use super::ClientVersion;
 
 /// Vector of block hashes
 #[derive(Debug, Clone, PartialEq)]

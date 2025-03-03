@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use crate::{ parse, Blob, Parse, Parser };
+use crate::{parse, Blob, Parse, Parser};
 
 pub const GROTH_PROOF_SIZE: usize = 48 + 96 + 48;
 

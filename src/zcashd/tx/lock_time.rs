@@ -17,14 +17,17 @@ impl LockTime {
         }
     }
 
+    #[allow(dead_code)]
     pub fn is_block_height(&self) -> bool {
         matches!(self, LockTime::BlockHeight(_))
     }
 
+    #[allow(dead_code)]
     pub fn is_timestamp(&self) -> bool {
         matches!(self, LockTime::Timestamp(_))
     }
 
+    #[allow(dead_code)]
     pub fn as_block_height(&self) -> Option<u32> {
         match self {
             LockTime::BlockHeight(height) => Some(*height),
@@ -32,6 +35,7 @@ impl LockTime {
         }
     }
 
+    #[allow(dead_code)]
     pub fn as_timestamp(&self) -> Option<SecondsSinceEpoch> {
         match self {
             LockTime::Timestamp(ts) => Some(*ts),

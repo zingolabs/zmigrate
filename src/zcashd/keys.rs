@@ -3,23 +3,11 @@ use std::collections::HashMap;
 use super::{Key, PubKey};
 
 #[derive(Clone, PartialEq)]
-pub struct Keys (pub HashMap<PubKey, Key>);
+pub struct Keys(pub HashMap<PubKey, Key>);
 
 impl Keys {
     pub fn new(map: HashMap<PubKey, Key>) -> Self {
         Self(map)
-    }
-
-    pub fn get(&self, pubkey: &PubKey) -> Option<&Key> {
-        self.0.get(pubkey)
-    }
-
-    pub fn len(&self) -> usize {
-        self.0.len()
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.0.is_empty()
     }
 
     pub fn keypairs(&self) -> impl Iterator<Item = &Key> {

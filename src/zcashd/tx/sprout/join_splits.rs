@@ -1,7 +1,7 @@
+use crate::{parse, ParseWithParam, Parser};
 use anyhow::Result;
-use crate::{ parse, ParseWithParam, Parser };
 
-use super::{ Ed25519Signature, Ed25519VerificationKey, JSDescription };
+use super::{Ed25519Signature, Ed25519VerificationKey, JSDescription};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct JoinSplits {
@@ -20,11 +20,7 @@ impl ParseWithParam<bool> for JoinSplits {
                 sig: Some(parse!(p, "sig")?),
             })
         } else {
-            Ok(Self {
-                descriptions,
-                pub_key: None,
-                sig: None,
-            })
+            Ok(Self { descriptions, pub_key: None, sig: None })
         }
     }
 }

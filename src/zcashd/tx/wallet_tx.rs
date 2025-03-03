@@ -1,10 +1,12 @@
 use std::collections::HashMap;
 
-use crate::{
-    parse, u256, BranchId, CompactSize, Data, OrchardTxMeta, Parse, Parser, SaplingBundleV5,
-    ZIP225_TX_VERSION,
-};
 use anyhow::Result;
+
+use crate::{
+    parse, u256,
+    zcashd::{BranchId, OrchardTxMeta, SaplingBundleV5, ZIP225_TX_VERSION},
+    CompactSize, Data, Parse, Parser,
+};
 
 use super::{
     ExpiryHeight, JSOutPoint, JoinSplits, LockTime, OrchardBundle, SaplingBundle, SaplingBundleV4,

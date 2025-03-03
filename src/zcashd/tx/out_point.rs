@@ -12,9 +12,6 @@ pub struct OutPoint {
 
 impl Parse for OutPoint {
     fn parse(p: &mut Parser) -> Result<Self> {
-        Ok(Self {
-            txid: parse!(p, "txid")?,
-            vout: parse!(p, "vout")?,
-        })
+        Ok(Self { txid: parse!(p, "txid")?, vout: parse!(p, "vout")? })
     }
 }

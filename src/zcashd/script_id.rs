@@ -1,8 +1,6 @@
 use anyhow::Result;
 
-use crate::{parse, Parse, Parser};
-
-use super::u160;
+use crate::{parse, u160, Parse, Parser};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ScriptId(pub u160);

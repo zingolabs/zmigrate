@@ -1,6 +1,6 @@
-use anyhow::{ Result, bail };
+use anyhow::{bail, Result};
 
-use crate::{ parse, u256, Parse, Parser };
+use crate::{parse, u256, Parse, Parser};
 
 #[derive(Clone, Copy, PartialEq)]
 pub enum Language {
@@ -97,7 +97,7 @@ impl Parse for MnemonicSeed {
         Ok(Self {
             language: parse!(p, "language")?,
             mnemonic: parse!(p, "mnemonic")?,
-            fingerprint: None
+            fingerprint: None,
         })
     }
 }

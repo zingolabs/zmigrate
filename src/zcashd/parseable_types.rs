@@ -1,8 +1,6 @@
 use anyhow::{bail, Context, Result};
 
-use crate::{parse, Data, Parse, Parser};
-
-use super::CompactSize;
+use crate::{parse, CompactSize, Data, Parse, Parser};
 
 impl Parse for String {
     /// 1 byte (length) + bytes of the string

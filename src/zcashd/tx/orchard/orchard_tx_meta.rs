@@ -2,7 +2,9 @@ use std::collections::HashMap;
 
 use anyhow::Result;
 
-use crate::{parse, Blob64, ClientVersion, Parse, Parser};
+use crate::{parse, Blob64, Parse, Parser};
+
+use super::super::super::ClientVersion;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct OrchardTxMeta {
@@ -12,7 +14,10 @@ pub struct OrchardTxMeta {
 }
 
 impl Parse for OrchardTxMeta {
-    fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
+    fn parse(parser: &mut Parser) -> Result<Self>
+    where
+        Self: Sized,
+    {
         Ok(Self {
             version: parse!(parser, "version")?,
             action_data: parse!(parser, "action_data")?,

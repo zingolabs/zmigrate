@@ -1,7 +1,3 @@
-mod ep; pub use ep::*;
-mod extracted_note_commitment; pub use extracted_note_commitment::*;
-mod fp; pub use fp::*;
-mod nullifier; pub use nullifier::*;
 mod orchard_action; pub use orchard_action::*;
 mod orchard_authorized; pub use orchard_authorized::*;
 mod orchard_bundle; pub use orchard_bundle::*;
@@ -10,10 +6,5 @@ mod orchard_note_commitment_tree; pub use orchard_note_commitment_tree::*;
 mod orchard_raw_address; pub use orchard_raw_address::*;
 mod orchard_signature; pub use orchard_signature::*;
 mod orchard_tx_meta; pub use orchard_tx_meta::*;
-mod pallas_base; pub use pallas_base::*;
-mod pallas_point; pub use pallas_point::*;
-mod proof; pub use proof::*;
 mod red_pallas_signature; pub use red_pallas_signature::*;
-mod red_pallas_verification_key; pub use red_pallas_verification_key::*;
 mod transmitted_note_ciphertext; pub use transmitted_note_ciphertext::*;
-mod value_commitment; pub use value_commitment::*;

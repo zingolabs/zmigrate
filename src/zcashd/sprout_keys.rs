@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use super::{ SproutPaymentAddress, SproutSpendingKey };
+use super::{SproutPaymentAddress, SproutSpendingKey};
 
 #[derive(Clone, PartialEq)]
 pub struct SproutKeys(pub HashMap<SproutPaymentAddress, SproutSpendingKey>);
@@ -8,18 +8,6 @@ pub struct SproutKeys(pub HashMap<SproutPaymentAddress, SproutSpendingKey>);
 impl SproutKeys {
     pub fn new(map: HashMap<SproutPaymentAddress, SproutSpendingKey>) -> Self {
         Self(map)
-    }
-
-    pub fn get(&self, address: &SproutPaymentAddress) -> Option<&SproutSpendingKey> {
-        self.0.get(address)
-    }
-
-    pub fn len(&self) -> usize {
-        self.0.len()
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.0.is_empty()
     }
 
     pub fn keypairs(&self) -> impl Iterator<Item = &SproutSpendingKey> {

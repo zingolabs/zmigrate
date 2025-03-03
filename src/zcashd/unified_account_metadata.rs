@@ -1,8 +1,6 @@
 use anyhow::Result;
 
-use crate::{parse, Parse, Parser};
-
-use super::u256;
+use crate::{parse, u256, Parse, Parser};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct UnifiedAccountMetadata {

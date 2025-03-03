@@ -1,8 +1,6 @@
 use anyhow::Result;
 
-use crate::KeyMetadata;
-
-use super::{SaplingExtendedSpendingKey, SaplingIncomingViewingKey};
+use super::{super::super::KeyMetadata, SaplingExtendedSpendingKey, SaplingIncomingViewingKey};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct SaplingKey {
@@ -12,7 +10,11 @@ pub struct SaplingKey {
 }
 
 impl SaplingKey {
-    pub fn new(ivk: SaplingIncomingViewingKey, key: SaplingExtendedSpendingKey, metadata: KeyMetadata) -> Result<Self> {
+    pub fn new(
+        ivk: SaplingIncomingViewingKey,
+        key: SaplingExtendedSpendingKey,
+        metadata: KeyMetadata,
+    ) -> Result<Self> {
         Ok(Self { ivk, key, metadata })
     }
 }

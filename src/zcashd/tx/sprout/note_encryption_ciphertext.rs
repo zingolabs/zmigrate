@@ -3,7 +3,6 @@ use anyhow::Result;
 use crate::{ parse, Blob, Parse, Parser };
 
 pub const NOTEPLAINTEXT_LEADING: usize = 1;
-pub const SAPLING_DIVERSIFIER_SIZE: usize = 11;
 pub const V_SIZE: usize = 8;
 pub const R_SIZE: usize = 32;
 pub const RHO_SIZE: usize = 32;

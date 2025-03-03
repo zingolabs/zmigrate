@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use crate::{ parse, Blob32, Parse, Parser, SecondsSinceEpoch };
+use crate::{parse, Blob32, Parse, Parser, SecondsSinceEpoch};
 
 const VERSION_WITH_HDDATA: i32 = 10;
 #[derive(Debug, Clone, PartialEq)]
@@ -16,7 +16,11 @@ impl Parse for KeyMetadata {
         let version = parse!(p, "version")?;
         let create_time: SecondsSinceEpoch = parse!(p, "create_time")?;
         // 0 means unknown (per `walletdb.h`)
-        let create_time = if create_time.is_zero() { None } else { Some(create_time) };
+        let create_time = if create_time.is_zero() {
+            None
+        } else {
+            Some(create_time)
+        };
         let hd_keypath: Option<String>;
         let seed_fp: Option<Blob32>;
         if version >= VERSION_WITH_HDDATA {
@@ -26,11 +30,6 @@ impl Parse for KeyMetadata {
             hd_keypath = None;
             seed_fp = None;
         }
-        Ok(Self {
-            version,
-            create_time,
-            hd_keypath,
-            seed_fp,
-        })
+        Ok(Self { version, create_time, hd_keypath, seed_fp })
     }
 }

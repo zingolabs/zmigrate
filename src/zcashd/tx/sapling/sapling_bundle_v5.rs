@@ -1,8 +1,11 @@
 use anyhow::Result;
 
-use crate::{parse, parse_fixed_length_vec, u256, Amount, Blob64, GrothProof, Parse, Parser};
+use crate::{parse, u256, Blob64, Parse, Parser};
 
-use super::{OutputDescription, OutputV5, SpendDescription, SpendV5};
+use super::{
+    super::{super::parse_fixed_length_vec, Amount, GrothProof},
+    OutputDescription, OutputV5, SpendDescription, SpendV5,
+};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct SaplingBundleV5 {
@@ -42,11 +45,7 @@ impl Parse for SaplingBundleV5 {
 
         let shielded_spends = sd_v5s
             .into_iter()
-            .zip(
-                v_spend_proofs
-                    .into_iter()
-                    .zip(v_spend_auth_sigs),
-            )
+            .zip(v_spend_proofs.into_iter().zip(v_spend_auth_sigs))
             .map(|(sd_5, (zkproof, spend_auth_sig))| {
                 // the following `unwrap` is safe because we know n_spends > 0.
                 sd_5.into_spend_description(anchor.clone().unwrap(), zkproof, spend_auth_sig)

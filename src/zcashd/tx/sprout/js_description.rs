@@ -1,8 +1,8 @@
 use anyhow::Result;
 
-use crate::{ parse, u256, Amount, ParseWithParam, Parser };
+use crate::{parse, u256, ParseWithParam, Parser};
 
-use super::{ NoteEncryptionCiphertext, SproutProof };
+use super::{super::super::Amount, NoteEncryptionCiphertext, SproutProof};
 
 const ZC_NUM_JS_INPUTS: usize = 2;
 const ZC_NUM_JS_OUTPUTS: usize = 2;

@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use crate::{ parse, Parse };
+use crate::{parse, Parse};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum BranchId {
@@ -63,8 +63,7 @@ impl From<BranchId> for u32 {
 impl Parse for BranchId {
     fn parse(p: &mut crate::Parser) -> Result<Self> {
         let consensus_branch_id = parse!(p, u32, "consensus branch ID")?;
-        BranchId::try_from(consensus_branch_id).map_err(|_| {
-            anyhow::anyhow!("Unknown consensus branch ID: {}", consensus_branch_id)
-        })
+        BranchId::try_from(consensus_branch_id)
+            .map_err(|_| anyhow::anyhow!("Unknown consensus branch ID: {}", consensus_branch_id))
     }
 }

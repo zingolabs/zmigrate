@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 
-use super::{u256, UnifiedAccountMetadata, UnifiedAddressMetadata};
+use crate::u256;
+
+use super::{UnifiedAccountMetadata, UnifiedAddressMetadata};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct UnifiedAccounts {

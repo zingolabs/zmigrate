@@ -5,10 +5,15 @@ use std::{
 
 use anyhow::{bail, Context, Result};
 
-use crate::{parse, u256, Parser, RecipientAddress};
+use crate::{parse, u252, u256, Parser};
 
 use super::{
-    u252, zcashd_dump::DBKey, Address, BlockLocator, ClientVersion, DBValue, Key, KeyMetadata, KeyPoolEntry, Keys, MnemonicHDChain, MnemonicSeed, NetworkInfo, OrchardNoteCommitmentTree, PrivKey, PubKey, RecipientMapping, SaplingExtendedSpendingKey, SaplingIncomingViewingKey, SaplingKey, SaplingKeys, SaplingZPaymentAddress, SproutKeys, SproutPaymentAddress, SproutSpendingKey, UnifiedAccountMetadata, UnifiedAccounts, UnifiedAddressMetadata, WalletTx, ZcashdDump, ZcashdWallet
+    zcashd_dump::DBKey, Address, BlockLocator, ClientVersion, DBValue, Key, KeyMetadata,
+    KeyPoolEntry, Keys, MnemonicHDChain, MnemonicSeed, NetworkInfo, OrchardNoteCommitmentTree,
+    PrivKey, PubKey, RecipientAddress, RecipientMapping, SaplingExtendedSpendingKey,
+    SaplingIncomingViewingKey, SaplingKey, SaplingKeys, SaplingZPaymentAddress, SproutKeys,
+    SproutPaymentAddress, SproutSpendingKey, UnifiedAccountMetadata, UnifiedAccounts,
+    UnifiedAddressMetadata, WalletTx, ZcashdDump, ZcashdWallet,
 };
 
 #[derive(Debug)]
@@ -260,15 +265,16 @@ impl<'a> ZcashdParser<'a> {
         }
         for (key, value) in key_records {
             let ivk = parse!(buf & key.data, SaplingIncomingViewingKey, "ivk")?;
-            let spending_key = parse!(buf value.as_data(), SaplingExtendedSpendingKey, "spending_key")?;
+            let spending_key =
+                parse!(buf value.as_data(), SaplingExtendedSpendingKey, "spending_key")?;
             let metakey = DBKey::new("sapzkeymeta", &key.data);
             let metadata_binary = self
                 .dump
                 .value_for_key(&metakey)
                 .context("Getting sapzkeymeta metadata")?;
             let metadata = parse!(buf metadata_binary, KeyMetadata, "sapzkeymeta metadata")?;
-            let keypair =
-                SaplingKey::new(ivk.clone(), spending_key.clone(), metadata).context("Creating keypair")?;
+            let keypair = SaplingKey::new(ivk.clone(), spending_key.clone(), metadata)
+                .context("Creating keypair")?;
             keys_map.insert(ivk, keypair);
 
             self.mark_key_parsed(&key);
@@ -335,9 +341,12 @@ impl<'a> ZcashdParser<'a> {
             let txid = parse!(&mut p, u256, "txid")?;
             let recipient_address = parse!(&mut p, RecipientAddress, "recipient_address")?;
             p.check_finished()?;
-            let unified_address = parse!(buf &value, String, "unified_address")?;
+            let unified_address = parse!(buf & value, String, "unified_address")?;
             let recipient_mapping = RecipientMapping::new(recipient_address, unified_address);
-            send_recipients.entry(txid).or_default().push(recipient_mapping);
+            send_recipients
+                .entry(txid)
+                .or_default()
+                .push(recipient_mapping);
             self.mark_key_parsed(&key);
         }
 
@@ -351,7 +360,11 @@ impl<'a> ZcashdParser<'a> {
         let address_metadata_records = self.dump.records_for_keyname("unifiedaddrmeta")?;
         let mut address_metadata: HashMap<u256, UnifiedAddressMetadata> = HashMap::new();
         for (key, value) in address_metadata_records {
-            let metadata = parse!(buf & key.data, UnifiedAddressMetadata, "UnifiedAddressMetadata key")?;
+            let metadata = parse!(
+                buf & key.data,
+                UnifiedAddressMetadata,
+                "UnifiedAddressMetadata key"
+            )?;
             address_metadata.insert(metadata.key_id.clone(), metadata);
             let v: u32 = parse!(buf value.as_data(), u32, "UnifiedAddressMetadata value")?;
             if v != 0 {
@@ -363,7 +376,11 @@ impl<'a> ZcashdParser<'a> {
         let account_metadata_records = self.dump.records_for_keyname("unifiedaccount")?;
         let mut account_metadata: HashMap<u256, UnifiedAccountMetadata> = HashMap::new();
         for (key, value) in account_metadata_records {
-            let metadata = parse!(buf & key.data, UnifiedAccountMetadata, "UnifiedAccountMetadata key")?;
+            let metadata = parse!(
+                buf & key.data,
+                UnifiedAccountMetadata,
+                "UnifiedAccountMetadata key"
+            )?;
             account_metadata.insert(metadata.key_id.clone(), metadata);
             let v: u32 = parse!(buf value.as_data(), u32, "UnifiedAccountMetadata value")?;
             if v != 0 {
@@ -381,11 +398,18 @@ impl<'a> ZcashdParser<'a> {
             self.mark_key_parsed(&key);
         }
 
-        if address_metadata.is_empty() || full_viewing_keys.is_empty() || account_metadata.is_empty() {
+        if address_metadata.is_empty()
+            || full_viewing_keys.is_empty()
+            || account_metadata.is_empty()
+        {
             return Ok(None);
         }
 
-        Ok(Some(UnifiedAccounts::new(address_metadata, full_viewing_keys, account_metadata)))
+        Ok(Some(UnifiedAccounts::new(
+            address_metadata,
+            full_viewing_keys,
+            account_metadata,
+        )))
     }
     fn parse_mnemonic_phrase(&self) -> Result<MnemonicSeed> {
         let (key, value) = self

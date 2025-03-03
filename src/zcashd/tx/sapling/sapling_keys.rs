@@ -10,18 +10,6 @@ impl SaplingKeys {
         Self(map)
     }
 
-    pub fn get(&self, key: &SaplingIncomingViewingKey) -> Option<&SaplingKey> {
-        self.0.get(key)
-    }
-
-    pub fn len(&self) -> usize {
-        self.0.len()
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.0.is_empty()
-    }
-
     pub fn keypairs(&self) -> impl Iterator<Item = &SaplingKey> {
         self.0.values()
     }

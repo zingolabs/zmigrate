@@ -1,8 +1,8 @@
 use anyhow::Result;
 
-use crate::{parse, Blob, Parse, Parser};
+use crate::{parse, u256, Blob, Parse, Parser};
 
-use super::{u256, ReceiverType};
+use super::ReceiverType;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct UnifiedAddressMetadata {
