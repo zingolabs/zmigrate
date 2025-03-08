@@ -3,25 +3,25 @@ use anyhow::{ Result, bail };
 use crate::Data;
 
 pub trait Parse {
-    fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized;
+    fn parse(p: &mut Parser) -> Result<Self> where Self: Sized;
 
     fn parse_buf(buf: &dyn AsRef<[u8]>, trace: bool) -> Result<Self> where Self: Sized {
-        let mut parser = Parser::new(&buf);
-        parser.set_trace(trace);
-        let result = Self::parse(&mut parser)?;
-        parser.check_finished()?;
+        let mut p = Parser::new(&buf);
+        p.set_trace(trace);
+        let result = Self::parse(&mut p)?;
+        p.check_finished()?;
         Ok(result)
     }
 }
 
 pub trait ParseWithParam<P> {
-    fn parse(parser: &mut Parser, param: P) -> Result<Self> where Self: Sized;
+    fn parse(p: &mut Parser, param: P) -> Result<Self> where Self: Sized;
 
     fn parse_buf(buf: &dyn AsRef<[u8]>, param: P, trace: bool) -> Result<Self> where Self: Sized {
-        let mut parser = Parser::new(&buf);
-        parser.set_trace(trace);
-        let result = Self::parse(&mut parser, param)?;
-        parser.check_finished()?;
+        let mut p = Parser::new(&buf);
+        p.set_trace(trace);
+        let result = Self::parse(&mut p, param)?;
+        p.check_finished()?;
         Ok(result)
     }
 }
@@ -30,6 +30,16 @@ pub struct Parser<'a> {
     pub buffer: &'a [u8],
     pub offset: usize,
     pub trace: bool,
+}
+
+impl std::fmt::Debug for Parser<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Parser")
+            .field("offset", &self.offset)
+            .field("len", &self.len())
+            .field("remaining", &self.remaining())
+            .finish()
+    }
 }
 
 impl<'a> Parser<'a> {
@@ -67,16 +77,14 @@ impl<'a> Parser<'a> {
         let bytes = &self.buffer[self.offset..self.offset + n];
         self.offset += n;
         if self.trace {
-            println!("\t🟢 next({}): {:?}", n, hex::encode(bytes));
+            println!("\t🟢 next({}): {:?} remaining: {} peek: {:?}", n, hex::encode(bytes), self.remaining(), hex::encode(self.peek(100)));
         }
         Ok(bytes)
     }
 
-    pub fn peek(&self, n: usize) -> Result<&'a [u8]> {
-        if self.offset + n > self.buffer.len() {
-            bail!("Buffer underflow at offset {}, needed {} bytes, only {} remaining", self.offset, n, self.remaining());
-        }
-        Ok(&self.buffer[self.offset..self.offset + n])
+    pub fn peek(&self, n: usize) -> &'a [u8] {
+        let available = std::cmp::min(n, self.remaining());
+        &self.buffer[self.offset..self.offset + available]
     }
 
     pub fn rest(&mut self) -> Data {
@@ -95,5 +103,15 @@ impl<'a> Parser<'a> {
         if self.trace {
             println!("🔵 {}: {:?}", msg, self.peek_rest());
         }
+    }
+}
+
+impl std::io::Read for &mut Parser<'_> {
+    fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
+        let parser = &mut **self;
+        let n = std::cmp::min(buf.len(), parser.remaining());
+        buf[..n].copy_from_slice(&parser.buffer[parser.offset..parser.offset + n]);
+        parser.offset += n;
+        Ok(n)
     }
 }

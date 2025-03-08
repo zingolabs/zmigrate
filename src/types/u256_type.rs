@@ -36,7 +36,17 @@ impl AsRef<[u8]> for u256 {
 
 impl std::fmt::Debug for u256 {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "u256({})", hex::encode(&self.0))
+        let mut bytes = self.0.0;
+        bytes.reverse();
+        write!(f, "u256({})", hex::encode(bytes))
+    }
+}
+
+impl std::fmt::Display for u256 {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let mut bytes = self.0.0;
+        bytes.reverse();
+        write!(f, "{}", hex::encode(bytes))
     }
 }
 

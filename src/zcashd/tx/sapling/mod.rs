@@ -3,8 +3,6 @@ mod output_v5; pub use output_v5::*;
 mod sapling_bundle_v4; pub use sapling_bundle_v4::*;
 mod sapling_bundle_v5; pub use sapling_bundle_v5::*;
 mod sapling_bundle; pub use sapling_bundle::*;
-mod sapling_expanded_spending_key; pub use sapling_expanded_spending_key::*;
-mod sapling_extended_spending_key; pub use sapling_extended_spending_key::*;
 mod sapling_incoming_viewing_key; pub use sapling_incoming_viewing_key::*;
 mod sapling_key; pub use sapling_key::*;
 mod sapling_keys; pub use sapling_keys::*;

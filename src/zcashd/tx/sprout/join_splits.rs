@@ -1,7 +1,10 @@
-use crate::{parse, ParseWithParam, Parser};
+use crate::{blob, parse, ParseWithParam, Parser};
 use anyhow::Result;
 
-use super::{Ed25519Signature, Ed25519VerificationKey, JSDescription};
+use super::JSDescription;
+
+blob!(Ed25519Signature, 64);
+blob!(Ed25519VerificationKey, 32);
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct JoinSplits {

@@ -1,9 +1,9 @@
 use anyhow::Result;
 
-use crate::{parse, u256, Blob64, Parse, Parser};
+use crate::{parse, parse_fixed_length_vec, u256, Blob64, Parse, Parser};
 
 use super::{
-    super::{super::parse_fixed_length_vec, Amount, GrothProof},
+    super::{Amount, GrothProof},
     OutputDescription, OutputV5, SpendDescription, SpendV5,
 };
 

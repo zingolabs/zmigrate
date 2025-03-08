@@ -1,5 +1,3 @@
-mod ed25519_signature; pub use ed25519_signature::*;
-mod ed25519_verification_key; pub use ed25519_verification_key::*;
 mod join_splits; pub use join_splits::*;
 mod js_description; pub use js_description::*;
 mod js_out_point; pub use js_out_point::*;

@@ -1,6 +1,4 @@
-use anyhow::Result;
-
-use crate::{ parse, Blob, Parse, Parser };
+use crate::blob;
 
 pub const NOTEPLAINTEXT_LEADING: usize = 1;
 pub const V_SIZE: usize = 8;
@@ -12,11 +10,4 @@ pub const MLEN: usize = NOTEPLAINTEXT_SIZE;
 pub const NOTEENCRYPTION_AUTH_BYTES: usize = 16;
 pub const CLEN: usize = MLEN + NOTEENCRYPTION_AUTH_BYTES;
 
-#[derive(Debug, Clone, PartialEq)]
-pub struct NoteEncryptionCiphertext(pub Blob<CLEN>);
-
-impl Parse for NoteEncryptionCiphertext {
-    fn parse(p: &mut Parser) -> Result<Self> {
-        Ok(Self(parse!(p, "NoteEncryptionCiphertext")?))
-    }
-}
+blob!(NoteEncryptionCiphertext, CLEN);

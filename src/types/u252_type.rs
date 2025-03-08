@@ -29,7 +29,17 @@ impl AsRef<[u8]> for u252 {
 
 impl std::fmt::Debug for u252 {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "u252({})", hex::encode(&self.0))
+        let mut bytes = self.0.0;
+        bytes.reverse();
+        write!(f, "u252({})", hex::encode(bytes))
+    }
+}
+
+impl std::fmt::Display for u252 {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let mut bytes = self.0.0;
+        bytes.reverse();
+        write!(f, "{}", hex::encode(bytes))
     }
 }
 

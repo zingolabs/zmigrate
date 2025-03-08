@@ -1,9 +1,8 @@
 use anyhow::{bail, Context, Result};
 
-use crate::{parse, CompactSize, Data, Parse, Parser};
+use crate::{parse, CompactSize, Parse, Parser};
 
 impl Parse for String {
-    /// 1 byte (length) + bytes of the string
     fn parse(p: &mut Parser) -> Result<Self> {
         let length = parse!(p, CompactSize, "String length")?;
         let bytes = parse!(p, bytes * length, "string")?;
@@ -81,13 +80,6 @@ impl Parse for i64 {
         const SIZE: usize = std::mem::size_of::<i64>();
         let bytes = p.next(SIZE).context("i64")?;
         Ok(i64::from_le_bytes(bytes.try_into().context("i64")?))
-    }
-}
-
-impl Parse for Data {
-    fn parse(p: &mut Parser) -> Result<Self> {
-        let len = parse!(p, CompactSize, "Data length")?;
-        Self::parse_len(p, *len)
     }
 }
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 
-SRC=dat_files
-TARGET=dumps
+SRC=dat_files/zcashd
+TARGET=dumps/zcashd
 
 VERSION=sprout
 SRC_DIR=${SRC}/${VERSION}

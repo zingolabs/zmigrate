@@ -16,13 +16,19 @@ pub struct SaplingExtendedSpendingKey {
 
 impl Parse for SaplingExtendedSpendingKey {
     fn parse(p: &mut Parser) -> Result<Self> {
+        let depth = parse!(p, "depth")?;
+        let parent_fvk_tag = parse!(p, "parent_fvk_tag")?;
+        let child_index = parse!(p, "child_index")?;
+        let chain_code = parse!(p, "chain_code")?;
+        let expsk = parse!(p, "expsk")?;
+        let dk = parse!(p, "dk")?;
         Ok(SaplingExtendedSpendingKey {
-            depth: parse!(p, "depth")?,
-            parent_fvk_tag: parse!(p, "parent_fvk_tag")?,
-            child_index: parse!(p, "child_index")?,
-            chain_code: parse!(p, "chain_code")?,
-            expsk: parse!(p, "expsk")?,
-            dk: parse!(p, "dk")?,
+            depth,
+            parent_fvk_tag,
+            child_index,
+            chain_code,
+            expsk,
+            dk,
         })
     }
 }

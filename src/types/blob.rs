@@ -40,6 +40,10 @@ impl<const N: usize> Blob<N> {
         let data = hex::decode(hex).expect("Decoding hex string");
         Self::from_vec(data).expect("Creating Blob from hex")
     }
+
+    pub fn reverse(&mut self) {
+        self.0.reverse();
+    }
 }
 
 impl<const N: usize> Default for Blob<N> {

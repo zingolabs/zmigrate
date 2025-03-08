@@ -1,6 +1,8 @@
 use anyhow::{ Result, Context };
 
-use crate::Parser;
+use crate::{parse, Parse, Parser};
+
+use super::CompactSize;
 
 #[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 /// A variable-size byte array.
@@ -52,6 +54,13 @@ impl Data {
     pub fn parse_len(parser: &mut Parser, len: usize) -> Result<Self> {
         let bytes = parser.next(len).context("Parsing Data")?;
         Ok(Self::from_slice(bytes))
+    }
+}
+
+impl Parse for Data {
+    fn parse(p: &mut Parser) -> Result<Self> {
+        let len = parse!(p, CompactSize, "Data length")?;
+        Self::parse_len(p, *len)
     }
 }
 

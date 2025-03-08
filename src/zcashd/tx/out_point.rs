@@ -1,12 +1,12 @@
 use anyhow::Result;
 
-use crate::{parse, u256, Parse, Parser};
+use crate::{parse, Parse, Parser, TxId};
 
 pub type SaplingOutPoint = OutPoint;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct OutPoint {
-    pub txid: u256,
+    pub txid: TxId,
     pub vout: u32,
 }
 

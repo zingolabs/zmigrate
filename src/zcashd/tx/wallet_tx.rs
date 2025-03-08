@@ -3,9 +3,7 @@ use std::collections::HashMap;
 use anyhow::Result;
 
 use crate::{
-    parse, u256,
-    zcashd::{BranchId, OrchardTxMeta, SaplingBundleV5, ZIP225_TX_VERSION},
-    CompactSize, Data, Parse, Parser,
+    parse, u256, zcashd::{OrchardTxMeta, SaplingBundleV5, ZIP225_TX_VERSION}, BranchId, CompactSize, Data, Parse, Parser
 };
 
 use super::{

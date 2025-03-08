@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::u256;
+use crate::TxId;
 
 use super::{
     Address, BlockLocator, ClientVersion, KeyPoolEntry, Keys, MnemonicHDChain, MnemonicSeed,
@@ -25,9 +25,9 @@ pub struct ZcashdWallet {
     pub orderposnext: Option<i64>,
     pub sapling_keys: SaplingKeys,
     pub sapling_z_addresses: HashMap<SaplingZPaymentAddress, SaplingIncomingViewingKey>,
-    pub send_recipients: HashMap<u256, Vec<RecipientMapping>>,
+    pub send_recipients: HashMap<TxId, Vec<RecipientMapping>>,
     pub sprout_keys: Option<SproutKeys>,
-    pub transactions: HashMap<u256, WalletTx>,
+    pub transactions: HashMap<TxId, WalletTx>,
     pub unified_accounts: Option<UnifiedAccounts>,
     pub witnesscachesize: i64,
 }

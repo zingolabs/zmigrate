@@ -5,12 +5,12 @@ use std::{
 
 use anyhow::{bail, Context, Result};
 
-use crate::{parse, u252, u256, Parser};
+use crate::{parse, sapling::SaplingExtendedSpendingKey, u252, u256, Parser, TxId};
 
 use super::{
     zcashd_dump::DBKey, Address, BlockLocator, ClientVersion, DBValue, Key, KeyMetadata,
     KeyPoolEntry, Keys, MnemonicHDChain, MnemonicSeed, NetworkInfo, OrchardNoteCommitmentTree,
-    PrivKey, PubKey, RecipientAddress, RecipientMapping, SaplingExtendedSpendingKey,
+    PrivKey, PubKey, RecipientAddress, RecipientMapping,
     SaplingIncomingViewingKey, SaplingKey, SaplingKeys, SaplingZPaymentAddress, SproutKeys,
     SproutPaymentAddress, SproutSpendingKey, UnifiedAccountMetadata, UnifiedAccounts,
     UnifiedAddressMetadata, WalletTx, ZcashdDump, ZcashdWallet,
@@ -327,8 +327,8 @@ impl<'a> ZcashdParser<'a> {
         parse!(buf value, MnemonicHDChain, "mnemonichdchain")
     }
 
-    fn parse_send_recipients(&self) -> Result<HashMap<u256, Vec<RecipientMapping>>> {
-        let mut send_recipients: HashMap<u256, Vec<RecipientMapping>> = HashMap::new();
+    fn parse_send_recipients(&self) -> Result<HashMap<TxId, Vec<RecipientMapping>>> {
+        let mut send_recipients: HashMap<TxId, Vec<RecipientMapping>> = HashMap::new();
         if !self.dump.has_keys_for_keyname("recipientmapping") {
             return Ok(send_recipients);
         }
@@ -338,7 +338,7 @@ impl<'a> ZcashdParser<'a> {
             .context("Getting 'recipientmapping' records")?;
         for (key, value) in records {
             let mut p = Parser::new(&key.data);
-            let txid = parse!(&mut p, u256, "txid")?;
+            let txid = parse!(&mut p, TxId, "txid")?;
             let recipient_address = parse!(&mut p, RecipientAddress, "recipient_address")?;
             p.check_finished()?;
             let unified_address = parse!(buf & value, String, "unified_address")?;
@@ -520,7 +520,7 @@ impl<'a> ZcashdParser<'a> {
         Ok(key_pool)
     }
 
-    fn parse_transactions(&self) -> Result<HashMap<u256, WalletTx>> {
+    fn parse_transactions(&self) -> Result<HashMap<TxId, WalletTx>> {
         let mut transactions = HashMap::new();
         // Some wallet files don't have any transactions
         if self.dump.has_keys_for_keyname("tx") {
@@ -531,11 +531,7 @@ impl<'a> ZcashdParser<'a> {
             let mut sorted_records: Vec<_> = records.into_iter().collect();
             sorted_records.sort_by(|(key1, _), (key2, _)| key1.data.cmp(&key2.data));
             for (key, value) in sorted_records {
-                let txid = parse!(buf & key.data, u256, "transaction ID")?;
-                // let trace = txid == u256::from_hex("2727577862fd0eae69a2c51cb43fd2866fb6f16253de3db0cacbbc22f49270b6");
-                // if trace {
-                //     println!("🔵 Transaction ID: {:?}", txid);
-                // }
+                let txid = parse!(buf & key.data, TxId, "transaction ID")?;
                 let trace = false;
                 let transaction = parse!(buf value.as_data(), WalletTx, "transaction", trace)?;
                 if transactions.contains_key(&txid) {
