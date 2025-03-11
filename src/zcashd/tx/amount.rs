@@ -1,33 +1,13 @@
 use anyhow::Result;
 
-use crate::{format_zats_as_zec, parse, Parse, Parser};
+use crate::{parse, Parse, Parser};
 
-pub type ZatBalance = Amount;
-
-#[derive(Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub struct Amount(pub u64);
-
-impl Amount {
-    pub fn as_u64(&self) -> u64 {
-        self.0
-    }
-}
-
-impl From<Amount> for u64 {
-    fn from(amount: Amount) -> Self {
-        amount.0
-    }
-}
-
-impl std::fmt::Debug for Amount {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "Amount({})", format_zats_as_zec(*self))
-    }
-}
+pub type Amount = zcash_protocol::value::ZatBalance;
 
 impl Parse for Amount {
     fn parse(p: &mut Parser) -> Result<Self> {
-        let amount = parse!(p, "amount")?;
-        Ok(Self(amount))
+        let zat_balance = parse!(p, i64, "Zat balance")?;
+        Amount::try_from(zat_balance)
+            .map_err(|_| anyhow::anyhow!("Invalid Zat balance: {}", zat_balance))
     }
 }

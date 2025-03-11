@@ -24,7 +24,7 @@ impl Parse for SaplingBundleV5 {
         let value_balance = if n_spends > 0 || n_outputs > 0 {
             parse!(p, "amount")?
         } else {
-            Amount::default()
+            Amount::zero()
         };
 
         let anchor = if n_spends > 0 {

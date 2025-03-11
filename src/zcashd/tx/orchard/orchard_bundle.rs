@@ -1,8 +1,8 @@
 use anyhow::Result;
 
-use crate::{parse, Blob32, Data, Parse, Parser};
+use crate::{parse, zcashd::Amount, Blob32, Data, Parse, Parser};
 
-use super::{super::ZatBalance, OrchardAction, OrchardAuthorized, OrchardFlags};
+use super::{OrchardAction, OrchardAuthorized, OrchardFlags};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct OrchardBundle(pub Option<OrchardBundleInner>);
@@ -11,7 +11,7 @@ pub struct OrchardBundle(pub Option<OrchardBundleInner>);
 pub struct OrchardBundleInner {
     pub actions: Vec<OrchardAction>,
     pub flags: OrchardFlags,
-    pub value_balance: ZatBalance,
+    pub value_balance: Amount,
     pub anchor: Blob32,
     pub authorization: OrchardAuthorized,
 }

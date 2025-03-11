@@ -4,12 +4,23 @@ use crate::{parse, Blob64, Parse, Parser};
 
 use super::super::{Amount, OutputV4, SpendV4};
 
-#[derive(Debug, Clone, PartialEq, Default)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct SaplingBundleV4 {
     pub amount: Amount,
     pub spends: Vec<SpendV4>,
     pub outputs: Vec<OutputV4>,
     pub binding_sig: Option<Blob64>,
+}
+
+impl Default for SaplingBundleV4 {
+    fn default() -> Self {
+        Self {
+            amount: Amount::zero(),
+            spends: Vec::new(),
+            outputs: Vec::new(),
+            binding_sig: None,
+        }
+    }
 }
 
 impl SaplingBundleV4 {

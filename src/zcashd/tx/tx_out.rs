@@ -1,10 +1,10 @@
 use anyhow::Result;
 
-use crate::{parse, Parse, Parser};
+use crate::{Parse, Parser, parse};
 
 use super::{Amount, Script};
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct TxOut {
     pub value: Amount,
     pub script_pub_key: Script,

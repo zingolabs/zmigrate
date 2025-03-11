@@ -1,5 +1,6 @@
 mod address; pub use address::*;
 mod block_locator; pub use block_locator::*;
+mod branch_id; pub use branch_id::*;
 mod client_version; pub use client_version::*;
 mod cmd; pub use cmd::*;
 mod key_id; pub use key_id::*;

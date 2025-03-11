@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use std::collections::HashMap;
 
 use crate::TxId;
@@ -8,6 +10,7 @@ use super::{
     SaplingKeys, SaplingZPaymentAddress, SproutKeys, UnifiedAccounts, WalletTx,
 };
 
+#[derive(Debug)]
 pub struct ZcashdWallet {
     pub address_names: HashMap<Address, String>,
     pub address_purposes: HashMap<Address, String>,
@@ -30,35 +33,4 @@ pub struct ZcashdWallet {
     pub transactions: HashMap<TxId, WalletTx>,
     pub unified_accounts: Option<UnifiedAccounts>,
     pub witnesscachesize: i64,
-}
-
-impl std::fmt::Debug for ZcashdWallet {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        f.debug_struct("ZcashdWallet")
-            .field("address_names", &self.address_names)
-            .field("address_purposes", &self.address_purposes)
-            .field("bestblock_nomerkle", &self.bestblock_nomerkle)
-            .field("bestblock", &self.bestblock)
-            .field("client_version", &self.client_version)
-            .field("default_key", &self.default_key)
-            .field("key_pool", &self.key_pool)
-            .field("keys", &self.keys)
-            .field("min_version", &self.min_version)
-            .field("mnemonic_hd_chain", &self.mnemonic_hd_chain)
-            .field("mnemonic_phrase", &self.mnemonic_phrase)
-            .field("network_info", &self.network_info)
-            .field(
-                "orchard_note_commitment_tree",
-                &self.orchard_note_commitment_tree,
-            )
-            .field("orderposnext", &self.orderposnext)
-            .field("sapling_keys", &self.sapling_keys)
-            .field("sapling_z_addresses", &self.sapling_z_addresses)
-            .field("send_recipients", &self.send_recipients)
-            .field("sprout_keys", &self.sprout_keys)
-            .field("transactions", &self.transactions)
-            .field("unified_accounts", &self.unified_accounts)
-            .field("witnesscachesize", &self.witnesscachesize)
-            .finish()
-    }
 }
