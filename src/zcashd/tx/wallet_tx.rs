@@ -88,7 +88,7 @@ impl Parse for WalletTx {
 
             if version.number >= 2 {
                 let use_groth = version.is_overwinter() && version.number >= SAPLING_TX_VERSION;
-                join_splits = Some(parse!(p, param use_groth, "join_splits")?);
+                join_splits = Some(parse!(p, param = use_groth, "join_splits")?);
             }
 
             if (version.is_sapling() || version.is_future()) && sapling_bundle_v4.have_actions() {

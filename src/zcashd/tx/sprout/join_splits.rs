@@ -15,7 +15,7 @@ pub struct JoinSplits {
 
 impl ParseWithParam<bool> for JoinSplits {
     fn parse(p: &mut Parser, use_groth: bool) -> Result<Self> {
-        let descriptions = parse!(p, Vec<JSDescription>, param use_groth, "descriptions")?;
+        let descriptions = parse!(p, Vec<JSDescription>, param = use_groth, "descriptions")?;
         if !descriptions.is_empty() {
             Ok(Self {
                 descriptions,

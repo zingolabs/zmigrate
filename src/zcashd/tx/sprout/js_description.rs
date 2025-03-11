@@ -32,7 +32,7 @@ impl ParseWithParam<bool> for JSDescription {
             ephemeral_key: parse!(p, "ephemeral_key")?,
             random_seed: parse!(p, "random_seed")?,
             macs: parse!(p, "macs")?,
-            zkproof: parse!(p, param use_groth, "zkproof")?,
+            zkproof: parse!(p, param = use_groth, "zkproof")?,
             ciphertexts: parse!(p, "ciphertexts")?,
         })
     }

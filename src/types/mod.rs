@@ -1,8 +1,10 @@
 mod blob_macro;
 mod blob; pub use blob::*;
+mod block_height; pub use block_height::*;
 mod compact_size; pub use compact_size::*;
 mod data_macro;
 mod data; pub use data::*;
+mod parseable_types; pub use parseable_types::*;
 mod seconds_since_epoch; pub use seconds_since_epoch::*;
 mod string_macro;
 mod txid; pub use txid::*;

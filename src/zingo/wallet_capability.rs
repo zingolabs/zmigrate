@@ -1,86 +1,48 @@
-#![allow(unused_variables, unused_assignments)]
+use anyhow::Result;
+use crate::{ParseWithParam, Parser};
+use std::sync::Arc;
 
-use anyhow::bail;
+use append_only_vec::AppendOnlyVec;
+use zcash_client_backend::wallet::TransparentAddressMetadata;
+use zcash_keys::address::UnifiedAddress;
+use zcash_primitives::legacy::TransparentAddress;
+use zingolib::{config::ChainType, wallet::{keys::unified::UnifiedKeyStore, traits::ReadableWriteable}};
 
-use crate::{blob, parse, sapling::SaplingExtendedSpendingKey, zingo::{UnifiedKeystore, Version2Keystore}, Parse, Parser};
+pub struct WalletCapability(pub zingolib::wallet::keys::unified::WalletCapability);
 
-use super::{Keystore, ReceiverSelection, Versioned, Capability, LegacyExtendedPrivKey, LegacyExtendedPubKey, SaplingDiversifiableFullViewingKey, Version1Keystore};
+impl WalletCapability {
+    pub fn unified_key_store(&self) -> &UnifiedKeyStore {
+        &self.0.unified_key_store
+    }
 
-blob!(OrchardFullViewingKey, 96);
-blob!(OrchardSpendingKey, 32);
+    pub fn transparent_child_addresses(&self) -> &Arc<AppendOnlyVec<(usize, TransparentAddress)>> {
+        self.0.transparent_child_addresses()
+    }
 
-#[derive(Debug, Clone, Default)]
-pub struct WalletCapability {
-    pub version: u8,
-    pub keystore: Keystore,
-    pub receiver_selections: Vec<ReceiverSelection>,
-    pub length_of_rejection_addresses: u32,
+    pub fn rejection_addresses(
+        &self,
+    ) -> &Arc<AppendOnlyVec<(TransparentAddress, TransparentAddressMetadata)>> {
+        self.0.get_rejection_addresses()
+    }
+
+    pub fn addresses(&self) -> &AppendOnlyVec<UnifiedAddress> {
+        self.0.addresses()
+    }
 }
 
-impl Versioned for WalletCapability {
-    const VERSION: u8 = 4;
+impl ParseWithParam<ChainType> for WalletCapability {
+    fn parse(p: &mut Parser, param: ChainType) -> Result<Self> {
+        Ok(Self(zingolib::wallet::keys::unified::WalletCapability::read(p, param)?))
+    }
 }
 
-impl Parse for WalletCapability {
-    fn parse(p: &mut Parser) -> anyhow::Result<Self> where Self: Sized {
-        let version = Self::get_version(p)?;
-
-        let legacy_key: bool;
-        let length_of_rejection_addresses: u32;
-
-        #[allow(unreachable_patterns, unused_variables, unreachable_code, clippy::let_unit_value)]
-        let wc = match version {
-            1 => {
-                legacy_key = true;
-                length_of_rejection_addresses = 0;
-
-                let keystore = parse!(p, Version1Keystore, "Version1Keystore")?;
-                Self {
-                    keystore: Keystore::Version1(Box::new(keystore)),
-                    ..Default::default()
-                }
-            }
-            2 => {
-                legacy_key = true;
-                length_of_rejection_addresses = 0;
-
-                let keystore = parse!(p, Version2Keystore, "Version2Keystore")?;
-                Self {
-                    keystore: Keystore::Version2(Box::new(keystore)),
-                    ..Default::default()
-                }
-            }
-            3 => {
-                legacy_key = false;
-                length_of_rejection_addresses = 0;
-
-                let keystore = parse!(p, UnifiedKeystore, "UnifiedKeystore")?;
-                Self {
-                    keystore: Keystore::Unified(Box::new(keystore)),
-                    ..Default::default()
-                }
-            }
-            4 => {
-                legacy_key = false;
-                length_of_rejection_addresses = parse!(p, u32, "length_of_rejection_addresses")?;
-
-                let keystore = parse!(p, UnifiedKeystore, "UnifiedKeystore")?;
-                Self {
-                    keystore: Keystore::Unified(Box::new(keystore)),
-                    ..Default::default()
-                }
-            }
-            _ => {
-                bail!("Unknown WalletCapability version");
-            }
-        };
-
-        let receiver_selections = parse!(p, "receiver_selections")?;
-        Ok(Self {
-            version,
-            receiver_selections,
-            length_of_rejection_addresses,
-            ..wc
-        })
+impl std::fmt::Debug for WalletCapability {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("DebugWalletCapability")
+            .field("unified_key_store", self.unified_key_store())
+            .field("transparent_child_addresses", self.transparent_child_addresses())
+            .field("rejection_addresses", self.rejection_addresses())
+            .field("addresses", self.addresses())
+            .finish()
     }
 }

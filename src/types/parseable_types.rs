@@ -4,10 +4,21 @@ use crate::{parse, CompactSize, Parse, Parser};
 
 impl Parse for String {
     fn parse(p: &mut Parser) -> Result<Self> {
-        let length = parse!(p, CompactSize, "String length")?;
-        let bytes = parse!(p, bytes * length, "string")?;
+        let length = parse!(p, CompactSize, "string length")?;
+        let bytes = parse!(p, bytes = *length, "string")?;
         String::from_utf8(bytes.to_vec()).context("string")
     }
+}
+
+pub fn parse_string<T>(p: &mut Parser) -> Result<String>
+where
+    T: Parse + TryInto<usize>,
+    T::Error: std::error::Error + Send + Sync + 'static,
+{
+    let parsed = parse!(p, T, "string length")?;
+    let length = parsed.try_into().context("converting string length to usize")?;
+    let bytes = parse!(p, bytes = length, "string data")?;
+    String::from_utf8(bytes.to_vec()).context("string")
 }
 
 impl Parse for bool {

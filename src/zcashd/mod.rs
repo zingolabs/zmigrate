@@ -10,7 +10,6 @@ mod keys; pub use keys::*;
 mod mnemonic_hd_chain; pub use mnemonic_hd_chain::*;
 mod mnemonic_seed; pub use mnemonic_seed::*;
 mod network_info; pub use network_info::*;
-mod parseable_types;
 mod priv_key; pub use priv_key::*;
 mod pub_key; pub use pub_key::*;
 mod receiver_type; pub use receiver_type::*;

@@ -32,7 +32,7 @@ impl Parse for PrivKey {
         if length != 214 && length != 279 {
             bail!("Invalid PrivKey size: {}", length);
         }
-        let data = parse!(p, data length, "PrivKey")?;
+        let data = parse!(p, data = length, "PrivKey")?;
         let hash = parse!(p, "PrivKey hash")?;
         Ok(Self { data, hash })
     }

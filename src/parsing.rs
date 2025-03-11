@@ -31,7 +31,7 @@ pub fn parse_fixed_length_vec_with_param<T: ParseWithParam<U>, U: Clone>(
 ) -> Result<Vec<T>> {
     let mut items = Vec::with_capacity(length);
     for i in 0..length {
-        items.push(parse!(p, param param.clone(), format!("array item {} of {}", i, length - 1))?);
+        items.push(parse!(p, param = param.clone(), format!("array item {} of {}", i, length - 1))?);
     }
     Ok(items)
 }
