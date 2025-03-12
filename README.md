@@ -10,11 +10,11 @@
 
 The zmigrate crate is the start of a framework for the universal translation of ZCash wallet formats.
 
-Currently it parses the `zcashd` format into memory, and outputs a the debug representation of the parsed data.
+Currently it parses the `zcashd` and `zingo` formats into memory, and outputs a the debug representation of the parsed data.
 
 ## Prerequisites
 
-You will need a `zcashd` wallet.dat file to test with. Some `wallet.dat` files may be found in the `zcash-wallet-formats` repo [here](https://github.com/zingolabs/zcash-wallet-formats/tree/master/zcashd/dat_files).
+You will need a `zcashd` or `zingo` wallet.dat file to test with. Some `wallet.dat` files may be found in the `zcash-wallet-formats` repo [here](https://github.com/zingolabs/zcash-wallet-formats/tree/master/zcashd/dat_files).
 
 Because `zcashd` uses BerkelyDB, you will need to have the `db_dump` tool installed on your system. On macOS, `db-dump` is part of the `berkeley-db` package, which can be installed with Homebrew:
 
@@ -22,15 +22,19 @@ Because `zcashd` uses BerkelyDB, you will need to have the `db_dump` tool instal
 brew install berkeley-db
 ```
 
+The `zingo` format requires no additional tools.
+
 ## Getting Started
 
-After cloning this repo, you can run the following command to parse a wallet.dat file and write the parsed data to a file:
+After cloning this repo, you can run the following command to parse a wallet.dat file and write the parsed data to a file. You do need to specify as the first argument whether you are parsing a `zcash` or `zingo` wallet.dat file.
 
 ```sh
-cargo run -- path/to/wallet.dat > wallet-dump.txt
+cargo run -- [zcash|zingo] path/to/wallet.dat > wallet-dump.txt
 ```
 
-The tool will first print out a summary of the keys in the wallet, and then dump the contents of the wallet to the file `wallet-dump.txt` in Rust debug format. If it encounters an error, it will print a list of the nested error contexts and exit.
+For `zcash`, the tool will first print out a summary of the keys in the wallet.
+
+For both formats, it will then dump the contents of the wallet to the file `wallet-dump.txt` in Rust debug format. If it encounters an error, it will print a list of the nested error contexts and exit.
 
 It is convenient to review the Rust debug output in VS code, as the editor allows collapsing of indented sections. The Shift key can be used to do this recursively.
 
@@ -44,11 +48,11 @@ cargo install --path .
 
 ### What's working
 
-- Parses all zcashd wallet files in the `zcash-wallet-formats` repo as of 2025-02-24.
+- Parses all `zcashd` and `zingo` wallet files in the `zcash-wallet-formats` repo as of 2025-02-24.
 - The parsing framework is designed to be extensible to other wallet formats, and uses a single `parse!` macro to flexibly parse fields of various structures using type inference wherever possible, but also allows the specification of types where necessary.
 - The parsing framework handles deeply-nested structures, and is designed to give useful context when errors occur.
 - The `zcashd` directory contains specializations of the parsing framework for the way that `zcashd` structures are serialized in `wallet.dat` files. These may or may not ultimately be shared with other wallet formats.
-- The in-memory structures are currently all `zcashd`-specific, and as we add other formats, we expect to create higher-level abstract structures that can will used to translate between formats.
+- The `zingo` directory only contains specializations of the highest-level structures, relyin on `zingolib` and its dependencies to parse the lower-level structures.
 
 ### What's not working
 
@@ -57,6 +61,7 @@ cargo install --path .
 
 ### What's needed
 
+- The main effort now is to find common abstractions between the `zcashd` and `zingo` formats, and to refactor the `zmigrate` framework to extract these commonalities from the `zcashd` and `zingo` in-memory structures.
 - More testing with a wider variety of `wallet.dat` files.
 - PRs that either correct errors, or add new parsing capabilities, such as decryption of encrypted structures.
 - The `zcash-wallet-formats` repo needs PRs to add more `wallet.dat` files to test with.
