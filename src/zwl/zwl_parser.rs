@@ -330,6 +330,8 @@ mod tests {
         let files = vec![
             data_dir.join("zwl-real.dat"),
             data_dir.join("zecwallet-light-wallet.dat"),
+            data_dir.join("mainnet-hhcclaltpcckcsslpcnetblr.dat"),
+            data_dir.join("mainnet-latest-hhcclaltpcckcsslpcnetblr.dat"),
         ];
 
         for file in files {
@@ -342,7 +344,12 @@ mod tests {
             let mut parser = ZwlParser::new(&file_data);
             let wallet = parser.parse();
 
-            assert!(wallet.is_ok(), "Parsing failed for valid file: {:?}", path);
+            assert!(
+                wallet.is_ok(),
+                "Parsing failed for file: {:?} with error: \n{:?}",
+                path,
+                wallet
+            );
         }
     }
 

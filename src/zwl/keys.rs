@@ -285,10 +285,10 @@ impl<P: zcash_protocol::consensus::Parameters> ParseWithParam<(LightClientConfig
         let (config, version) = param;
 
         let keys = if version <= 14 {
-            Keys::read_old(version, p, config).unwrap()
+            Keys::read_old(version, p, config)?
             // Keys::read(p, config).unwrap()
         } else {
-            Keys::read(p, config).unwrap()
+            Keys::read(p, config)?
         };
 
         Ok(keys)
