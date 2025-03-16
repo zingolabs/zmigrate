@@ -1,4 +1,3 @@
-
 mod styles;
 
 use clap::{Parser as ClapParser, Subcommand};
@@ -42,6 +41,7 @@ fn inner_main() -> anyhow::Result<()> {
     let output = match cli.command {
         MainCommands::Zcashd(args) => args.exec(),
         MainCommands::Zingo(args) => args.exec(),
+        MainCommands::Zwl(args) => args.exec(),
     };
     let output = output?;
     if !output.is_empty() {
