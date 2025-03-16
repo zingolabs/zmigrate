@@ -318,39 +318,36 @@ impl<'a> ZwlParser<'a> {
 #[cfg(test)]
 mod tests {
     use std::{env, path::Path};
+    use test_case::test_case;
 
     use crate::zwl::zwl_parser::ZwlParser;
 
-    #[test]
-    fn test_parser_does_not_panic() {
+    #[test_case("zwl-real.dat" ; "zwl-real.dat")]
+    #[test_case("zecwallet-light-wallet.dat" ; "zecwallet-light-wallet.dat")]
+    #[test_case("mainnet-latest-hhcclaltpcckcsslpcnetblr.dat" ; "mainnet-latest-hhcclaltpcckcsslpcnetblr.dat")]
+    #[test_case("mainnet-hhcclaltpcckcsslpcnetblr.dat" ; "mainnet-hhcclaltpcckcsslpcnetblr.dat")]
+    fn test_parser_does_not_panic(filename: &str) {
         let project_root = env::current_dir().expect("Failed to get current directory");
         let data_dir = project_root.join("src/zwl/tests/data");
 
         // Paths to wallet files
-        let files = vec![
-            data_dir.join("zwl-real.dat"),
-            data_dir.join("zecwallet-light-wallet.dat"),
-            data_dir.join("mainnet-hhcclaltpcckcsslpcnetblr.dat"),
-            data_dir.join("mainnet-latest-hhcclaltpcckcsslpcnetblr.dat"),
-        ];
+        let file = data_dir.join(filename);
 
-        for file in files {
-            let path = Path::new(&file);
-            assert!(path.exists(), "Wallet file missing: {:?}", path);
+        let path = Path::new(&file);
+        assert!(path.exists(), "Wallet file missing: {:?}", path);
 
-            let file_data = crate::Data(
-                std::fs::read(path).expect(&format!("Failed to read wallet file: {:?}", path)),
-            );
-            let mut parser = ZwlParser::new(&file_data);
-            let wallet = parser.parse();
+        let file_data = crate::Data(
+            std::fs::read(path).expect(&format!("Failed to read wallet file: {:?}", path)),
+        );
+        let mut parser = ZwlParser::new(&file_data);
+        let wallet = parser.parse();
 
-            assert!(
-                wallet.is_ok(),
-                "Parsing failed for file: {:?} with error: \n{:?}",
-                path,
-                wallet
-            );
-        }
+        assert!(
+            wallet.is_ok(),
+            "Parsing failed for file: {:?} with error: \n{:?}",
+            path,
+            wallet
+        );
     }
 
     #[test]
