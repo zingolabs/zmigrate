@@ -1,8 +1,11 @@
 #![allow(dead_code)]
 
 use bip0039::Mnemonic;
-use zcash_client_backend::proto::service::TreeState;
-use zingolib::wallet::{data::{BlockData, WalletZecPriceInfo}, WalletOptions};
+use zingolib::wallet::{
+    WalletOptions,
+    data::{BlockData, WalletZecPriceInfo},
+};
+use zl_zcash_client_backend::proto::service::TreeState;
 
 use super::WalletCapability;
 

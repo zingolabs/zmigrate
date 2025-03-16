@@ -8,7 +8,7 @@ use crate::{
     file_args::{FileArgs, FileArgsLike},
 };
 
-use super::ZingoParser;
+use super::zwl_parser::ZwlParser;
 
 /// Doc comment here
 #[derive(Debug, Args)]
@@ -28,7 +28,7 @@ impl crate::exec::Exec for CommandArgs {
     fn exec(&self) -> Result<String> {
         let file_path = self.file();
         let file_data = Data(std::fs::read(file_path)?);
-        let mut parser = ZingoParser::new(&file_data);
+        let mut parser = ZwlParser::new(&file_data);
         let wallet = parser.parse()?;
         Ok(format!("{:#?}", wallet))
     }

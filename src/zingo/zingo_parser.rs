@@ -1,14 +1,21 @@
 use std::io::{self, ErrorKind, Read};
 
-use anyhow::{Result, bail, Context};
+use anyhow::{Context, Result, bail};
 use bip0039::Mnemonic;
 use byteorder::{LittleEndian, ReadBytesExt};
-use zcash_client_backend::proto::service::TreeState;
-use zcash_encoding::{Optional, Vector};
 use zcash_protocol::consensus::BlockHeight;
-use zingolib::{config::{ZingoConfig, ZingoConfigBuilder}, wallet::{data::{BlockData, WalletZecPriceInfo}, tx_map::TxMap, WalletOptions}};
+use zingolib::{
+    config::{ZingoConfig, ZingoConfigBuilder},
+    wallet::{
+        WalletOptions,
+        data::{BlockData, WalletZecPriceInfo},
+        tx_map::TxMap,
+    },
+};
+use zl_zcash_client_backend::proto::service::TreeState;
+use zl_zcash_encoding::{Optional, Vector};
 
-use crate::{parse, parse_string, Data, Parser};
+use crate::{Data, Parser, parse, parse_string};
 
 use super::{WalletCapability, ZingoWallet};
 
@@ -106,8 +113,10 @@ impl<'a> ZingoParser<'a> {
                 r.read_exact(&mut anchor_bytes)?;
                 let block_height = BlockHeight::from_u32(r.read_u32::<LittleEndian>()?);
                 Ok((
-                    Option::<orchard::Anchor>::from(orchard::Anchor::from_bytes(anchor_bytes))
-                        .ok_or(io::Error::new(ErrorKind::InvalidData, "Bad orchard anchor"))?,
+                    Option::<orchard_old::Anchor>::from(orchard_old::Anchor::from_bytes(
+                        anchor_bytes,
+                    ))
+                    .ok_or(io::Error::new(ErrorKind::InvalidData, "Bad orchard anchor"))?,
                     block_height,
                 ))
             })?
