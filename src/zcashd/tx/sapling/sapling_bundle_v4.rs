@@ -1,8 +1,8 @@
 use anyhow::Result;
 
-use crate::{parse, Blob64, Parse, Parser};
+use crate::{parse, Amount, Blob64, Parse, Parser};
 
-use super::super::{Amount, OutputV4, SpendV4};
+use super::super::{OutputV4, SpendV4};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct SaplingBundleV4 {

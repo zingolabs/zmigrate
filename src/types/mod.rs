@@ -11,3 +11,4 @@ mod txid; pub use txid::*;
 mod u160_type; pub use u160_type::*;
 mod u252_type; pub use u252_type::*;
 mod u256_type; pub use u256_type::*;
+mod amount; pub use amount::*;

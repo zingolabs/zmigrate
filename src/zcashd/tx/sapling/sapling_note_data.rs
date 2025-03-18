@@ -1,8 +1,8 @@
 use anyhow::Result;
 
-use crate::{parse, u256, Parse, Parser};
+use crate::{parse, u256, Parse, Parser, SaplingWitness};
 
-use super::{SaplingIncomingViewingKey, SaplingWitness};
+use super::SaplingIncomingViewingKey;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SaplingNoteData {

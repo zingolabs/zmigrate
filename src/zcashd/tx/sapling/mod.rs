@@ -10,11 +10,3 @@ mod sapling_note_data; pub use sapling_note_data::*;
 mod sapling_z_payment_address; pub use sapling_z_payment_address::*;
 mod spend_v4; pub use spend_v4::*;
 mod spend_v5; pub use spend_v5::*;
-
-use crate::u256;
-
-use super::IncrementalWitness;
-
-const SAPLING_INCREMENTAL_MERKLE_TREE_DEPTH: usize = 32;
-pub type PedersenHash = u256;
-pub type SaplingWitness = IncrementalWitness<SAPLING_INCREMENTAL_MERKLE_TREE_DEPTH, PedersenHash>;

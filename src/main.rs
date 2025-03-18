@@ -11,6 +11,7 @@ mod styles;
 mod types; pub use types::*;
 mod zcashd;
 mod zingo;
+mod zewif; pub use zewif::*;
 
 use clap::{Parser as ClapParser, Subcommand};
 
