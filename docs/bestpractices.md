@@ -17,9 +17,9 @@ graph TD
     M --> L[(...)]
 ```
 
-As the above diagram shows, the zmigrate Rust crate lies at the center of the ZeWIF system. It creates in-memory representations of data from a variety of data inputs and can  output that abstracted data in a numbers of forms. Obviously, it can accept input from ZeWIF and it can output to ZeWIF. However, that's just part of the process. Individual developers can also choose to use zmigrate when they are importing data from their wallet or to export data to their wallet.
+As the above diagram shows, the zmigrate Rust crate lies at the center of the ZeWIF system. It creates in-memory representations of data from a variety of inputs and can  output that abstracted data in a numbers of forms. Obviously, it can accept input from ZeWIF and it can output to ZeWIF. However, that's just part of the process. Individual developers can also choose to use creat front ends that interface their own wallet data to zmigrate and back ends that export the data from zmigrate to their own wallet.
 
-The following best practices offer suggestions for those wallet developers, to ensure that their data remains not just maximally interoperable, but also maximally accessible, both now and in the far future.
+The following best practices offer suggestions for those front-end and back-end wallet developers, to ensure that their data remains not just maximally interoperable, but also maximally accessible, both now and in the far future.
 
 ```
 Deliverable # 3.4: A best practices document on importing & exporting data.
