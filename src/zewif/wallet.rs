@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 
-use bc_components::{Digest, ARID};
-use bc_envelope::prelude::*;
+use bc_components::ARID;
 
 use super::{Account, Attachments, Identifiable, SeedMaterial};
 
@@ -13,10 +12,10 @@ use super::{Account, Attachments, Identifiable, SeedMaterial};
 /// the `WalletDB` type.
 #[derive(Debug, Clone)]
 pub struct Wallet {
-    id: ARID,
-    seed_material: Option<SeedMaterial>,
-    accounts: HashMap<ARID, Account>,
-    attachments: Attachments,
+    pub id: ARID,
+    pub seed_material: Option<SeedMaterial>,
+    pub accounts: HashMap<ARID, Account>,
+    pub attachments: Attachments,
 }
 
 /// Further impls of this omitted for brevity.

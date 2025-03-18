@@ -1,8 +1,3 @@
-use std::collections::HashMap;
-
-use bc_components::Digest;
-use bc_envelope::Envelope;
-
 use crate::{BlockHeight, Data, TxId};
 
 use super::{Attachments, JoinSplitDescription, OrchardActionDescription, SaplingOutputDescription, SaplingSpendDescription, TxIn, TxOut};
@@ -12,14 +7,14 @@ use super::{Attachments, JoinSplitDescription, OrchardActionDescription, Sapling
 #[derive(Debug, Clone)]
 pub struct Transaction {
     /// The transaction id.
-    txid: TxId,
+    pub txid: TxId,
     /// The raw transaction data, if known.
-    raw: Option<Data>,
+    pub raw: Option<Data>,
     /// The height at which the transaction was mined, if known.
     /// It is possible that if a rollback occurred just after the zeWIF
     /// export, the transaction could have been unmined, and possibly
     /// remined at a different height.
-    mined_height: Option<BlockHeight>,
+    pub mined_height: Option<BlockHeight>,
 
     // Design issue: do we want to parse out all of this? All wallets will
     // necessarily have code to parse a transaction. The only information
@@ -31,17 +26,17 @@ pub struct Transaction {
     // -- Daira-Emma
 
     /// Optional data for transparent inputs
-    inputs: Option<Vec<TxIn>>,
+    pub inputs: Option<Vec<TxIn>>,
     /// Optional data for transparent outputs
-    outputs: Option<Vec<TxOut>>,
+    pub outputs: Option<Vec<TxOut>>,
     /// Optional data for Sapling spends
-    sapling_spends: Option<Vec<SaplingSpendDescription>>,
+    pub sapling_spends: Option<Vec<SaplingSpendDescription>>,
     /// Optional data for Sapling outputs
-    sapling_outputs: Option<Vec<SaplingOutputDescription>>,
+    pub sapling_outputs: Option<Vec<SaplingOutputDescription>>,
     /// Optional data for Orchard actions
-    orchard_actions: Option<Vec<OrchardActionDescription>>,
+    pub orchard_actions: Option<Vec<OrchardActionDescription>>,
     /// Optional data for Sprout JoinSplit descriptions
-    sprout_joinsplits: Option<Vec<JoinSplitDescription>>,
+    pub sprout_joinsplits: Option<Vec<JoinSplitDescription>>,
     // Additional metadata such as confirmations or timestamp may be added here.
-    attachments: Attachments,
+    pub attachments: Attachments,
 }

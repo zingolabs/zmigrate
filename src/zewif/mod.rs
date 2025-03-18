@@ -1,4 +1,4 @@
-#![allow(dead_code, unused_imports)]
+// #![allow(dead_code, unused_imports)]
 
 mod account; pub use account::*;
 mod address; pub use address::*;
@@ -26,5 +26,20 @@ mod transparent_spend_authority; pub use transparent_spend_authority::*;
 mod tx_in; pub use tx_in::*;
 mod tx_out; pub use tx_out::*;
 mod tx_out_point; pub use tx_out_point::*;
-mod wallet_db; pub use wallet_db::*;
 mod wallet; pub use wallet::*;
+
+use std::collections::HashMap;
+
+use bc_components::ARID;
+
+use crate::TxId;
+
+/// Represents a wallet database, the top level of the interchange format
+/// hierarchy, which can contain multiple wallets and a global transaction
+/// history.
+#[derive(Debug, Clone)]
+pub struct WalletDB {
+    pub wallets: HashMap<ARID, Wallet>,
+    pub transactions: HashMap<TxId, Transaction>,
+    pub attachments: Attachments,
+}

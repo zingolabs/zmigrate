@@ -1,5 +1,4 @@
 use crate::Blob;
 
-
 #[derive(Debug, Clone)]
-pub struct SpendingKey(Blob<32>);
+pub struct SpendingKey(pub Blob<32>);

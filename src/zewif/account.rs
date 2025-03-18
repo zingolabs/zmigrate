@@ -1,7 +1,6 @@
 use std::collections::{HashMap, HashSet};
 
-use bc_components::{Digest, ARID};
-use bc_envelope::prelude::*;
+use bc_components::ARID;
 
 use crate::TxId;
 
