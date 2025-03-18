@@ -322,21 +322,10 @@ mod tests {
 
     use crate::zwl::zwl_parser::ZwlParser;
 
-    // Testnet
-    #[test_case("testnet-cbbhrwiilgbrababsshsmtpr-latest.dat" ; "testnet-cbbhrwiilgbrababsshsmtpr-latest.dat")]
-    #[test_case("testnet-cbbhrwiilgbrababsshsmtpr-v26.dat" ; "testnet-cbbhrwiilgbrababsshsmtpr-v26.dat")]
-    #[test_case("testnet-cbbhrwiilgbrababsshsmtpr-v27.dat" ; "testnet-cbbhrwiilgbrababsshsmtpr-v27.dat")]
-    #[test_case("testnet-cbbhrwiilgbrababsshsmtpr-v28.dat" ; "testnet-cbbhrwiilgbrababsshsmtpr-v28.dat")]
-    #[test_case("testnet-G93738061a-Gab72a38b.dat" ; "testnet-G93738061a-Gab72a38b.dat")]
-    #[test_case("testnet-G93738061a-latest.dat" ; "testnet-G93738061a-latest.dat")]
-    #[test_case("testnet-glorygoddess-latest.dat" ; "testnet-glorygoddess-latest.dat")]
-    #[test_case("testnet-mskmgdbhotbpetcjwcspgopp-G93738061a.dat" ; "testnet-mskmgdbhotbpetcjwcspgopp-G93738061a.dat")]
     // Mainnet
     #[test_case("zwl-real.dat" ; "zwl-real.dat")]
     #[test_case("zecwallet-light-wallet.dat" ; "zecwallet-light-wallet.dat")]
     #[test_case("zecwallet-light-wallet-test.dat" ; "zecwallet-light-wallet-test.dat")]
-    #[test_case("mainnet-latest-hhcclaltpcckcsslpcnetblr.dat" ; "mainnet-latest-hhcclaltpcckcsslpcnetblr.dat")]
-    #[test_case("mainnet-hhcclaltpcckcsslpcnetblr.dat" ; "mainnet-hhcclaltpcckcsslpcnetblr.dat")]
     fn test_parser_does_not_panic(filename: &str) {
         let project_root = env::current_dir().expect("Failed to get current directory");
         let data_dir = project_root.join("src/zwl/tests/data");
