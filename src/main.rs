@@ -8,7 +8,6 @@ mod parsing; pub use parsing::*;
 mod sapling;
 mod string_utils; pub use string_utils::*;
 mod styles;
-mod types; pub use types::*;
 mod zcashd;
 mod zingo;
 mod zewif; pub use zewif::*;

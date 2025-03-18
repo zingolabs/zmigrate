@@ -8,6 +8,7 @@ mod key_metadata; pub use key_metadata::*;
 mod key_pool; pub use key_pool::*;
 mod key; pub use key::*;
 mod keys; pub use keys::*;
+mod migrate; pub use migrate::*;
 mod mnemonic_hd_chain; pub use mnemonic_hd_chain::*;
 mod mnemonic_seed; pub use mnemonic_seed::*;
 mod network_info; pub use network_info::*;

@@ -18,3 +18,19 @@
 - **Type Inference**: Use type inference where possible, be explicit otherwise
 - **File Structure**: Group related functionality in modules
 - **Traits**: Prefer trait implementations for extensible functionality
+
+## Migration Plan: ZCashd to Zewif
+
+### Implementation Strategy
+1. Create `src/zcashd/migrate.rs` module with function `migrate_to_zewif(wallet: &ZcashdWallet) -> ZewifWallets`
+2. Design mapping approach using conversion traits:
+   - Implement `From<ZcashdWallet> for WalletDB`
+   - Create mapping functions for complex nested types
+3. Data transformation steps:
+   - Generate appropriate ARIDs for wallet and accounts
+   - Map seed material from mnemonic phrase
+   - Convert transparent and shielded addresses
+   - Transform transactions with TXID-based lookups
+   - Map wallet-specific metadata to appropriate attachments
+4. Add comprehensive context-rich error handling
+5. Write unit tests with sample wallet data
