@@ -87,7 +87,7 @@ The following best practices offer suggestions for those front-end and back-end 
 
 * _Example:_ Zingo! maintains Witness Trees in TxMap.WitnessTrees. This information should be preserved.
   
-***[Import:] Dump Incorrect Witness Trees.*** Best practice is to recheck witness trees as they're being imported and to dump them if they're incorrect, so as to not incorporate corrupt data into the new wallet.
+***[Import:] Drop Incorrect Witness Trees.*** Best practice is to recheck witness trees as they're being imported and to dump them if they're incorrect, so as to not incorporate corrupt data into the new wallet.
 
 ## Attachments
 
@@ -95,18 +95,20 @@ The following best practices offer suggestions for those front-end and back-end 
 
 * _Example:_ [an example of something that didn't make it into the ZeWIF spec, but which we still suggest storing.][which just might be a repeat of the above]
 
-***[Export:] Simplify Data in Attachments.***
+***[Export:] Simplify Data in Attachments.*** Do your best to simplify any data you put into an attachment. At a minimum you should ***Break Apart Composite Data*** as described above, but you should also do your best to regularize it and otherwise make it easily accessible to other developers or users who may be accessing the data in the future.
+
+* _Example:_ [an example of something that didn't make it into the ZeWIF spec that could benefit from normalization._
 
 ***[Export:] Document Attachments Online.*** It is recommended that  a `conformsTo` assertion be included with each attachment. This is even more highly recommended as a best practice when storing class II data into attachments. Ideally, the `conformsTo` should be a web page that specifies exactly how all attachments data is stored: what it is and how it's encoded. By storing this data in a web page you can ensure that it's accessible far into the future: even if your web page is gone, it can be retrieved through a service such as archive.org.
 
-***[Export:] Document Attachments in ZeWIF with a Date.***
+***[Export:] Date or Version Your ZeWIF `conformsTo`.*** Specifications can change over time. It's therefore best to supplement any `conformsTo` content with a date or version. A date can simply be added to the wrapped attachment, preferably using a `conformsAt` assertion and a UNIX datetime. [[Make sure this is accurate with anything in spec and/or attachments doc.]] Alternatively, the URLs used in `conformsTo` can be version specific, with a new URL for each new version. This ensures that if a URL is retrieved in the future with archive.org, it's either automatically correct (if URLs are versioned) or will be correct if the correct date is chosen.
 
-***Document Attachments in ZeWIF with other Metadata.***
+* _Example:_ ZSampleWallet uses a `conformsTo` URL for all of its attachments of `https://www.zsamplewallet/spec/v1.0/`. When they add a new attachment, they replace their `conformsTo` URLs with `https://www.zsamplewallet/spec/v1.1/`.
 
-ways to define things better than bstring [blob]? 
-[+metadata, date, etc.]
+***[Export:] Document Attachments in ZeWIF with other Metadata.*** Many attachments will just be a blob of wrapped data, tagged with `vendor` and (optionally) `conformsTo` assertions. However other assertions can be added to the wrapped data as metadata, such as the `conformsAt` assertion suggested above. Plain-text names, descriptions, and even instructions on how to unarchive the data are also possible. Whenever possible, information that could help a future importer to read and understand the data should be included.
 
-
+* _Example:_ [something not in the spec, with an `importInstruction` or something that explains how to use it.
+* 
 ## Encryption
 
 ***Decrypt All Data.***
