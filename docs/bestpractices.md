@@ -31,6 +31,8 @@ The following best practices offer suggestions for those front-end and back-end 
 
 * _Example:_ `zcashd`'s CKeyMetaData contains a seed fingerprint (uint256), a creation date (UNIX timestamp), and an HD/ZIP-32 Keypath (string). Those datums should each be individually stored when migrated.
 
+***[Import:] Destroy ZeWIF Files after Importing.*** After importing a ZeWIF file, you should give users the option to destroy it, as it will usually contain sensitive information. An alternative is to ***Re-Encrypt for Storage*** as discussed below.
+
 ## Key Migration
 
 ***[All:] Use Account Abstractions.*** Some Zcash keys are based on system data, while others are HD keys derived from a seed. However, users of most wallets instead see keys grouped into accounts, which may contain related HD keys, unrelated system-randomness keys, or multiples of any of these. Since accounts represent a crucial usability tool for users to understand what is in their account and what it does, they should be preserved both through export and import, even if they represent an abstraction without any "real" meaning for how the keys relate.
@@ -107,15 +109,19 @@ The following best practices offer suggestions for those front-end and back-end 
 
 ***[Export:] Document Attachments in ZeWIF with other Metadata.*** Many attachments will just be a blob of wrapped data, tagged with `vendor` and (optionally) `conformsTo` assertions. However other assertions can be added to the wrapped data as metadata, such as the `conformsAt` assertion suggested above. Plain-text names, descriptions, and even instructions on how to unarchive the data are also possible. Whenever possible, information that could help a future importer to read and understand the data should be included.
 
-* _Example:_ [something not in the spec, with an `importInstruction` or something that explains how to use it.
-* 
+* _Example:_ [something not in the spec, with an `importInstruction` or something that explains how to use it.]
+
 ## Encryption
 
-***Decrypt All Data.***
+***[Export:] Decrypt All Data.*** All data that was encrypted in the original wallet file must be decrypted before being placed ZeWIF. Wallet importers will not know how to decrypt your data, and so if it remains encrypted it will be lost.
 
-***Re-Encrypt for Insecure Transmission.***
+* _Example:_ Zecwallet private keys are encrypted using the secretbox Rust crate, using a doublesha256 of the user's password and a random nonce and a combination of Salsa20 and Poly1305. Even if the password and nonce were known, an importing wallet may not know the procedure to use them to decrypt, which is why decryption must occur prior to the migration of the data file.
 
-***Re-Encrypt for Storage.***
+***[All:] Securely Transmit Data.*** Because ZeWIF has sensitive, decrypted data, it must be transmitted securely. Encrypted means such as SSH, Tor, and HTTPS are the best choices, but an [Animated QR](https://developer.blockchaincommons.com/animated-qrs/) is also fairly secure. If the transmission mechanism is not secure (such as Bluetooth or NFC transmission), ensure that the data is encrypted before transmission, as discussed below.
+
+* _Example:_ ZSampleWallet offers an Animated QR of an `ur:envelope` as a ZeWIF export function. If another wallet has been programmed to read in that data, the transmission should be fairly secure (absent unlikely in-person surveilance).
+
+***Re-Encrypt for Storage.*** If ZeWIF data is going to be stored, and it contains
 
 can encrypt with encryption or SSKR [can be done with Envelope tool, not in spec]
 
