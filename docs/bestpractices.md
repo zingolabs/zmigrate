@@ -91,11 +91,17 @@ The following best practices offer suggestions for those front-end and back-end 
 
 ## Attachments
 
-***Store Undefined Data with Attachments.*** As noted above in ***Store Data Not Included in the Spec*** all data that is considered important should be exported. If data is not in the spec, it should be instead stored as an [attachment](attachments.md).
+***[Export:] Store Undefined Data with Attachments.*** As noted above in ***Store Data Not Included in the Spec*** all data that is considered important should be exported. If data is not in the spec, it should be instead stored as an [attachment](attachments.md).
 
 * _Example:_ [an example of something that didn't make it into the ZeWIF spec, but which we still suggest storing.][which just might be a repeat of the above]
 
-***Document Attachments Whenever Possible.***
+***[Export:] Simplify Data in Attachments.***
+
+***[Export:] Document Attachments Online.*** It is recommended that  a `conformsTo` assertion be included with each attachment. This is even more highly recommended as a best practice when storing class II data into attachments. Ideally, the `conformsTo` should be a web page that specifies exactly how all attachments data is stored: what it is and how it's encoded. By storing this data in a web page you can ensure that it's accessible far into the future: even if your web page is gone, it can be retrieved through a service such as archive.org.
+
+***[Export:] Document Attachments in ZeWIF with a Date.***
+
+***Document Attachments in ZeWIF with other Metadata.***
 
 ways to define things better than bstring [blob]? 
 [+metadata, date, etc.]
