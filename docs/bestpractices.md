@@ -121,27 +121,20 @@ The following best practices offer suggestions for those front-end and back-end 
 
 * _Example:_ ZSampleWallet offers an Animated QR of an `ur:envelope` as a ZeWIF export function. If another wallet has been programmed to read in that data, the transmission should be fairly secure (absent unlikely in-person surveilance).
 
-***Re-Encrypt for Storage.*** If ZeWIF data is going to be stored, and it contains
+***[All:] Re-Encrypt for Storage.*** If ZeWIF data is going to be stored, and if it contains sensitive data (which will almost always be the case), it should be reencrypted. This is not currently possible using the zmigrate crate, but ZeWIF files are [Gordian Envelope-compliant](https://developer.blockchaincommons.com/envelope/), which means that the [bc-envelope-cli-rust app](https://github.com/BlockchainCommons/bc-envelope-cli-rust) may be used to manipulate any ZeWIF file output by zmigrate, including encrypting it.
 
-can encrypt with encryption or SSKR [can be done with Envelope tool, not in spec]
+* _Example:_ The Envelope CLI may be installed using `cargo install bc-envelope-cli`. The ZeWIF file can then be encrypted using [symmetric encryption](https://github.com/BlockchainCommons/bc-envelope-cli-rust/blob/master/docs/BasicExamples.md#example-4-symmetric-encryption) (in which case the key must be carefully preserved) or [SSKR](https://github.com/BlockchainCommons/bc-envelope-cli-rust/blob/master/docs/SSKRExample.md) (in which case the envelopes with shares should be separated, as the data can be encrypted if a threshold of the envelopes are together).
 
 ## Elision & Compression
 
-***Compress as Necessary.***
+***[All:] Elide Thoughtfully.*** The standard use case for a ZeWIF file involves using it to migrate data between two wallets. However, ZeWIF may also be used for other purposes, such as transmitting information on the state of a wallet to an accountant. In these cases, sensitive information that is not required by the recipient (such as keys and seeds) should be elided prior to the transmission of the data. This is not currently a feature of zmigrate, but it can be accomplished by piping the output ZeWIF file through the [bc-envelope-cli-rust app](https://github.com/BlockchainCommons/bc-envelope-cli-rust). 
 
-***Elide Thoughtfully.***
-
-Be clear that anything can be wrapped to elide, compress [e.g. large string, not random numbers] if space tight
-
-may want to differentiate between what would give to an auditor and to a wallet: might do as multiple attachments [privacy-breaking]
-
+* _Example:_ Envelope-CLI docs explain [how to redact specific information from a Gordian Envelope](https://github.com/BlockchainCommons/bc-envelope-cli-rust/blob/master/docs/VCElisionExample.md).
+  
 ## Reports
 
-***Report All Failures.***
+***[All:] Report All Failures.*** Any failures to export data should be reported to the user. This might include data purposefully excluded from the export process. Any failures to important data must be reported to the user.
 
-***Flag Asset Failures in Red.***
+***[Import:] Flag Asset Failures in Red.*** If a failure to import data results in keys or seeds not being imported, this must be clearly reported with red, bold, or otherwise highlighted warnings, as it could result in a loss of assets.
 
-
-```
-Deliverable # 3.4: A best practices document on importing & exporting data.
-```
+* _Example:_ ZTestWallet doesn't know what to do with keys not associated with seeds, so it does not import them. This is flagged for the user with a bold warning so that they can either sweep their funds prior to moving to the new wallet or else choose a different wallet that better meets their needs. The user decides to sweep, and so when they return with a new post-sweep ZeWIF file, it no longer reports errors. This allows them to begin using the new wallet with confidence.
