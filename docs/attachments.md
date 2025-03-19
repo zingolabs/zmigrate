@@ -59,7 +59,7 @@ graph LR
     4["predicate"]
     5["object"]
     6["assertion"]
-    7["subject"]
+    7["predicate"]
     8["node"]
     9["subject"]
     10["assertion"]
