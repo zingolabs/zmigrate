@@ -11,7 +11,7 @@ use crate::{
 /// Migrate a ZCashd wallet to the Zewif wallet format
 pub fn migrate_to_zewif(wallet: &ZcashdWallet) -> Result<ZewifTop> {
     // Create a new ZewifDB
-    let mut zewif_db = ZewifTop::new();
+    let mut zewif_top = ZewifTop::new();
 
     // Convert seed material (mnemonic phrase)
     let seed_material = convert_seed_material(wallet)?;
@@ -35,13 +35,18 @@ pub fn migrate_to_zewif(wallet: &ZcashdWallet) -> Result<ZewifTop> {
 
     // Create a complete Zewif wallet
     let mut zewif_wallet = ZewifWallet::new();
-    zewif_wallet.seed_material = seed_material;
+
+    if let Some(seed_material) = seed_material {
+        zewif_wallet.set_seed_material(seed_material);
+    }
+
+    zewif_wallet.add_account(account);
 
     // Add wallet and transactions to the ZewifDB
-    zewif_db.add_wallet(zewif_wallet);
-    zewif_db.transactions = transactions;
+    zewif_top.add_wallet(zewif_wallet);
+    zewif_top.transactions = transactions;
 
-    Ok(zewif_db)
+    Ok(zewif_top)
 }
 
 /// Convert ZCashd mnemonic seed to Zewif SeedMaterial
@@ -112,6 +117,8 @@ fn convert_transactions(wallet: &ZcashdWallet) -> Result<HashMap<TxId, zewif::Tr
 fn convert_transaction(tx_id: TxId, tx: &zcashd::WalletTx) -> Result<zewif::Transaction> {
     let zewif_tx = zewif::Transaction::new(tx_id);
 
+    // TODO: Convert transaction details
+    
     Ok(zewif_tx)
 }
 

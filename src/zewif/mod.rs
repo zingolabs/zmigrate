@@ -120,7 +120,7 @@ impl ZewifTop {
     }
 
     pub fn add_wallet(&mut self, wallet: ZewifWallet) {
-        self.wallets.insert(wallet.id.clone(), wallet);
+        self.wallets.insert(wallet.id().clone(), wallet);
     }
 
     pub fn transactions(&self) -> &HashMap<TxId, Transaction> {
@@ -137,5 +137,11 @@ impl ZewifTop {
 
     pub fn get_transaction(&self, txid: &TxId) -> Option<&Transaction> {
         self.transactions.get(txid)
+    }
+}
+
+impl Default for ZewifTop {
+    fn default() -> Self {
+        Self::new()
     }
 }

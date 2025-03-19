@@ -14,13 +14,12 @@ use super::{Account, Attachments, Identifiable, SeedMaterial};
 /// the `ZewifDB` type.
 #[derive(Debug, Clone)]
 pub struct ZewifWallet {
-    pub id: ARID,
-    pub seed_material: Option<SeedMaterial>,
-    pub accounts: HashMap<ARID, Account>,
-    pub attachments: Attachments,
+    id: ARID,
+    seed_material: Option<SeedMaterial>,
+    accounts: HashMap<ARID, Account>,
+    attachments: Attachments,
 }
 
-/// Further impls of this omitted for brevity.
 impl Identifiable for ZewifWallet {
     fn id(&self) -> &ARID {
         &self.id
@@ -37,6 +36,22 @@ impl ZewifWallet {
             accounts: HashMap::new(),
             attachments: Attachments::new(),
         }
+    }
+
+    pub fn seed_material(&self) -> Option<&SeedMaterial> {
+        self.seed_material.as_ref()
+    }
+
+    pub fn set_seed_material(&mut self, seed_material: SeedMaterial) {
+        self.seed_material = Some(seed_material);
+    }
+
+    pub fn accounts(&self) -> &HashMap<ARID, Account> {
+        &self.accounts
+    }
+
+    pub fn add_account(&mut self, account: Account) {
+        self.accounts.insert(account.id().clone(), account);
     }
 }
 
