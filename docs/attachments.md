@@ -58,11 +58,13 @@ graph LR
     3["assertion"]
     4["predicate"]
     5["object"]
-    6["node"]
-    7["subject"]  
-    8["assertion"]
-    9["predicate"]
-    10["object"]
+    6["assertion"]
+    7["subject"]
+    8["node"]
+    9["subject"]
+    10["assertion"]
+    11["predicate"]
+    12["object"]
     1 --> 2
     1 --> 3
     3 --> 4
@@ -72,6 +74,8 @@ graph LR
     6 --> 8
     8 --> 9
     8 --> 10
+    10 --> 11
+    10 --> 12
 ```
 
 * 
