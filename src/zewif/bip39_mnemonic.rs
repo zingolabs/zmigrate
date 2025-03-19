@@ -1,4 +1,4 @@
-use super::{u256, MnemonicLanguage};
+use super::{MnemonicLanguage, u256};
 
 pub struct Bip39Mnemonic {
     mnemonic: String,
@@ -17,13 +17,12 @@ impl std::fmt::Debug for Bip39Mnemonic {
 }
 
 impl Bip39Mnemonic {
-    pub fn new(mnemonic: String, language: Option<MnemonicLanguage>, fingerprint: Option<u256>) -> Self {
-        Self { mnemonic, language, fingerprint }
+    pub fn new(mnemonic: String) -> Self {
+        Self { mnemonic, language: None, fingerprint: None }
     }
 
-    pub fn set_fingerprint(mut self, fingerprint: u256) -> Self {
+    pub fn set_fingerprint(&mut self, fingerprint: u256) {
         self.fingerprint = Some(fingerprint);
-        self
     }
 
     pub fn mnemonic(&self) -> &String {

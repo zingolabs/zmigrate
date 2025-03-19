@@ -378,7 +378,7 @@ impl<'a> ZcashdParser<'a> {
                 UnifiedAddressMetadata,
                 "UnifiedAddressMetadata key"
             )?;
-            address_metadata.insert(metadata.key_id.clone(), metadata);
+            address_metadata.insert(metadata.key_id, metadata);
             let v: u32 = parse!(buf = value.as_data(), u32, "UnifiedAddressMetadata value")?;
             if v != 0 {
                 bail!("Unexpected value for UnifiedAddressMetadata: 0x{:08x}", v);
@@ -394,7 +394,7 @@ impl<'a> ZcashdParser<'a> {
                 UnifiedAccountMetadata,
                 "UnifiedAccountMetadata key"
             )?;
-            account_metadata.insert(metadata.key_id.clone(), metadata);
+            account_metadata.insert(metadata.key_id, metadata);
             let v: u32 = parse!(buf = value.as_data(), u32, "UnifiedAccountMetadata value")?;
             if v != 0 {
                 bail!("Unexpected value for UnifiedAccountMetadata: 0x{:08x}", v);
@@ -424,16 +424,18 @@ impl<'a> ZcashdParser<'a> {
             account_metadata,
         )))
     }
+
     fn parse_mnemonic_phrase(&self) -> Result<Bip39Mnemonic> {
         let (key, value) = self
             .dump
             .record_for_keyname("mnemonicphrase")
             .context("Getting 'mnemonicphrase' record")?;
         let fingerprint = parse!(buf = &key.data, u256, "seed fingerprint")?;
-        let seed =
-            parse!(buf = &value, Bip39Mnemonic, "mnemonic phrase")?.set_fingerprint(fingerprint);
+        let mut bip39_mnemonic =
+            parse!(buf = &value, Bip39Mnemonic, "mnemonic phrase")?;
+        bip39_mnemonic.set_fingerprint(fingerprint);
         self.mark_key_parsed(&key);
-        Ok(seed)
+        Ok(bip39_mnemonic)
     }
 
     fn parse_address_names(&self) -> Result<HashMap<Address, String>> {

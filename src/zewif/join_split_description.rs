@@ -1,4 +1,4 @@
-use crate::{impl_attachable, Blob, Data};
+use crate::{impl_attachable, u256, Data};
 
 use super::{Anchor, Attachments};
 
@@ -6,8 +6,8 @@ use super::{Anchor, Attachments};
 #[derive(Debug, Clone)]
 pub struct JoinSplitDescription {
     pub anchor: Anchor,
-    pub nullifiers: [Blob<32>; 2],
-    pub commitments: [Blob<32>; 2],
+    pub nullifiers: [u256; 2],
+    pub commitments: [u256; 2],
     /// A zero-knowledge proof to validate the JoinSplit operation.
     pub zkproof: Data,
     // Further fields may be added as necessary.

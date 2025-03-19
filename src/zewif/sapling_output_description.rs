@@ -1,4 +1,4 @@
-use crate::{impl_attachable, Blob, Data};
+use crate::{impl_attachable, Data, u256};
 
 use super::{Anchor, Attachments, Position, SaplingWitness};
 
@@ -12,9 +12,9 @@ use super::{Anchor, Attachments, Position, SaplingWitness};
 pub struct SaplingOutputDescription {
     pub output_index: u32,
     /// The note commitment.
-    pub commitment: Blob<32>,
+    pub commitment: u256,
     /// Ephemeral key for the encrypted note.
-    pub ephemeral_key: Blob<32>,
+    pub ephemeral_key: u256,
     /// Encrypted ciphertext containing the note details.
     pub enc_ciphertext: Data,
     /// An optional memo field.

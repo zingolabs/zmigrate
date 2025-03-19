@@ -1,4 +1,4 @@
-use crate::{impl_attachable, u256, Blob, Data};
+use crate::{impl_attachable, u256, Data};
 
 use super::{Anchor, Attachments, IncrementalWitness, Position};
 
@@ -7,21 +7,20 @@ pub type SinsemillaHash = u256;
 pub type OrchardWitness = IncrementalWitness<ORCHARD_INCREMENTAL_MERKLE_TREE_DEPTH, SinsemillaHash>;
 
 /// Data specific to Orchard actions.
-/// TODO CHECK
 #[derive(Debug, Clone)]
 pub struct OrchardActionDescription {
     pub action_index: u32,
     /// The anchor of the current commitment tree.
-    pub anchor: Blob<32>,
+    pub anchor: u256,
     /// A nullifier to ensure the note is spent only once.
-    pub nullifier: Blob<32>,
+    pub nullifier: u256,
     /// A zero-knowledge proof that the spend is valid.
     pub zkproof: Data,
     /// Additional fields (e.g., spending key components) may be required.
     /// The note commitment.
-    pub commitment: Blob<32>,
+    pub commitment: u256,
     /// Ephemeral key for the encrypted note.
-    pub ephemeral_key: Blob<32>,
+    pub ephemeral_key: u256,
     /// Encrypted ciphertext containing the note details.
     pub enc_ciphertext: Data,
     /// An optional memo field.

@@ -46,8 +46,8 @@ impl Account {
         &self.name
     }
 
-    pub fn set_name(&mut self, name: String) {
-        self.name = name;
+    pub fn set_name(&mut self, name: impl Into<String>) {
+        self.name = name.into();
     }
 
     pub fn zip32_account_id(&self) -> Option<u32> {

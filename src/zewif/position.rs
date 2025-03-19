@@ -1,3 +1,3 @@
 /// A position in a note commitment tree.
-#[derive(Debug, Clone)]
+#[derive(Clone, Copy, Debug)]
 pub struct Position(pub u32);

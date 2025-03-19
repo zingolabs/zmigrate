@@ -36,6 +36,20 @@ pub struct OutputDescription {
     zkproof: GrothProof,
 }
 
+impl OutputDescription {
+    pub fn cmu(&self) -> u256 {
+        self.cmu
+    }
+
+    pub fn ephemeral_key(&self) -> u256 {
+        self.ephemeral_key
+    }
+
+    pub fn enc_ciphertext(&self) -> &Blob<580> {
+        &self.enc_ciphertext
+    }
+}
+
 impl Parse for OutputV5 {
     fn parse(p: &mut Parser) -> Result<Self> {
         Ok(Self {

@@ -39,6 +39,16 @@ pub struct SpendDescription {
     spend_auth_sig: Blob64,
 }
 
+impl SpendDescription {
+    pub fn nullifier(&self) -> u256 {
+        self.nullifier
+    }
+
+    pub fn zkproof(&self) -> &GrothProof {
+        &self.zkproof
+    }
+}
+
 impl Parse for SpendV5 {
     fn parse(p: &mut Parser) -> Result<Self> {
         Ok(Self {

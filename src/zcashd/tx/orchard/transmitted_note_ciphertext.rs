@@ -11,6 +11,12 @@ pub struct TransmittedNoteCiphertext {
     out_ciphertext: Blob<80>,
 }
 
+impl TransmittedNoteCiphertext {
+    pub fn enc_ciphertext(&self) -> &Blob<580> {
+        &self.enc_ciphertext
+    }
+}
+
 impl Parse for TransmittedNoteCiphertext {
     fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
         Ok(Self {

@@ -1,15 +1,15 @@
 use anyhow::Result;
 
-use crate::{parse, Blob32, Parse, Parser};
+use crate::{parse, u256, Parse, Parser};
 
 use super::{OrchardSignature, TransmittedNoteCiphertext};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct OrchardAction {
-    pub cv_net: Blob32,
-    pub nf_old: Blob32,
-    pub rk: Blob32,
-    pub cmx: Blob32,
+    pub cv_net: u256,
+    pub nf_old: u256,
+    pub rk: u256,
+    pub cmx: u256,
     pub encrypted_note: TransmittedNoteCiphertext,
     pub authorization: Option<OrchardSignature>,
 }

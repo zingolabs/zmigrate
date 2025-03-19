@@ -1,6 +1,4 @@
-use crate::{impl_attachable, Amount, Blob, BlockHeight, Data};
-
-use super::Attachments;
+use crate::{impl_attachable, u256, Attachments, Amount, BlockHeight, Data};
 
 /// Data specific to Sapling spends.
 #[derive(Debug, Clone)]
@@ -11,7 +9,7 @@ pub struct SaplingSpendDescription {
     /// The height that the anchor corresponds to, if known.
     pub anchor_height: Option<BlockHeight>,
     /// A nullifier to ensure the note is spent only once.
-    pub nullifier: Blob<32>,
+    pub nullifier: u256,
     /// A zero-knowledge proof that the spend is valid.
     pub zkproof: Data,
     // Additional fields (e.g., spending key components) may be required.

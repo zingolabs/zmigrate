@@ -45,7 +45,7 @@ impl Parse for SaplingBundleV5 {
             .zip(v_spend_proofs.into_iter().zip(v_spend_auth_sigs))
             .map(|(sd_5, (zkproof, spend_auth_sig))| {
                 // the following `unwrap` is safe because we know n_spends > 0.
-                sd_5.into_spend_description(anchor.clone().unwrap(), zkproof, spend_auth_sig)
+                sd_5.into_spend_description(anchor.unwrap(), zkproof, spend_auth_sig)
             })
             .collect();
 

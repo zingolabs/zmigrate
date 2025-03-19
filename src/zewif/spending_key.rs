@@ -1,6 +1,6 @@
 use crate::{Blob, u256};
 
-/// Represents a spending key which contains cryptographic material 
+/// Represents a spending key which contains cryptographic material
 /// necessary to spend funds and view transaction details
 #[derive(Debug, Clone)]
 pub enum SpendingKey {
@@ -12,7 +12,7 @@ pub enum SpendingKey {
         nsk: u256,
         /// Outgoing viewing key - allows viewing outgoing transaction details
         ovk: u256,
-        
+
         // Extended spending key components (ZIP-32 HD wallet)
         /// Depth in the HD hierarchy
         depth: Option<u8>,
@@ -43,11 +43,12 @@ impl SpendingKey {
             dk: None,
         }
     }
-    
+
     /// Create a new complete Sapling extended spending key with all HD components
+    #[allow(clippy::too_many_arguments)]
     pub fn new_sapling_extended(
-        ask: u256, 
-        nsk: u256, 
+        ask: u256,
+        nsk: u256,
         ovk: u256,
         depth: u8,
         parent_fingerprint: u32,
@@ -66,7 +67,7 @@ impl SpendingKey {
             dk: Some(dk),
         }
     }
-    
+
     /// Create a raw spending key (for backward compatibility)
     pub fn new_raw(key_data: Blob<32>) -> Self {
         SpendingKey::Raw(key_data)
