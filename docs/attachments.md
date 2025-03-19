@@ -78,11 +78,9 @@ graph LR
     10 --> 12
 ```
 
-* 
-* 
-* **Envelope Can Be Stored as a UR.**
-* **Envelopes Can Be Signed.**
-* **Envelope Hashes Allow Data to Be Elided.**
+* **Envelope Can Be Stored as a UR.** Blockchain Commons [Uniform Resources (UR) format](https://developer.blockchaincommons.com/ur/) supports the text encoding of CBOR data. It can be used to store a ZeWIF Envelope file and to encode it as a QR or an [Animated QR](https://developer.blockchaincommons.com/animated-qrs/). This can resolve issues of storage and transmission.
+* **Envelopes Can Be Signed.** Envelopes can be "wrapped" and then signed. This is not currently supported by zmigrate, but could be used in the future to guarantee the authenticity of ZeWIF file.
+* **Envelope Hashes Allow Data to Be Elided.** Some or all data in an Envelope can be elided. Hashes remain allowing for proof of content and proof signature. This is another Envelope feature not currently supported by zmigrate, but that might have future usefulness.
  
 ## Attachments Technical Overview
 
