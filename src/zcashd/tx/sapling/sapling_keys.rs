@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 
-use super::{SaplingIncomingViewingKey, SaplingKey};
+use crate::SaplingIncomingViewingKey;
+
+use super::SaplingKey;
 
 #[derive(Clone, PartialEq)]
 pub struct SaplingKeys (pub HashMap<SaplingIncomingViewingKey, SaplingKey>);

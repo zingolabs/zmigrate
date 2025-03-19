@@ -1,4 +1,4 @@
-use crate::{Amount, Blob, BlockHeight, Data};
+use crate::{impl_attachable, Amount, Blob, BlockHeight, Data};
 
 use super::Attachments;
 
@@ -17,3 +17,5 @@ pub struct SaplingSpendDescription {
     // Additional fields (e.g., spending key components) may be required.
     pub attachments: Attachments,
 }
+
+impl_attachable!(SaplingSpendDescription);

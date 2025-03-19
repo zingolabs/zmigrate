@@ -3,6 +3,21 @@ use std::collections::HashMap;
 use bc_components::Digest;
 use bc_envelope::prelude::*;
 
+#[macro_export]
+macro_rules! impl_attachable {
+    ($type:ty) => {
+        impl $crate::Attachable for $type {
+            fn attachments(&self) -> &Attachments {
+                &self.attachments
+            }
+
+            fn attachments_mut(&mut self) -> &mut Attachments {
+                &mut self.attachments
+            }
+        }
+    };
+}
+
 #[derive(Debug, Clone)]
 pub struct Attachments {
     envelopes: HashMap<Digest, Envelope>,
@@ -21,7 +36,8 @@ impl Attachments {
         }
     }
 
-    pub fn add(&mut self, attachment: Envelope) {
+    pub fn add(&mut self, payload: impl EnvelopeEncodable, vendor: &str, conforms_to: Option<&str>) {
+        let attachment = Envelope::new_attachment(payload, vendor, conforms_to);
         self.envelopes.insert(attachment.digest().into_owned(), attachment);
     }
 
@@ -35,5 +51,34 @@ impl Attachments {
 
     pub fn clear(&mut self) {
         self.envelopes.clear();
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.envelopes.is_empty()
+    }
+}
+
+pub trait Attachable {
+    fn attachments(&self) -> &Attachments;
+    fn attachments_mut(&mut self) -> &mut Attachments;
+
+    fn add_attachment(&mut self, payload: impl EnvelopeEncodable, vendor: &str, conforms_to: Option<&str>) {
+        self.attachments_mut().add(payload, vendor, conforms_to);
+    }
+
+    fn get_attachment(&self, digest: &Digest) -> Option<&Envelope> {
+        self.attachments().get(digest)
+    }
+
+    fn remove_attachment(&mut self, digest: &Digest) -> Option<Envelope> {
+        self.attachments_mut().remove(digest)
+    }
+
+    fn clear_attachments(&mut self) {
+        self.attachments_mut().clear();
+    }
+
+    fn has_attachments(&self) -> bool {
+        !self.attachments().is_empty()
     }
 }

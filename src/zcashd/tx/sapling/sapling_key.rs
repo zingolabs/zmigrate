@@ -1,8 +1,8 @@
 use anyhow::Result;
 
-use crate::sapling::SaplingExtendedSpendingKey;
+use crate::{sapling::SaplingExtendedSpendingKey, SaplingIncomingViewingKey};
 
-use super::{super::super::KeyMetadata, SaplingIncomingViewingKey};
+use super::super::super::KeyMetadata;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct SaplingKey {

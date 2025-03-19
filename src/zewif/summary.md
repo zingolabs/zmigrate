@@ -19,7 +19,7 @@ pub trait Identifiable {
 /// hierarchy, which can contain multiple wallets and a global transaction
 /// history.
 #[derive(Debug, Clone)]
-pub struct WalletDB {
+pub struct ZewifDB {
     wallets: HashMap<ARID, Wallet>,
     transactions: HashMap<TxId, Transaction>,
     attachments: Attachments,

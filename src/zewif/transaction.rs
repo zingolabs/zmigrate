@@ -1,4 +1,4 @@
-use crate::{BlockHeight, Data, TxId};
+use crate::{impl_attachable, BlockHeight, Data, TxId};
 
 use super::{Attachments, JoinSplitDescription, OrchardActionDescription, SaplingOutputDescription, SaplingSpendDescription, TxIn, TxOut};
 
@@ -7,14 +7,14 @@ use super::{Attachments, JoinSplitDescription, OrchardActionDescription, Sapling
 #[derive(Debug, Clone)]
 pub struct Transaction {
     /// The transaction id.
-    pub txid: TxId,
+    txid: TxId,
     /// The raw transaction data, if known.
-    pub raw: Option<Data>,
+    raw: Option<Data>,
     /// The height at which the transaction was mined, if known.
     /// It is possible that if a rollback occurred just after the zeWIF
     /// export, the transaction could have been unmined, and possibly
     /// remined at a different height.
-    pub mined_height: Option<BlockHeight>,
+    mined_height: Option<BlockHeight>,
 
     // Design issue: do we want to parse out all of this? All wallets will
     // necessarily have code to parse a transaction. The only information
@@ -26,17 +26,104 @@ pub struct Transaction {
     // -- Daira-Emma
 
     /// Optional data for transparent inputs
-    pub inputs: Option<Vec<TxIn>>,
+    inputs: Option<Vec<TxIn>>,
     /// Optional data for transparent outputs
-    pub outputs: Option<Vec<TxOut>>,
+    outputs: Option<Vec<TxOut>>,
     /// Optional data for Sapling spends
-    pub sapling_spends: Option<Vec<SaplingSpendDescription>>,
+    sapling_spends: Option<Vec<SaplingSpendDescription>>,
     /// Optional data for Sapling outputs
-    pub sapling_outputs: Option<Vec<SaplingOutputDescription>>,
+    sapling_outputs: Option<Vec<SaplingOutputDescription>>,
     /// Optional data for Orchard actions
-    pub orchard_actions: Option<Vec<OrchardActionDescription>>,
+    orchard_actions: Option<Vec<OrchardActionDescription>>,
     /// Optional data for Sprout JoinSplit descriptions
-    pub sprout_joinsplits: Option<Vec<JoinSplitDescription>>,
+    sprout_joinsplits: Option<Vec<JoinSplitDescription>>,
     // Additional metadata such as confirmations or timestamp may be added here.
-    pub attachments: Attachments,
+    attachments: Attachments,
+}
+
+impl_attachable!(Transaction);
+
+impl Transaction {
+    pub fn new(txid: TxId) -> Self {
+        Self {
+            txid,
+            raw: None,
+            mined_height: None,
+            inputs: None,
+            outputs: None,
+            sapling_spends: None,
+            sapling_outputs: None,
+            orchard_actions: None,
+            sprout_joinsplits: None,
+            attachments: Attachments::new(),
+        }
+    }
+
+    pub fn txid(&self) -> &TxId {
+        &self.txid
+    }
+
+    pub fn raw(&self) -> Option<&Data> {
+        self.raw.as_ref()
+    }
+
+    pub fn set_raw(&mut self, raw: Data) {
+        self.raw = Some(raw);
+    }
+
+    pub fn mined_height(&self) -> Option<&BlockHeight> {
+        self.mined_height.as_ref()
+    }
+
+    pub fn set_mined_height(&mut self, height: BlockHeight) {
+        self.mined_height = Some(height);
+    }
+
+    pub fn inputs(&self) -> Option<&Vec<TxIn>> {
+        self.inputs.as_ref()
+    }
+
+    pub fn add_input(&mut self, input: TxIn) {
+        self.inputs.get_or_insert_with(Vec::new).push(input);
+    }
+
+    pub fn outputs(&self) -> Option<&Vec<TxOut>> {
+        self.outputs.as_ref()
+    }
+
+    pub fn add_output(&mut self, output: TxOut) {
+        self.outputs.get_or_insert_with(Vec::new).push(output);
+    }
+
+    pub fn sapling_spends(&self) -> Option<&Vec<SaplingSpendDescription>> {
+        self.sapling_spends.as_ref()
+    }
+
+    pub fn add_sapling_spend(&mut self, spend: SaplingSpendDescription) {
+        self.sapling_spends.get_or_insert_with(Vec::new).push(spend);
+    }
+
+    pub fn sapling_outputs(&self) -> Option<&Vec<SaplingOutputDescription>> {
+        self.sapling_outputs.as_ref()
+    }
+
+    pub fn add_sapling_output(&mut self, output: SaplingOutputDescription) {
+        self.sapling_outputs.get_or_insert_with(Vec::new).push(output);
+    }
+
+    pub fn orchard_actions(&self) -> Option<&Vec<OrchardActionDescription>> {
+        self.orchard_actions.as_ref()
+    }
+
+    pub fn add_orchard_action(&mut self, action: OrchardActionDescription) {
+        self.orchard_actions.get_or_insert_with(Vec::new).push(action);
+    }
+
+    pub fn sprout_joinsplits(&self) -> Option<&Vec<JoinSplitDescription>> {
+        self.sprout_joinsplits.as_ref()
+    }
+
+    pub fn add_sprout_joinsplit(&mut self, joinsplit: JoinSplitDescription) {
+        self.sprout_joinsplits.get_or_insert_with(Vec::new).push(joinsplit);
+    }
 }

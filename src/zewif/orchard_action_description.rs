@@ -1,4 +1,4 @@
-use crate::{u256, Blob, Data};
+use crate::{impl_attachable, u256, Blob, Data};
 
 use super::{Anchor, Attachments, IncrementalWitness, Position};
 
@@ -33,3 +33,5 @@ pub struct OrchardActionDescription {
     pub witness: Option<(Anchor, OrchardWitness)>,
     pub attachments: Attachments,
 }
+
+impl_attachable!(OrchardActionDescription);

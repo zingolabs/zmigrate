@@ -3,17 +3,19 @@ use std::{
     collections::{HashMap, HashSet},
 };
 
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 
-use crate::{parse, sapling::SaplingExtendedSpendingKey, u252, u256, Parser, TxId};
+use crate::{
+    Bip39Mnemonic, Parser, SaplingIncomingViewingKey, TxId, parse,
+    sapling::SaplingExtendedSpendingKey, u252, u256,
+};
 
 use super::{
-    zcashd_dump::DBKey, Address, BlockLocator, ClientVersion, DBValue, Key, KeyMetadata,
-    KeyPoolEntry, Keys, MnemonicHDChain, MnemonicSeed, NetworkInfo, OrchardNoteCommitmentTree,
-    PrivKey, PubKey, RecipientAddress, RecipientMapping,
-    SaplingIncomingViewingKey, SaplingKey, SaplingKeys, SaplingZPaymentAddress, SproutKeys,
+    Address, BlockLocator, ClientVersion, DBValue, Key, KeyMetadata, KeyPoolEntry, Keys,
+    MnemonicHDChain, NetworkInfo, OrchardNoteCommitmentTree, PrivKey, PubKey, RecipientAddress,
+    RecipientMapping, SaplingKey, SaplingKeys, SaplingZPaymentAddress, SproutKeys,
     SproutPaymentAddress, SproutSpendingKey, UnifiedAccountMetadata, UnifiedAccounts,
-    UnifiedAddressMetadata, WalletTx, ZcashdDump, ZcashdWallet,
+    UnifiedAddressMetadata, WalletTx, ZcashdDump, ZcashdWallet, zcashd_dump::DBKey,
 };
 
 #[derive(Debug)]
@@ -168,7 +170,7 @@ impl<'a> ZcashdParser<'a> {
             keys,
             min_version,
             mnemonic_hd_chain,
-            mnemonic_phrase,
+            bip39_mnemonic: mnemonic_phrase,
             network_info,
             orchard_note_commitment_tree,
             orderposnext,
@@ -199,12 +201,20 @@ impl<'a> ZcashdParser<'a> {
 
     fn parse_client_version(&self, keyname: &str) -> Result<ClientVersion> {
         let value = self.value_for_keyname(keyname)?;
-        parse!(buf = value, ClientVersion, format!("client version for keyname: {}", keyname))
+        parse!(
+            buf = value,
+            ClientVersion,
+            format!("client version for keyname: {}", keyname)
+        )
     }
 
     fn parse_block_locator(&self, keyname: &str) -> Result<BlockLocator> {
         let value = self.value_for_keyname(keyname)?;
-        parse!(buf = value, BlockLocator, format!("block locator for keyname: {}", keyname))
+        parse!(
+            buf = value,
+            BlockLocator,
+            format!("block locator for keyname: {}", keyname)
+        )
     }
 
     fn parse_opt_block_locator(&self, keyname: &str) -> Result<Option<BlockLocator>> {
@@ -229,7 +239,7 @@ impl<'a> ZcashdParser<'a> {
         }
         let mut keys_map = HashMap::new();
         for (key, value) in key_records {
-            let pubkey = parse!(buf = & key.data, PubKey, "pubkey")?;
+            let pubkey = parse!(buf = &key.data, PubKey, "pubkey")?;
             let privkey = parse!(buf = value.as_data(), PrivKey, "privkey")?;
             let metakey = DBKey::new("keymeta", &key.data);
             let metadata_binary = self
@@ -264,9 +274,12 @@ impl<'a> ZcashdParser<'a> {
             bail!("Mismatched sapzkey and sapzkeymeta records");
         }
         for (key, value) in key_records {
-            let ivk = parse!(buf = & key.data, SaplingIncomingViewingKey, "ivk")?;
-            let spending_key =
-            parse!(buf = value.as_data(), SaplingExtendedSpendingKey, "spending_key")?;
+            let ivk = parse!(buf = &key.data, SaplingIncomingViewingKey, "ivk")?;
+            let spending_key = parse!(
+                buf = value.as_data(),
+                SaplingExtendedSpendingKey,
+                "spending_key"
+            )?;
             let metakey = DBKey::new("sapzkeymeta", &key.data);
             let metadata_binary = self
                 .dump
@@ -300,7 +313,7 @@ impl<'a> ZcashdParser<'a> {
         }
         let mut zkeys_map = HashMap::new();
         for (key, value) in zkey_records {
-            let payment_address = parse!(buf = & key.data, SproutPaymentAddress, "payment_address")?;
+            let payment_address = parse!(buf = &key.data, SproutPaymentAddress, "payment_address")?;
             let spending_key = parse!(buf = value.as_data(), u252, "spending_key")?;
             let metakey = DBKey::new("zkeymeta", &key.data);
             let metadata_binary = self
@@ -341,7 +354,7 @@ impl<'a> ZcashdParser<'a> {
             let txid = parse!(&mut p, TxId, "txid")?;
             let recipient_address = parse!(&mut p, RecipientAddress, "recipient_address")?;
             p.check_finished()?;
-            let unified_address = parse!(buf = & value, String, "unified_address")?;
+            let unified_address = parse!(buf = &value, String, "unified_address")?;
             let recipient_mapping = RecipientMapping::new(recipient_address, unified_address);
             send_recipients
                 .entry(txid)
@@ -392,7 +405,7 @@ impl<'a> ZcashdParser<'a> {
         let full_viewing_keys_records = self.dump.records_for_keyname("unifiedfvk")?;
         let mut full_viewing_keys: HashMap<u256, String> = HashMap::new();
         for (key, value) in full_viewing_keys_records {
-            let key_id = parse!(buf = & key.data, u256, "UnifiedFullViewingKey key")?;
+            let key_id = parse!(buf = &key.data, u256, "UnifiedFullViewingKey key")?;
             let fvk = parse!(buf = value.as_data(), String, "UnifiedFullViewingKey value")?;
             full_viewing_keys.insert(key_id, fvk);
             self.mark_key_parsed(&key);
@@ -411,14 +424,14 @@ impl<'a> ZcashdParser<'a> {
             account_metadata,
         )))
     }
-    fn parse_mnemonic_phrase(&self) -> Result<MnemonicSeed> {
+    fn parse_mnemonic_phrase(&self) -> Result<Bip39Mnemonic> {
         let (key, value) = self
             .dump
             .record_for_keyname("mnemonicphrase")
             .context("Getting 'mnemonicphrase' record")?;
         let fingerprint = parse!(buf = &key.data, u256, "seed fingerprint")?;
         let seed =
-            parse!(buf = &value, MnemonicSeed, "mnemonic phrase")?.set_fingerprint(fingerprint);
+            parse!(buf = &value, Bip39Mnemonic, "mnemonic phrase")?.set_fingerprint(fingerprint);
         self.mark_key_parsed(&key);
         Ok(seed)
     }
@@ -475,8 +488,11 @@ impl<'a> ZcashdParser<'a> {
         for (key, value) in records {
             let payment_address =
                 parse!(buf = &key.data, SaplingZPaymentAddress, "payment address")?;
-            let viewing_key =
-                parse!(buf = value.as_data(), SaplingIncomingViewingKey, "viewing key")?;
+            let viewing_key = parse!(
+                buf = value.as_data(),
+                SaplingIncomingViewingKey,
+                "viewing key"
+            )?;
             if sapling_z_addresses.contains_key(&payment_address) {
                 bail!("Duplicate payment address found: {:?}", payment_address);
             }
@@ -499,8 +515,11 @@ impl<'a> ZcashdParser<'a> {
         let value = self
             .value_for_keyname("orchard_note_commitment_tree")
             .context("Getting 'orchard_note_commitment_tree' record")?;
-        let orchard_note_commitment_tree =
-            parse!(buf = value.as_data(), OrchardNoteCommitmentTree, "orchard note commitment tree")?;
+        let orchard_note_commitment_tree = parse!(
+            buf = value.as_data(),
+            OrchardNoteCommitmentTree,
+            "orchard note commitment tree"
+        )?;
         Ok(orchard_note_commitment_tree)
     }
 

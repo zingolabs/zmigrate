@@ -1,4 +1,4 @@
-use crate::{Blob, Data};
+use crate::{impl_attachable, Blob, Data};
 
 use super::{Anchor, Attachments};
 
@@ -13,3 +13,5 @@ pub struct JoinSplitDescription {
     // Further fields may be added as necessary.
     pub attachments: Attachments,
 }
+
+impl_attachable!(JoinSplitDescription);

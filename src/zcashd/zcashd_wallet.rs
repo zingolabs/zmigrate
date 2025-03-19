@@ -2,12 +2,12 @@
 
 use std::collections::HashMap;
 
-use crate::TxId;
+use crate::{Bip39Mnemonic, TxId, SaplingIncomingViewingKey};
 
 use super::{
-    Address, BlockLocator, ClientVersion, KeyPoolEntry, Keys, MnemonicHDChain, MnemonicSeed,
-    NetworkInfo, OrchardNoteCommitmentTree, PubKey, RecipientMapping, SaplingIncomingViewingKey,
-    SaplingKeys, SaplingZPaymentAddress, SproutKeys, UnifiedAccounts, WalletTx,
+    Address, BlockLocator, ClientVersion, KeyPoolEntry, Keys, MnemonicHDChain, NetworkInfo,
+    OrchardNoteCommitmentTree, PubKey, RecipientMapping, SaplingKeys,
+    SaplingZPaymentAddress, SproutKeys, UnifiedAccounts, WalletTx,
 };
 
 #[derive(Debug)]
@@ -22,7 +22,7 @@ pub struct ZcashdWallet {
     pub keys: Keys,
     pub min_version: ClientVersion,
     pub mnemonic_hd_chain: MnemonicHDChain,
-    pub mnemonic_phrase: MnemonicSeed,
+    pub bip39_mnemonic: Bip39Mnemonic,
     pub network_info: NetworkInfo,
     pub orchard_note_commitment_tree: OrchardNoteCommitmentTree,
     pub orderposnext: Option<i64>,
@@ -33,4 +33,10 @@ pub struct ZcashdWallet {
     pub transactions: HashMap<TxId, WalletTx>,
     pub unified_accounts: Option<UnifiedAccounts>,
     pub witnesscachesize: i64,
+}
+
+impl ZcashdWallet {
+    pub fn network(&self) -> zcash_address::Network {
+        self.network_info.network()
+    }
 }

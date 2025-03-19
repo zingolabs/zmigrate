@@ -21,16 +21,11 @@
 
 ## Migration Plan: ZCashd to Zewif
 
-### Implementation Strategy
-1. Create `src/zcashd/migrate.rs` module with function `migrate_to_zewif(wallet: &ZcashdWallet) -> ZewifWallets`
-2. Design mapping approach using conversion traits:
-   - Implement `From<ZcashdWallet> for WalletDB`
-   - Create mapping functions for complex nested types
-3. Data transformation steps:
-   - Generate appropriate ARIDs for wallet and accounts
-   - Map seed material from mnemonic phrase
-   - Convert transparent and shielded addresses
-   - Transform transactions with TXID-based lookups
-   - Map wallet-specific metadata to appropriate attachments
-4. Add comprehensive context-rich error handling
-5. Write unit tests with sample wallet data
+### Next Task
+1. The goal is to migrate a `ZcashdWallet` (already read into the structures in `src/zcashd/`) to a `ZewfitWallets` (using the structures in `src/zewif/`).
+2. For now, we will focus on the wallet and account data, and not the transaction data.
+3. Figure out a mapping from the highest level of the Zcashd wallet to the highest level of the Zewif wallet.
+4. Implement the mapping for the wallet and account data.
+5. Use `todo!()` for anything deeper than the top level of the wallet and account data.
+
+- Don't generate tests yet.

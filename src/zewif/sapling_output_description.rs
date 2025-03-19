@@ -1,4 +1,4 @@
-use crate::{Blob, Data};
+use crate::{impl_attachable, Blob, Data};
 
 use super::{Anchor, Attachments, Position, SaplingWitness};
 
@@ -26,3 +26,5 @@ pub struct SaplingOutputDescription {
     pub witness: Option<(Anchor, SaplingWitness)>,
     pub attachments: Attachments,
 }
+
+impl_attachable!(SaplingOutputDescription);
