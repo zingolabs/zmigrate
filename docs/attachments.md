@@ -28,7 +28,7 @@ Nonetheless, the following major points are useful as an overview for ZeWIF stor
 
 * **Envelope Uses CBOR.** Envelope is built using CBOR, a [well-specified](https://cbor.io/) and mature binary data representation format. Every Envelope is not only [legal CBOR](https://datatracker.ietf.org/doc/html/rfc8949), but also [legal dCBOR](https://datatracker.ietf.org/doc/draft-mcnally-deterministic-cbor/), a deterministic version of CBOR. Every Envelope, and therefore every ZeWIF file, can be read using CBOR tools such as [cbor.me](https://cbor.me/). (But don't read ZeWIF files containing private keys in an online site!)
 * **Envelope Stores Data in a Merkle-Like Tree.** Envelope is a branching hierarchical structure. Central nodes lead to multiple branches and eventually to leaves. This allows for the organized storage of data. The tree is Merkle-like because branches can be hashed and that hash can be stored in a store to prove that data that lies under it (which may not be relevant for the first iteration of ZeWIF, but which allows for powerful elision and signatures).
-* **Envelope is Built on Semantic Triples.** Data is stored in an Envelope as a sematic triple of subject-predicate-object. Each predicate-object pair is called an assertion.
+* **Envelope is Built on Semantic Triples.** Data is stored in an Envelope as a sematic triple of subject-predicate-object. Each predicate-object pair is called an assertion. A node connects together a subject and zero or more assertions about that subject. 
 
 ```mermaid
 graph LR
@@ -49,6 +49,33 @@ graph LR
     6 --> 7
     6 --> 8
 ```
+* **Envelope Can Be Recursive.** Any subject, predicate, object, or assertion can itself be an Envelope (a semantic triple). This allows for fully recursive structures to improve organization.
+
+```mermaid
+graph LR
+    1("node")
+    2["subect"]
+    3["assertion"]
+    4["predicate"]
+    5["object"]
+    6["node"]
+    7["subject"]  
+    8["assertion"]
+    9["predicate"]
+    10["object"]
+    1 --> 2
+    1 --> 3
+    3 --> 4
+    3 --> 5
+    1 --> 6
+    6 --> 7
+    6 --> 8
+    8 --> 9
+    8 --> 10
+```
+
+* 
+* 
 * **Envelope Can Be Stored as a UR.**
 * **Envelopes Can Be Signed.**
 * **Envelope Hashes Allow Data to Be Elided.**
