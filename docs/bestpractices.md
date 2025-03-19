@@ -33,7 +33,9 @@ The following best practices offer suggestions for those front-end and back-end 
 
 ## Key Migration
 
-***Use Account Abstractions.***
+***Use Account Abstractions.*** Some Zcash keys are based on system data, while others are HD keys derived from a seed. However, users of most wallets instead see keys grouped into accounts, which may contain related HD keys, unrelated system-randomness keys, or multiples of any of these. Since accounts represent a crucial usability tool for users to understand what is in their account and what it does, they should be preserved both through export and import, even if they represent an abstraction without any "real" meaning for how the keys relate.
+
+* _Example:_ [This was certainly our recommendation based on the data survey and meeting #1. I assume it's how things are being done in ZeWIF? If so, we can provide examples. If not, we can dump this.]
 
 ***Store Existing Assets As They Are, Usually.*** In the vast majority of cases, the migration process should happen without making any changes on the blockchain. This is not the time to do other clean-up, except in a few important cases. You want to preserve the data being imported as it is, because it was theoretically in a known, working state.
 
