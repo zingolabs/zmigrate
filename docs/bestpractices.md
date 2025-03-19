@@ -33,29 +33,32 @@ _Example:_ `zcashd`'s CKeyMetaData contains a seed fingerprint (uint256), a crea
 
 ## Key Migration
 
-***Migrate Existing Assets As They Are, Usually.***
+***Store Existing Assets As They Are, Usually.*** In the vast majority of cases, the migration process should happen without making any changes on the blockchain. This is not the time to do other clean-up, except in a few important cases. You want to preserve the data being imported as it is, because it was theoretically in a known, working state.
 
-***Migrate Sprout-Keyed Assets If Possible.***
+_Example:_ A user has lots of Zcash dust that can't be used effectively. Nonetheless, the keys controlling that dust should be converted over. The new wallet can decide if it wants to do anything with the issue.
 
-***Resolve Bugs If Possible.***
+***Resolve Bugs In Asset Control If Possible.*** If your wallet did something out of spec with the larger Zcash community and it affects the control of assets, this is important to resolve before exporting your data, because future wallets will not know about the variance from the specification and it could cause lost of funds. Spec variance is mostly likely to be a variance in how keys are derived from a seed or a master key, but there might be other issues. In these cases, move funds off of the out-of-spec keys or seeds (or whatever) before migrating the wallet file.
 
-Zecwallet-cli BIP39 derivation bug
-In v1.0 of zecwallet-cli, there was a bug that incorrectly derived HD wallet keys after the first key. That is, the first key, address was correct, but subsequent ones were not.
+_Example:_ `zecwallet-cli 1.0` incorrectly derived HD wallet keys after the first key, affecting both `t` and `z` addresses. Funds on addresses after the first should be moved prior to the migration of a `zecwallet-cli 1.o` wallet as future wallets won't know about these incorrectly derived keys, and thus will not be able to access the funds without knowing specifically how to derive them.
 
-The issue was that the 32-byte seed was directly being used to derive then subsequent addresses instead of the 64-byte pkdf2(seed). The issue affected both t and z addresses.
-
-Note that no funds are at risk. The issue is that, if in the future, you import the seed into a different wallet, you might not see all your addresses in the new wallet, so it's better to fix it now.
+***Migrate Sprout-Keyed Assets If Desired.***
 
 
+## Calculated Data
+
+***Store All Transactions Information.***
+
+***Store Almost All Witness Trees.***
+
+***Dump Incorrect Witness Trees.***
 
 ## Attachments
+
+***Store Undefined Data with Attachments.***
 
 ***Drop Wallet-Specific Configuration.***
 
 1. Can drop wallet specific stuff, like minversion
-
-***Store Undefined Data with Attachments.***
-
 ***Document Attachments Whenever Possible.***
 
 ways to define things better than bstring [blob]? 
@@ -82,6 +85,10 @@ can encrypt with encryption or SSKR [can be done with Envelope tool, not in spec
 Be clear that anything can be wrapped to elide, compress [e.g. large string, not random numbers] if space tight
 
 may want to differentiate between what would give to an auditor and to a wallet: might do as multiple attachments [privacy-breaking]
+
+## Reports
+
+***Report All Failures.***
 
 ```
 Deliverable # 3.4: A best practices document on importing & exporting data.
