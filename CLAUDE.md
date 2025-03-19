@@ -21,6 +21,13 @@
 - **File Structure**: Group related functionality in modules
 - **Traits**: Prefer trait implementations for extensible functionality
 
+## Important Basic Types
+
+- `Blob<N>`: A fixed-size byte array (wrapper around `[u8; N]`)
+- `Blob32`: Type alias for `Blob<32>`
+- `Data`: A variable-size byte array (wrapper around `Vec<u8>`)
+- `u256`: A 256-bit unsigned integer (wrapper around `Blob32`), assumes little-endian byte order so reverses on display.
+
 ### Coding Notes
 
 - Do *not* use the attachments feature yet. It will be used for wallet-specific data that is not part of the core Zewif interchange format, but which will be preserved by it.
@@ -40,13 +47,24 @@
 1. **Spending Keys Migration** ✅
    - Analysis: Spending keys are essential for wallet functionality but were not previously migrated.
    - Implementation:
-     - Added a `spending_key` field to `ShieldedAddress` to store the spending key information
+     - Enhanced the `SpendingKey` structure to use an explicit enum that properly captures all components:
+       - Core cryptographic components (using the appropriate `u256` type):
+         - `ask` (spending authorization key) - Enables transaction signing
+         - `nsk` (nullifier spending key) - Required for creating nullifiers to prevent double-spending
+         - `ovk` (outgoing viewing key) - Allows viewing outgoing transaction details
+       - Explicit ZIP-32 HD wallet derivation fields:
+         - `depth` - Depth in the HD hierarchy
+         - `parent_fingerprint` - Parent key fingerprint for derivation paths
+         - `child_index` - Index at current depth in the derivation path
+         - `chain_code` - Chain code for key derivation
+         - `dk` - Diversifier key for address generation
      - Created a lookup mechanism to find the corresponding `SaplingKey` for a given incoming viewing key
-     - Extracted and converted the spending key from the Zcashd format to the Zewif format
-     - Implemented proper serialization using the `ask` field as the primary component for simplicity
+     - Implemented direct field conversion without unnecessary type transformations
+     - Used consistent type representations (`u256` for key material) throughout the codebase
+     - Added backward compatibility through a Raw key format option
    - Future improvements:
-     - Implement full serialization of extended spending keys according to the ZCash protocol
-     - Consider handling other types of spending keys (Orchard, etc.)
+     - Add specialized handling for other key types (Orchard, etc.)
+     - Implement proper ZCash protocol serialization standards
 
 2. **Unified Accounts Migration**
    - Analyze: The `wallet.unified_accounts` structure contains critical information about HD account hierarchy.

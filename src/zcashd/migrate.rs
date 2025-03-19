@@ -132,20 +132,20 @@ fn find_sapling_key_for_ivk<'a>(
 fn convert_sapling_spending_key(
     key: &crate::sapling::SaplingExtendedSpendingKey,
 ) -> Result<zewif::SpendingKey> {
-    // For now, we'll create a simplified representation of the key
-    // In a real implementation, we would use proper ZCash serialization
-
-    // We'll use the expanded spending key's ask value as the primary component
-    // of our simplified spending key representation
-    let ask_bytes = key.expsk.ask.as_ref();
-
-    // Create a blob with the 32-byte array from the ask field
-    let mut key_bytes = [0u8; 32];
-    key_bytes.copy_from_slice(ask_bytes);
-
-    let blob = zewif::Blob::new(key_bytes);
-
-    Ok(zewif::SpendingKey(blob))
+    // Create the Sapling spending key with all components including HD parameters
+    // Since both structures use u256, we can directly clone them without conversion
+    let spending_key = zewif::SpendingKey::new_sapling_extended(
+        key.expsk.ask.clone(), 
+        key.expsk.nsk.clone(), 
+        key.expsk.ovk.clone(),
+        key.depth,
+        key.parent_fvk_tag,
+        key.child_index,
+        key.chain_code.clone(),
+        key.dk.clone()
+    );
+    
+    Ok(spending_key)
 }
 
 /// Convert ZCashd transactions to Zewif format
