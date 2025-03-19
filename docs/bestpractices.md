@@ -53,7 +53,7 @@ The following best practices offer suggestions for those front-end and back-end 
 
 * _Example:_ This is just a logistical reminder! You don't want to start your migration process, export your file, sweep funds, and then migrate a file that doesn't have the new sweep addresses!
 
-## Data Classes
+## Data Classes & Data Types
 
 ***[Export:] Store Data Not Included in the Spec.*** The ZeWIF project recognizes three classes of data: important data used in multiple wallets (class I); important data used by one or few wallets (class II); and unimportant data (class III). It only specifically covers class I data, which should include all data required for asset recovery. Class II data remains important, but because it's wallet-specific, it falls on individual wallet developers to decide which of their data is class II and store this data when migrating to ZeWIF. This is done by storing class II data in [attachments](attachments.md).
 
@@ -63,7 +63,7 @@ The following best practices offer suggestions for those front-end and back-end 
 
 * _Example:_ The `wallet.dat` file from `zcashd` is copied into the ZeWIF file as a blob and identified as the last step of the migraiton.
 
-### Wallet Specific Data
+### Wallet-Specific Data
 
 ***[Export:] Drop Wallet-Specific Configuration.*** Wallet-specific configuration is an example of class III data, as it's no longer needed when the data is removed from the wallet. It can be dropped as a result.
 
@@ -73,7 +73,7 @@ The following best practices offer suggestions for those front-end and back-end 
 
 * _Example:_ A ZeWIF file originated with `zcashd 6.1.0`. When data is exported from `zcashd`, the ZeWIF file is marked appropriately. That data is later imported into the Zingo! wallet, which correctly preserves the fact that the data was previously held by `zcashd`. When the data is later reexported from Zingo!, it's marked with `zingo` and `v1.12.1`. Both versions will be seen (and imported) by the next wallet the user chooses to use.
 
-## Calculated Data
+### Calculated & Downloaded Data
 
 ***[Export:] Store All Transactions Information.*** Different wallets store different information regarding transactions. Some of it is recoverable from the blockchain, some of it is not. Nonetheless, all transaction information should be stored, whether it's recoverable or not. Storing irrecoverable information is obviously a requirement. Storing recoverable information keeps the new wallet from having to look up information on the blockchain (which is a privacy concern, as noted below). Storing everything held by a wallet ensures that you don't make a mistake and accidently omit something because you thought it was recoverable and it was not.
 
@@ -83,15 +83,17 @@ The following best practices offer suggestions for those front-end and back-end 
 
 * _Example:_ `zcashd` does not store most of the recoverable transaction information, such as block heights, fees, prices, times, etc. This data should not be individually looked up by an importing wallet to fill in the data.
 
-***Store Almost All Witness Trees.***
+***[Export:] Store Almost All Witness Trees.*** Witness Trees are definitely recoverable, but they're a pain to calculate, so they should be stored as part of a ZeWIF file.
 
-***Dump Incorrect Witness Trees.***
-
-
+* _Example:_ Zingo! maintains Witness Trees in TxMap.WitnessTrees. This information should be preserved.
+  
+***[Import:] Dump Incorrect Witness Trees.*** Best practice is to recheck witness trees as they're being imported and to dump them if they're incorrect, so as to not incorporate corrupt data into the new wallet.
 
 ## Attachments
 
-***Store Undefined Data with Attachments.***
+***Store Undefined Data with Attachments.*** As noted above in ***Store Data Not Included in the Spec*** all data that is considered important should be exported. If data is not in the spec, it should be instead stored as an [attachment](attachments.md).
+
+* _Example:_ [an example of something that didn't make it into the ZeWIF spec, but which we still suggest storing.][which just might be a repeat of the above]
 
 ***Document Attachments Whenever Possible.***
 
