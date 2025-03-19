@@ -23,9 +23,13 @@ The following best practices offer suggestions for those front-end and back-end 
 
 ## The Core Format
 
-***Break Apart Composite Data.***
+***Use Defined CBOR Tags.*** If there is a ZeWIF-defined CBOR tag for a piece of data that is being migrated, that CBOR tag should be used, even if it requires converting the data type as part of the migration.
 
-***Use Defined CBOR Tags.***
+_Example:_ [an example of a CBOR and something from a wallet that should be stored in that format, especially if the wallet stores it with a different data type]
+
+***Break Apart Composite Data.*** If a single datum in a wallet contains several individual keys and values, they should be separated out before migrating them, even if they're related.
+
+_Example:_ `zcashd`'s CKeyMetaData contains a seed fingerprint (uint256), a creation date (UNIX timestamp), and an HD/ZIP-32 Keypath (string). Those datums should each be individually stored when migrated.
 
 ## Key Migration
 
