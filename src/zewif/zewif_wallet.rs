@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use bc_components::ARID;
 
-use crate::{impl_attachable, Network};
+use crate::{Network, impl_attachable};
 
 use super::{Account, Attachments, Identifiable, SeedMaterial};
 

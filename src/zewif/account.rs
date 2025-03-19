@@ -2,7 +2,7 @@ use std::collections::{HashMap, HashSet};
 
 use bc_components::ARID;
 
-use crate::{impl_attachable, TxId};
+use crate::{TxId, impl_attachable};
 
 use super::{Address, Attachments, OrchardSentOutput, SaplingSentOutput};
 

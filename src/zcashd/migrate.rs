@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use anyhow::Result;
 
 use crate::{
-    ProtocolAddress, TxId,
+    ProtocolAddress, SaplingIncomingViewingKey, TxId,
     zcashd::{self, ZcashdWallet},
     zewif::{self, ZewifTop, ZewifWallet},
 };
@@ -96,6 +96,14 @@ fn convert_sapling_addresses(wallet: &ZcashdWallet, account: &mut zewif::Account
         // Create a new ShieldedAddress
         let mut shielded_address = zewif::ShieldedAddress::new(address_str.clone());
         shielded_address.set_incoming_viewing_key(viewing_key.clone());
+
+        // Add spending key if available in sapling_keys
+        if let Some(sapling_key) = find_sapling_key_for_ivk(wallet, viewing_key) {
+            // Convert to Zewif spending key format
+            let spending_key = convert_sapling_spending_key(&sapling_key.key)?;
+            shielded_address.set_spending_key(spending_key);
+        }
+
         let protocol_address = zewif::ProtocolAddress::Shielded(shielded_address);
         let mut zewif_address = zewif::Address::new(protocol_address);
 
@@ -110,6 +118,34 @@ fn convert_sapling_addresses(wallet: &ZcashdWallet, account: &mut zewif::Account
     }
 
     Ok(())
+}
+
+/// Find a SaplingKey for a given incoming viewing key
+fn find_sapling_key_for_ivk<'a>(
+    wallet: &'a ZcashdWallet,
+    ivk: &SaplingIncomingViewingKey,
+) -> Option<&'a zcashd::SaplingKey> {
+    wallet.sapling_keys.0.get(ivk)
+}
+
+/// Convert ZCashd SaplingExtendedSpendingKey to Zewif SpendingKey
+fn convert_sapling_spending_key(
+    key: &crate::sapling::SaplingExtendedSpendingKey,
+) -> Result<zewif::SpendingKey> {
+    // For now, we'll create a simplified representation of the key
+    // In a real implementation, we would use proper ZCash serialization
+
+    // We'll use the expanded spending key's ask value as the primary component
+    // of our simplified spending key representation
+    let ask_bytes = key.expsk.ask.as_ref();
+
+    // Create a blob with the 32-byte array from the ask field
+    let mut key_bytes = [0u8; 32];
+    key_bytes.copy_from_slice(ask_bytes);
+
+    let blob = zewif::Blob::new(key_bytes);
+
+    Ok(zewif::SpendingKey(blob))
 }
 
 /// Convert ZCashd transactions to Zewif format

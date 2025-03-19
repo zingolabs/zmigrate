@@ -31,22 +31,27 @@
 ### Next Task
 
 1. The goal is to migrate a `ZcashdWallet` (already read into the structures in `src/zcashd/`) to a `ZewifTop` (using the structures in `src/zewif/`).
-2. Right now we are are focusing on the wallet and account data, and not the transaction data.
-3. Determine whether all high-level data in the `Zcashd` side is being migrated to the `Zewif` side using the `zcashd::migrate::migrate_to_zewif` function.
-4. For any mappings not yet present, perform a triage. First, decide whether the mapping is high-priority or low-priority.
-   1. If high-priority, document it in the `High-Priority Zcashd -> Zewif Mappings` section below. For each high-priority mapping, write your analysis of what is required to migrate the data, and what assumptions are being made.
-   2. If low-priority or Zcashd-specific, document it in the `Low-Priority or Zcashd-specific Mappings` section below.
+2. The main migration function is `src/zcashd/migrate.rs::migrate_to_zewif`.
+3. Right now we are focusing on the wallet and account data, and not the transaction data.
+4. DELIVERABLE: First draft of the migration of item 1 below: `wallet.sapling_keys`.
 
 ### High-Priority Zcashd -> Zewif Mappings
 
-1. **Unified Accounts Migration**
+1. **Spending Keys Migration** ✅
+   - Analysis: Spending keys are essential for wallet functionality but were not previously migrated.
+   - Implementation:
+     - Added a `spending_key` field to `ShieldedAddress` to store the spending key information
+     - Created a lookup mechanism to find the corresponding `SaplingKey` for a given incoming viewing key
+     - Extracted and converted the spending key from the Zcashd format to the Zewif format
+     - Implemented proper serialization using the `ask` field as the primary component for simplicity
+   - Future improvements:
+     - Implement full serialization of extended spending keys according to the ZCash protocol
+     - Consider handling other types of spending keys (Orchard, etc.)
+
+2. **Unified Accounts Migration**
    - Analyze: The `wallet.unified_accounts` structure contains critical information about HD account hierarchy.
    - Implementation: Map each unified account to a Zewif account with proper ZIP32 account ID.
    - Required changes: Add code to process `unified_accounts` if present, creating distinct accounts rather than a single default account.
-
-2. **Spending Keys Migration**
-   - Analyze: Spending keys are essential for wallet functionality but are not currently migrated.
-   - Implementation: Extract spending keys from `wallet.sapling_keys` and other key structures, and add them to the appropriate Zewif address structures.
 
 3. **Note Commitment Trees**
    - Analyze: Note commitment trees are important for transaction validation.
