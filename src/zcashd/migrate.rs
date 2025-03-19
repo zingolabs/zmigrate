@@ -34,7 +34,7 @@ pub fn migrate_to_zewif(wallet: &ZcashdWallet) -> Result<ZewifTop> {
     }
 
     // Create a complete Zewif wallet
-    let mut zewif_wallet = ZewifWallet::new();
+    let mut zewif_wallet = ZewifWallet::new(wallet.network());
 
     if let Some(seed_material) = seed_material {
         zewif_wallet.set_seed_material(seed_material);
@@ -75,6 +75,11 @@ fn convert_transparent_addresses(
         let mut zewif_address = zewif::Address::new(protocol_address);
         zewif_address.set_name(name.clone());
 
+        // Set purpose if available
+        if let Some(purpose) = wallet.address_purposes.get(zcashd_address) {
+            zewif_address.set_purpose(purpose.clone());
+        }
+
         // Add the address to the account with its string representation as key
         account.add_address(zewif_address);
     }
@@ -92,7 +97,13 @@ fn convert_sapling_addresses(wallet: &ZcashdWallet, account: &mut zewif::Account
         let mut shielded_address = zewif::ShieldedAddress::new(address_str.clone());
         shielded_address.set_incoming_viewing_key(viewing_key.clone());
         let protocol_address = zewif::ProtocolAddress::Shielded(shielded_address);
-        let zewif_address = zewif::Address::new(protocol_address);
+        let mut zewif_address = zewif::Address::new(protocol_address);
+
+        // Set purpose if available - convert to Address type for lookup
+        let zcashd_address = zcashd::Address(address_str.clone());
+        if let Some(purpose) = wallet.address_purposes.get(&zcashd_address) {
+            zewif_address.set_purpose(purpose.clone());
+        }
 
         // Add the address to the account with its string representation as key
         account.add_address(zewif_address);
@@ -118,7 +129,7 @@ fn convert_transaction(tx_id: TxId, tx: &zcashd::WalletTx) -> Result<zewif::Tran
     let zewif_tx = zewif::Transaction::new(tx_id);
 
     // TODO: Convert transaction details
-    
+
     Ok(zewif_tx)
 }
 

@@ -2,7 +2,7 @@
 
 use std::collections::HashMap;
 
-use crate::{Bip39Mnemonic, TxId, SaplingIncomingViewingKey};
+use crate::{Bip39Mnemonic, TxId, SaplingIncomingViewingKey, Network};
 
 use super::{
     Address, BlockLocator, ClientVersion, KeyPoolEntry, Keys, MnemonicHDChain, NetworkInfo,
@@ -36,7 +36,7 @@ pub struct ZcashdWallet {
 }
 
 impl ZcashdWallet {
-    pub fn network(&self) -> zcash_address::Network {
+    pub fn network(&self) -> Network {
         self.network_info.network()
     }
 }

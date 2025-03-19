@@ -1,8 +1,6 @@
-use anyhow::{bail, Result};
+use anyhow::Result;
 
-use zcash_address::Network;
-
-use crate::{parse, Parse, Parser};
+use crate::{network_for_identifier, parse, Network, Parse, Parser};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct NetworkInfo {
@@ -30,17 +28,5 @@ impl Parse for NetworkInfo {
         let (zcash, identifier): (String, String) = parse!(p, "(zcash, identifier)")?;
         let network = network_for_identifier(&identifier)?;
         Ok(Self { zcash, identifier, network })
-    }
-}
-
-pub fn network_for_identifier(identifier: &str) -> Result<Network> {
-    if identifier == "main" {
-        Ok(Network::Main)
-    } else if identifier == "test" {
-        Ok(Network::Test)
-    } else if identifier == "regtest" {
-        Ok(Network::Regtest)
-    } else {
-        bail!("Invalid network identifier: {}", identifier)
     }
 }

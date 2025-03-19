@@ -39,4 +39,32 @@
 
 ### High-Priority Zcashd -> Zewif Mappings
 
+1. **Unified Accounts Migration**
+   - Analyze: The `wallet.unified_accounts` structure contains critical information about HD account hierarchy.
+   - Implementation: Map each unified account to a Zewif account with proper ZIP32 account ID.
+   - Required changes: Add code to process `unified_accounts` if present, creating distinct accounts rather than a single default account.
+
+2. **Spending Keys Migration**
+   - Analyze: Spending keys are essential for wallet functionality but are not currently migrated.
+   - Implementation: Extract spending keys from `wallet.sapling_keys` and other key structures, and add them to the appropriate Zewif address structures.
+
+3. **Note Commitment Trees**
+   - Analyze: Note commitment trees are important for transaction validation.
+   - Implementation: Migrate the Orchard note commitment tree to appropriate Zewif structures.
+
 ### Low-Priority or Zcashd-specific Mappings
+
+1. **KeyPool Information**
+   - The `wallet.key_pool` is Zcashd-specific and likely not needed in a generic interchange format.
+
+2. **Client Version Information**
+   - The `wallet.client_version` and `wallet.min_version` are Zcashd implementation details.
+
+3. **Block Locator**
+   - The `wallet.bestblock` and `wallet.bestblock_nomerkle` are chain-specific sync data.
+
+4. **OrderPosNext**
+   - The `wallet.orderposnext` is an internal Zcashd ordering mechanism.
+
+5. **WitnessCacheSize**
+   - The `wallet.witnesscachesize` is an implementation detail of Zcashd.

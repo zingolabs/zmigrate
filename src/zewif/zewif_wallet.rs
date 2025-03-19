@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use bc_components::ARID;
 
-use crate::impl_attachable;
+use crate::{impl_attachable, Network};
 
 use super::{Account, Attachments, Identifiable, SeedMaterial};
 
@@ -15,6 +15,7 @@ use super::{Account, Attachments, Identifiable, SeedMaterial};
 #[derive(Debug, Clone)]
 pub struct ZewifWallet {
     id: ARID,
+    network: Network,
     seed_material: Option<SeedMaterial>,
     accounts: HashMap<ARID, Account>,
     attachments: Attachments,
@@ -29,13 +30,18 @@ impl Identifiable for ZewifWallet {
 impl_attachable!(ZewifWallet);
 
 impl ZewifWallet {
-    pub fn new() -> Self {
+    pub fn new(network: Network) -> Self {
         Self {
             id: ARID::new(),
+            network,
             seed_material: None,
             accounts: HashMap::new(),
             attachments: Attachments::new(),
         }
+    }
+
+    pub fn network(&self) -> Network {
+        self.network
     }
 
     pub fn seed_material(&self) -> Option<&SeedMaterial> {
@@ -52,11 +58,5 @@ impl ZewifWallet {
 
     pub fn add_account(&mut self, account: Account) {
         self.accounts.insert(account.id().clone(), account);
-    }
-}
-
-impl Default for ZewifWallet {
-    fn default() -> Self {
-        Self::new()
     }
 }

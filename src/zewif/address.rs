@@ -5,6 +5,7 @@ use super::{Attachments, ShieldedAddress, TransparentAddress};
 #[derive(Debug, Clone)]
 pub struct Address {
     name: String,
+    purpose: Option<String>,
     address: ProtocolAddress,
     attachments: Attachments,
 }
@@ -15,6 +16,7 @@ impl Address {
     pub fn new(address: ProtocolAddress) -> Self {
         Self {
             name: String::default(),
+            purpose: None,
             address,
             attachments: Attachments::new(),
         }
@@ -22,6 +24,14 @@ impl Address {
 
     pub fn name(&self) -> &str {
         &self.name
+    }
+
+    pub fn purpose(&self) -> Option<&str> {
+        self.purpose.as_deref()
+    }
+
+    pub fn set_purpose(&mut self, purpose: String) {
+        self.purpose = Some(purpose);
     }
 
     pub fn as_string(&self) -> String {

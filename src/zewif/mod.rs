@@ -36,6 +36,8 @@ mod join_split_description;
 pub use join_split_description::*;
 mod mnemonic_language;
 pub use mnemonic_language::*;
+mod network;
+pub use network::*;
 mod orchard_action_description;
 pub use orchard_action_description::*;
 mod orchard_sent_output;

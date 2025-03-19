@@ -106,3 +106,9 @@ impl Account {
         self.orchard_sent_outputs.push(output);
     }
 }
+
+impl Default for Account {
+    fn default() -> Self {
+        Self::new()
+    }
+}
