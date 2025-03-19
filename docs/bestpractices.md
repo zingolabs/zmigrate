@@ -53,6 +53,26 @@ The following best practices offer suggestions for those front-end and back-end 
 
 * _Example:_ This is just a logistical reminder! You don't want to start your migration process, export your file, sweep funds, and then migrate a file that doesn't have the new sweep addresses!
 
+## Data Classes
+
+***[Export:] Store Data Not Included in the Spec.*** The ZeWIF project recognizes three classes of data: important data used in multiple wallets (class I); important data used by one or few wallets (class II); and unimportant data (class III). It only specifically covers class I data, which should include all data required for asset recovery. Class II data remains important, but because it's wallet-specific, it falls on individual wallet developers to decide which of their data is class II and store this data when migrating to ZeWIF. This is done by storing class II data in [attachments](attachments.md).
+
+* _Example:_ [an example of something that didn't make it into the ZeWIF spec, but which we still suggest storing.]
+
+***[Export:] Store the Entire Data Set.*** After migrating all the discrete data elements into ZeWIF, the complete wallet file should be stored as a separate [attachment](attachments.md), to ensure that nothing is lost, not even class III data. The `vendor` should be defined with a reverse of the main domain name for the wallet publisher and the `conformsTo` should be set to the best specification for the wallet or if that does not exist the central marketing page for the wallet. [[This should probably be part of the spec, and it may need to be rewritten based on what's there.]]
+
+* _Example:_ The `wallet.dat` file from `zcashd` is copied into the ZeWIF file as a blob and identified as the last step of the migraiton.
+
+### Wallet Specific Data
+
+***[Export:] Drop Wallet-Specific Configuration.*** Wallet-specific configuration is an example of class III data, as it's no longer needed when the data is removed from the wallet. It can be dropped as a result.
+
+* _Example:_ Zecwallet stores a spam threshold and a memo download option in its `WalletOptions`. These can be ignored when migrating a Zcash wallet.
+
+***[All:] Store the Wallet Version.*** Despite being wallet-specific information, the wallet name and wallet version should be always be added to ZeWIF as metadata, _supplementing_ (not replacing) any wallet name and version already connected to the file. This creates a provenance chain for the ZeWIF file, identifying all wallets where the data has been used and allowing future users to debug issues that might have originated with a specific wallet. [[This should probably be in the spec too, and this best practice should be edited when it's there.]] To ensure this provenance chain, wallets importing ZeWIF data should also store information on any previous wallets, so that it can be re-exported as part of that chain.
+
+* _Example:_ A ZeWIF file originated with `zcashd 6.1.0`. When data is exported from `zcashd`, the ZeWIF file is marked appropriately. That data is later imported into the Zingo! wallet, which correctly preserves the fact that the data was previously held by `zcashd`. When the data is later reexported from Zingo!, it's marked with `zingo` and `v1.12.1`. Both versions will be seen (and imported) by the next wallet the user chooses to use.
+
 ## Calculated Data
 
 ***[Export:] Store All Transactions Information.*** Different wallets store different information regarding transactions. Some of it is recoverable from the blockchain, some of it is not. Nonetheless, all transaction information should be stored, whether it's recoverable or not. Storing irrecoverable information is obviously a requirement. Storing recoverable information keeps the new wallet from having to look up information on the blockchain (which is a privacy concern, as noted below). Storing everything held by a wallet ensures that you don't make a mistake and accidently omit something because you thought it was recoverable and it was not.
@@ -67,19 +87,17 @@ The following best practices offer suggestions for those front-end and back-end 
 
 ***Dump Incorrect Witness Trees.***
 
+
+
 ## Attachments
 
 ***Store Undefined Data with Attachments.***
 
-***Drop Wallet-Specific Configuration.***
-
-1. Can drop wallet specific stuff, like minversion
 ***Document Attachments Whenever Possible.***
 
 ways to define things better than bstring [blob]? 
 [+metadata, date, etc.]
 
-***Store the Entire Data Set.***
 
 ## Encryption
 
