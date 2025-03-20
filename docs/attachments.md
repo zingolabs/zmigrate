@@ -120,7 +120,19 @@ This feature is a crucial element of an attachment.
 
 ## Attachments Technical Overview
 
-Attachments are fully described in [BCR-2023-006](https://github.com/BlockchainCommons/Research/blob/master/papers/bcr-2023-006-envelope-attachment.md). 
+Attachments are fully described in [BCR-2023-006](https://github.com/BlockchainCommons/Research/blob/master/papers/bcr-2023-006-envelope-attachment.md). It makes use of Envelope wrapping (described above) and of [known values](https://github.com/BlockchainCommons/Research/blob/master/papers/bcr-2023-002-known-value.md), which are unique unsigned 64-bit integers that are registered with Blockchain Commons and used to refer to specific, repeating concepts in a precise, compact way. They are encoded in CBOR with the `#6.40000` tag. 
+
+* An attachment is an assertion in an envelope, meaning that it contains a predicate and an object.
+* The predicate of an attachment is known value #50, which is registered as `attachment`.
+* The object of an attachment is the payload of attachment data.
+
+When creating a payload for a ZeWIF attachment you might simply dump in the otherwise unspecified data as a binary blob, matching whatever format the data was held in in the originating wallet. It's better to simplify and standardize it as much as possible as discussed in the [ZeWIF best practices](https://github.com/BlockchainCommons/zmigrate/blob/master/docs/bestpractices.md#attachments). Because an object can be a full Envelope, it's also possible to create an entire recursive data structure as the object of an attachment. As always, your guide should be what is the most accessible: in what format is the data most likely to be recovered by someone in the future?
+
+* Once an attachment has been created, the Envelope is wrapped, turning it into the subject of a new Envelope.
+* A `vendor` assertion must be added. This is a predicate of known value #51 with the object of a string for the vendor name.
+* A `conformsTo` assertion may be added. (It's [highly suggested](https://github.com/BlockchainCommons/zmigrate/blob/master/docs/bestpractices.md#attachments)) for ZeWIF attachments.) This is a predicate of known value #52 with the object being a string that identifies the format of the attachment.
+ 
+That's it! You have an attachment! You should create them for all of the data in your wallet that is not defined by the ZeWIF spec.
 
 ### Defining `vendor` and `conformsTo`
 
