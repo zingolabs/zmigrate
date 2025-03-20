@@ -33,7 +33,7 @@ Nonetheless, the following major points are useful as an overview for ZeWIF stor
 ```mermaid
 graph LR
     1("node")
-    2["subect"]
+    2["subject"]
     3["assertion"]
     4["predicate"]
     5["object"]
@@ -54,7 +54,7 @@ graph LR
 ```mermaid
 graph LR
     1("node")
-    2["subect"]
+    2["subject"]
     3["assertion"]
     4["predicate"]
     5["object"]
@@ -89,7 +89,7 @@ A "wrapped" envelope is an Envelope that has been turned into a subject for a ne
 ```mermaid
 graph LR
     1["node"]
-    2["subect"]
+    2["subject"]
     3["assertion"]
     4["predicate"]
     5["object"]
@@ -103,10 +103,10 @@ graph LR
     W5["object"]
 
     W1 --> W2
-    W2 --> 2
+    W2 --> 1
     W1 --> W3
     W3 --> W4
-    W4 --> W5
+    W3 --> W5
     1 --> 2
     1 --> 3
     3 --> 4
