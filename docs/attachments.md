@@ -148,12 +148,60 @@ Your `conformsTo` should be versioned so that a user or importer can look up the
 
 Other assertions can be added to the wrapped Envelope. This might include notes about the contents, warnings, or even instructions for their use to supplement the `conformsTo` information. Anything that might be helpful to later recovery of the data should be considered for addition.
 
-## Encoding a Standard Attachment
+[[It looks like this may not be possible in current version because `add_attachment` only allows conformsTo and vendor? Need to update and refer it for the future if so.]]
 
-## Encoding a Freeform Attachment
+## Encoding an Attachment
 
-## Encoding a Data File
+Attachments are defined in `zewif/attachments.rs`. 
 
+Attachments can be added with the `add_attachment` function, which has arguments of an Envelope payload, a string `vendor`, and an optional string `conforms_to`.
+
+[[example]]
+
+### Encoding a Standard Attachment
+
+Some standardized data structures in ZeWIF contain spaces for attachments. This example shows how an attachment is incorporated into the `Account` while in memory:
+```
+pub struct Account {
+    id: ARID,
+    name: String, // May not be unique.
+    zip32_account_id: Option<u32>,
+    addresses: HashMap<String, Address>,
+    relevant_transactions: HashSet<TxId>, // Subset of the global transaction history.
+    // The following are intended for storage of information that may not be
+    // recoverable from the chain.
+    sapling_sent_outputs: Vec<SaplingSentOutput>,
+    orchard_sent_outputs: Vec<OrchardSentOutput>,
+    attachments: HashMap<Digest, Envelope>,
+}
+```
+The hashmap allows for a number of attachments to be added to this standard data structure, each of which is intended to hold metadata related to the Account.
+
+When output as ZeWIF, the attachment will then be part of that branch of the data tree.
+```
+[EXAMPLE OF ZeWIF OUTPUT]
+```
+An attachment can be added to a standard data structure as follows:
+```
+[example]
+```
+
+### Encoding a Freeform Attachment
+
+Additional data that does not have a defined space for it can be added an attachment to the overall envelope.
+```
+[envelope]
+````
+
+### Encoding a Data File
+
+Finally, the overall data file for the previous wallet should be stored as an attachment. This can be done as follows
+```
+[envelope]
+```
+As always, ensure the `conformsTo` points to a place that has a good specification for the data format.
+
+The biggest challenge here may actually be converting the data file into a serialiazable format. Though this will be trivial for a flat file, database driven wallets will likely need to dump a number of tables in a way that is meaningfully readable.
 
 
 
