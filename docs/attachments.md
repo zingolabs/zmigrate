@@ -28,7 +28,7 @@ Nonetheless, the following major points are useful as an overview for ZeWIF stor
 
 * **Envelope Uses CBOR.** Envelope is built using CBOR, a [well-specified](https://cbor.io/) and mature binary data representation format. Every Envelope is not only [legal CBOR](https://datatracker.ietf.org/doc/html/rfc8949), but also [legal dCBOR](https://datatracker.ietf.org/doc/draft-mcnally-deterministic-cbor/), a deterministic version of CBOR. Every Envelope, and therefore every ZeWIF file, can be read using CBOR tools such as [cbor.me](https://cbor.me/). (But don't read ZeWIF files containing private keys in an online site!)
 * **Envelope Stores Data in a Merkle-Like Tree.** Envelope is a branching hierarchical structure. Central nodes lead to multiple branches and eventually to leaves. This allows for the organized storage of data. The tree is Merkle-like because branches can be hashed and that hash can be stored in a store to prove that data that lies under it (which may not be relevant for the first iteration of ZeWIF, but which allows for powerful elision and signatures).
-* **Envelope is Built on Semantic Triples.** Data is stored in an Envelope as a sematic triple of subject-predicate-object. Each predicate-object pair is called an assertion. A node connects together a subject and zero or more assertions about that subject. 
+* **Envelope is Built on Semantic Triples.** Data is stored in an Envelope as a sematic triple of subject-predicate-object. Each predicate-object pair is called an assertion. It applies to a subject. A node connects together a subject and zero or more assertions about that subject. 
 
 ```mermaid
 graph LR
@@ -81,8 +81,46 @@ graph LR
 * **Envelope Can Be Stored as a UR.** Blockchain Commons [Uniform Resources (UR) format](https://developer.blockchaincommons.com/ur/) supports the text encoding of CBOR data. It can be used to store a ZeWIF Envelope file and to encode it as a QR or an [Animated QR](https://developer.blockchaincommons.com/animated-qrs/). This can resolve issues of storage and transmission.
 * **Envelopes Can Be Signed.** Envelopes can be "wrapped" and then signed. This is not currently supported by zmigrate, but could be used in the future to guarantee the authenticity of ZeWIF file.
 * **Envelope Hashes Allow Data to Be Elided.** Some or all data in an Envelope can be elided. Hashes remain allowing for proof of content and proof signature. This is another Envelope feature not currently supported by zmigrate, but that might have future usefulness.
- 
+
+### Wrapped Envelopes
+
+A "wrapped" envelope is an Envelope that has been turned into a subject for a new envelope. This allows assertions to refer to the entire content of the envelope.
+
+```mermaid
+graph LR
+    1["node"]
+    2["subect"]
+    3["assertion"]
+    4["predicate"]
+    5["object"]
+    6["assertion"]
+    7["predicate"]
+    8["object"]
+    W1["node"]
+    W2["wrapped (subject)"]
+    W3["assertion"]
+    W4["predicate"]
+    W5["object"]
+
+    W1 --> W2
+    W2 --> 2
+    W1 --> W3
+    W3 --> W4
+    W4 --> W5
+    1 --> 2
+    1 --> 3
+    3 --> 4
+    3 --> 5
+    1 --> 6
+    6 --> 7
+    6 --> 8
+```
+
+This feature is a crucial element of an attachment.
+
 ## Attachments Technical Overview
+
+Attachments are fully described in [BCR-2023-006](https://github.com/BlockchainCommons/Research/blob/master/papers/bcr-2023-006-envelope-attachment.md). 
 
 ### Defining `vendor` and `conformsTo`
 
