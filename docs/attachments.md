@@ -190,22 +190,15 @@ An attachment can be added to a standard data structure as follows:
 
 Additional data that does not have a defined space for it can be added an attachment to the overall envelope.
 ```
-[envelope]
+[example]
 ````
 
 ### Encoding a Data File
 
 Finally, the overall data file for the previous wallet should be stored as an attachment. This can be done as follows
 ```
-[envelope]
+[example]
 ```
 As always, ensure the `conformsTo` points to a place that has a good specification for the data format.
 
 The biggest challenge here may actually be converting the data file into a serialiazable format. Though this will be trivial for a flat file, database driven wallets will likely need to dump a number of tables in a way that is meaningfully readable.
-
-
-
-
-```
-Deliverable # 2.2: A developer's how-to document describing the use of Envelope attachments for data not included in basic interchange format.
-```
