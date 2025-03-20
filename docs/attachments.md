@@ -136,7 +136,15 @@ That's it! You have an attachment! You should create them for all of the data in
 
 ### Defining `vendor` and `conformsTo`
 
+**`vendor`** must be a unique name identifying the vendor of the wallet. It's suggested as a reverse domain name, such as `org.zingolabs`. 
+
+**`conformsTo`** is not required, but it is highly recommended, especially for ZeWIF data, since it's crucial that it be understandable in the far future. It's recommended as a URL that contains the specification describing what the data is and how it's encoded. By storing this info at a URL, you can sure it's recoverable in the far future. Even if your site is gone, archive.org or like services may have a copy.
+
 ### Versioning `conformsTo`
+
+Your `conformsTo` should be versioned so that a user or importer can look up the precise version that data was encoded with. One way to do so is to ensure that the URL referred to in `conformsTo` includes a version, with different versions going to different URLs. Another way is to add a `conformsAt` predicate with a UNIX time object, which will allow for the lookup of a specific version of the `conformsTo` URL using a service such as archive.org. 
+
+### Adding Other Metadata
 
 ## Encoding a Standard Attachment
 
