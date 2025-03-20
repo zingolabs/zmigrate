@@ -142,9 +142,11 @@ That's it! You have an attachment! You should create them for all of the data in
 
 ### Versioning `conformsTo`
 
-Your `conformsTo` should be versioned so that a user or importer can look up the precise version that data was encoded with. One way to do so is to ensure that the URL referred to in `conformsTo` includes a version, with different versions going to different URLs. Another way is to add a `conformsAt` predicate with a UNIX time object, which will allow for the lookup of a specific version of the `conformsTo` URL using a service such as archive.org. 
+Your `conformsTo` should be versioned so that a user or importer can look up the precise version that data was encoded with. One way to do so is to ensure that the URL referred to in `conformsTo` includes a version, with different versions going to different URLs. Another way is to add a `date` predicate (known value #16) with a [ISO-8601 derived W3C data format](https://www.w3.org/TR/NOTE-datetime), which will allow for the lookup of a specific version of the `conformsTo` URL using a service such as archive.org. 
 
 ### Adding Other Metadata
+
+Other assertions can be added to the wrapped Envelope. This might include notes about the contents, warnings, or even instructions for their use to supplement the `conformsTo` information. Anything that might be helpful to later recovery of the data should be considered for addition.
 
 ## Encoding a Standard Attachment
 
