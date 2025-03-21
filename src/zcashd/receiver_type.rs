@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use crate::{parse, CompactSize, Parse, Parser};
+use crate::{CompactSize, Parse, Parser, parse};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[repr(u8)]

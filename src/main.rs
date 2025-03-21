@@ -1,16 +1,24 @@
-mod bdb_dump; pub use bdb_dump::*;
-mod digest_utils; pub use digest_utils::*;
-mod exec; pub use exec::*;
-mod file_args; pub use file_args::*;
+mod bdb_dump;
+pub use bdb_dump::*;
+mod digest_utils;
+pub use digest_utils::*;
+mod exec;
+pub use exec::*;
+mod file_args;
+pub use file_args::*;
 mod parse_macro;
-mod parser; pub use parser::*;
-mod parsing; pub use parsing::*;
+mod parser;
+pub use parser::*;
+mod parsing;
+pub use parsing::*;
 mod sapling;
-mod string_utils; pub use string_utils::*;
+mod string_utils;
+pub use string_utils::*;
 mod styles;
 mod zcashd;
+mod zewif;
 mod zingo;
-mod zewif; pub use zewif::*;
+pub use zewif::*;
 
 use clap::{Parser as ClapParser, Subcommand};
 

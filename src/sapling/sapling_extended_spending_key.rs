@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use crate::{parse, u256, Parse, Parser};
+use crate::{Parse, Parser, parse, u256};
 
 use super::SaplingExpandedSpendingKey;
 

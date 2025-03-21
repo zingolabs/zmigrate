@@ -5,8 +5,8 @@ use clap::Args;
 use std::fmt::Write;
 
 use crate::{
-    file_args::{FileArgs, FileArgsLike},
     BDBDump,
+    file_args::{FileArgs, FileArgsLike},
 };
 
 use super::{ZcashdDump, ZcashdParser};

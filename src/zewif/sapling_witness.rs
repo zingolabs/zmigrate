@@ -1,4 +1,3 @@
-
 use crate::u256;
 
 use super::IncrementalWitness;

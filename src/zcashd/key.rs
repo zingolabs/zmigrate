@@ -1,6 +1,6 @@
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 
-use crate::{hash256, Data};
+use crate::{Data, hash256};
 
 use super::{KeyMetadata, PrivKey, PubKey};
 

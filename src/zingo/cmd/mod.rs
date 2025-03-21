@@ -3,7 +3,10 @@ use std::path::PathBuf;
 use anyhow::Result;
 use clap::Args;
 
-use crate::{file_args::{FileArgs, FileArgsLike}, Data};
+use crate::{
+    Data,
+    file_args::{FileArgs, FileArgsLike},
+};
 
 use super::ZingoParser;
 

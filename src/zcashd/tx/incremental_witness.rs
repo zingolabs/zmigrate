@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use crate::{parse, IncrementalWitness, Parse, Parser};
+use crate::{IncrementalWitness, Parse, Parser, parse};
 
 impl<const DEPTH: usize, Hash: Parse> Parse for IncrementalWitness<DEPTH, Hash> {
     fn parse(p: &mut Parser) -> Result<Self> {

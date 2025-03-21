@@ -1,5 +1,5 @@
-use anyhow::Result;
 use crate::{Parse, Parser};
+use anyhow::Result;
 
 pub type TxId = zcash_primitives::transaction::TxId;
 

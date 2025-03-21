@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use crate::{parse, u256, Parse, Parser, SproutWitness};
+use crate::{Parse, Parser, SproutWitness, parse, u256};
 
 use super::SproutPaymentAddress;
 

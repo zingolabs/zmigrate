@@ -1,6 +1,6 @@
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 
-use crate::{parse, Parse, Parser};
+use crate::{Parse, Parser, parse};
 
 #[derive(Clone, Copy, PartialEq)]
 pub enum MnemonicLanguage {

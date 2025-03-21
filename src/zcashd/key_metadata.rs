@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use crate::{parse, Blob32, Parse, Parser, SecondsSinceEpoch};
+use crate::{Blob32, Parse, Parser, SecondsSinceEpoch, parse};
 
 const VERSION_WITH_HDDATA: i32 = 10;
 #[derive(Debug, Clone, PartialEq)]

@@ -1,14 +1,21 @@
 use std::io::{self, ErrorKind, Read};
 
-use anyhow::{Result, bail, Context};
+use anyhow::{Context, Result, bail};
 use bip0039::Mnemonic;
 use byteorder::{LittleEndian, ReadBytesExt};
 use zcash_client_backend::proto::service::TreeState;
 use zcash_encoding::{Optional, Vector};
 use zcash_protocol::consensus::BlockHeight;
-use zingolib::{config::{ZingoConfig, ZingoConfigBuilder}, wallet::{data::{BlockData, WalletZecPriceInfo}, tx_map::TxMap, WalletOptions}};
+use zingolib::{
+    config::{ZingoConfig, ZingoConfigBuilder},
+    wallet::{
+        WalletOptions,
+        data::{BlockData, WalletZecPriceInfo},
+        tx_map::TxMap,
+    },
+};
 
-use crate::{parse, parse_string, Data, Parser};
+use crate::{Data, Parser, parse, parse_string};
 
 use super::{WalletCapability, ZingoWallet};
 
@@ -44,9 +51,14 @@ impl<'a> ZingoParser<'a> {
             );
         }
 
-        let wallet_capability = parse!(p, WalletCapability, param = config.chain, "wallet_capability")?;
-        let mut blocks = Vector::read(&mut *p, |r| BlockData::read(r))
-            .with_context(|| "BlockData")?;
+        let wallet_capability = parse!(
+            p,
+            WalletCapability,
+            param = config.chain,
+            "wallet_capability"
+        )?;
+        let mut blocks =
+            Vector::read(&mut *p, |r| BlockData::read(r)).with_context(|| "BlockData")?;
         if external_version <= 14 {
             // Reverse the order, since after version 20, we need highest-block-first
             // TODO: Consider order between 14 and 20.
@@ -54,11 +66,9 @@ impl<'a> ZingoParser<'a> {
         }
 
         let transactions = if external_version <= 14 {
-            TxMap::read_old(&mut *p, &wallet_capability.0)
-                .with_context(|| "TxMap old")
+            TxMap::read_old(&mut *p, &wallet_capability.0).with_context(|| "TxMap old")
         } else {
-            TxMap::read(&mut *p, &wallet_capability.0)
-                .with_context(|| "TxMap")
+            TxMap::read(&mut *p, &wallet_capability.0).with_context(|| "TxMap")
         }?;
 
         let chain_name = parse_string::<u64>(&mut *p)?;
@@ -66,8 +76,7 @@ impl<'a> ZingoParser<'a> {
         let wallet_options = if external_version <= 23 {
             WalletOptions::default()
         } else {
-            WalletOptions::read(&mut *p)
-                .with_context(|| "WalletOptions")?
+            WalletOptions::read(&mut *p).with_context(|| "WalletOptions")?
         };
 
         // let birthday = p.read_u64::<LittleEndian>()?;

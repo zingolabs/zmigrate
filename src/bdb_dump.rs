@@ -1,6 +1,10 @@
-use std::{ collections::HashMap, path::Path, process::{ Command, Stdio } };
+use std::{
+    collections::HashMap,
+    path::Path,
+    process::{Command, Stdio},
+};
 
-use anyhow::{ Result, bail, anyhow };
+use anyhow::{Result, anyhow, bail};
 
 use crate::Data;
 
@@ -95,9 +99,6 @@ impl BDBDump {
             bail!("Warning: Non-uniqueness in keys detected.");
         }
 
-        Ok(BDBDump {
-            header_records,
-            data_records,
-        })
+        Ok(BDBDump { header_records, data_records })
     }
 }

@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 
-use crate::{parse, CompactSize, Parse, ParseWithParam, Parser};
+use crate::{CompactSize, Parse, ParseWithParam, Parser, parse};
 
 pub fn parse_pair<T: Parse, U: Parse>(p: &mut Parser) -> Result<(T, U)> {
     let first = parse!(p, "first item of pair")?;
@@ -31,7 +31,11 @@ pub fn parse_fixed_length_vec_with_param<T: ParseWithParam<U>, U: Clone>(
 ) -> Result<Vec<T>> {
     let mut items = Vec::with_capacity(length);
     for i in 0..length {
-        items.push(parse!(p, param = param.clone(), format!("array item {} of {}", i, length - 1))?);
+        items.push(parse!(
+            p,
+            param = param.clone(),
+            format!("array item {} of {}", i, length - 1)
+        )?);
     }
     Ok(items)
 }

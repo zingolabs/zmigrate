@@ -1,5 +1,5 @@
-use clap::Args;
 use anyhow::Result;
+use clap::Args;
 use std::{io::Read, path::PathBuf};
 
 use crate::Data;

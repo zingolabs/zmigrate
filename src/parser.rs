@@ -1,11 +1,16 @@
-use anyhow::{ Result, bail };
+use anyhow::{Result, bail};
 
 use crate::Data;
 
 pub trait Parse {
-    fn parse(p: &mut Parser) -> Result<Self> where Self: Sized;
+    fn parse(p: &mut Parser) -> Result<Self>
+    where
+        Self: Sized;
 
-    fn parse_buf(buf: &dyn AsRef<[u8]>, trace: bool) -> Result<Self> where Self: Sized {
+    fn parse_buf(buf: &dyn AsRef<[u8]>, trace: bool) -> Result<Self>
+    where
+        Self: Sized,
+    {
         let mut p = Parser::new(&buf);
         p.set_trace(trace);
         let result = Self::parse(&mut p)?;
@@ -15,9 +20,14 @@ pub trait Parse {
 }
 
 pub trait ParseWithParam<P> {
-    fn parse(p: &mut Parser, param: P) -> Result<Self> where Self: Sized;
+    fn parse(p: &mut Parser, param: P) -> Result<Self>
+    where
+        Self: Sized;
 
-    fn parse_buf(buf: &dyn AsRef<[u8]>, param: P, trace: bool) -> Result<Self> where Self: Sized {
+    fn parse_buf(buf: &dyn AsRef<[u8]>, param: P, trace: bool) -> Result<Self>
+    where
+        Self: Sized,
+    {
         let mut p = Parser::new(&buf);
         p.set_trace(trace);
         let result = Self::parse(&mut p, param)?;
@@ -44,11 +54,7 @@ impl std::fmt::Debug for Parser<'_> {
 
 impl<'a> Parser<'a> {
     pub fn new(buffer: &'a dyn AsRef<[u8]>) -> Self {
-        Self {
-            buffer: buffer.as_ref(),
-            offset: 0,
-            trace: false,
-        }
+        Self { buffer: buffer.as_ref(), offset: 0, trace: false }
     }
 
     pub fn len(&self) -> usize {
@@ -72,12 +78,23 @@ impl<'a> Parser<'a> {
 
     pub fn next(&mut self, n: usize) -> Result<&'a [u8]> {
         if self.offset + n > self.buffer.len() {
-            bail!("Buffer underflow at offset {}, needed {} bytes, only {} remaining", self.offset, n, self.remaining());
+            bail!(
+                "Buffer underflow at offset {}, needed {} bytes, only {} remaining",
+                self.offset,
+                n,
+                self.remaining()
+            );
         }
         let bytes = &self.buffer[self.offset..self.offset + n];
         self.offset += n;
         if self.trace {
-            println!("\t🟢 next({}): {:?} remaining: {} peek: {:?}", n, hex::encode(bytes), self.remaining(), hex::encode(self.peek(100)));
+            println!(
+                "\t🟢 next({}): {:?} remaining: {} peek: {:?}",
+                n,
+                hex::encode(bytes),
+                self.remaining(),
+                hex::encode(self.peek(100))
+            );
         }
         Ok(bytes)
     }

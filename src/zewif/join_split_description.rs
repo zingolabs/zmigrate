@@ -1,4 +1,4 @@
-use crate::{impl_attachable, u256, Data};
+use crate::{Data, impl_attachable, u256};
 
 use super::{Anchor, Attachments};
 

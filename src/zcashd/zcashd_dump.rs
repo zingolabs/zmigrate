@@ -1,9 +1,9 @@
 use std::collections::{HashMap, HashSet};
 use std::fmt::Write;
 
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 
-use crate::{parse, BDBDump, Data, Parser};
+use crate::{BDBDump, Data, Parser, parse};
 
 #[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct DBKey {

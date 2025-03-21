@@ -1,6 +1,6 @@
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 
-use crate::{parse, u256, CompactSize, Data, Parse, Parser};
+use crate::{CompactSize, Data, Parse, Parser, parse, u256};
 
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct PrivKey {

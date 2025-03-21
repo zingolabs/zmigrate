@@ -431,8 +431,7 @@ impl<'a> ZcashdParser<'a> {
             .record_for_keyname("mnemonicphrase")
             .context("Getting 'mnemonicphrase' record")?;
         let fingerprint = parse!(buf = &key.data, u256, "seed fingerprint")?;
-        let mut bip39_mnemonic =
-            parse!(buf = &value, Bip39Mnemonic, "mnemonic phrase")?;
+        let mut bip39_mnemonic = parse!(buf = &value, Bip39Mnemonic, "mnemonic phrase")?;
         bip39_mnemonic.set_fingerprint(fingerprint);
         self.mark_key_parsed(&key);
         Ok(bip39_mnemonic)

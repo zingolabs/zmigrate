@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use crate::{parse, Amount, Parse, Parser};
+use crate::{Amount, Parse, Parser, parse};
 
 use super::Script;
 

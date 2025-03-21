@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use crate::{parse, u256, Blob64, Parse, Parser};
+use crate::{Blob64, Parse, Parser, parse, u256};
 
 use super::super::GrothProof;
 

@@ -31,14 +31,18 @@ impl Default for Attachments {
 
 impl Attachments {
     pub fn new() -> Self {
-        Self {
-            envelopes: HashMap::new(),
-        }
+        Self { envelopes: HashMap::new() }
     }
 
-    pub fn add(&mut self, payload: impl EnvelopeEncodable, vendor: &str, conforms_to: Option<&str>) {
+    pub fn add(
+        &mut self,
+        payload: impl EnvelopeEncodable,
+        vendor: &str,
+        conforms_to: Option<&str>,
+    ) {
         let attachment = Envelope::new_attachment(payload, vendor, conforms_to);
-        self.envelopes.insert(attachment.digest().into_owned(), attachment);
+        self.envelopes
+            .insert(attachment.digest().into_owned(), attachment);
     }
 
     pub fn get(&self, digest: &Digest) -> Option<&Envelope> {
@@ -62,7 +66,12 @@ pub trait Attachable {
     fn attachments(&self) -> &Attachments;
     fn attachments_mut(&mut self) -> &mut Attachments;
 
-    fn add_attachment(&mut self, payload: impl EnvelopeEncodable, vendor: &str, conforms_to: Option<&str>) {
+    fn add_attachment(
+        &mut self,
+        payload: impl EnvelopeEncodable,
+        vendor: &str,
+        conforms_to: Option<&str>,
+    ) {
         self.attachments_mut().add(payload, vendor, conforms_to);
     }
 

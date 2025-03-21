@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use crate::{parse, Data, Parse, Parser};
+use crate::{Data, Parse, Parser, parse};
 
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct Script(pub Data);
@@ -19,6 +19,6 @@ impl std::fmt::Debug for Script {
 
 impl AsRef<[u8]> for Script {
     fn as_ref(&self) -> &[u8] {
-        &self.0 .0
+        &self.0.0
     }
 }

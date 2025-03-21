@@ -1,6 +1,6 @@
 use anyhow::{Result, bail};
 
-use crate::{parse, Parse, Parser};
+use crate::{Parse, Parser, parse};
 
 use super::IntID;
 
@@ -59,16 +59,20 @@ impl Parse for TxVersion {
 
         let group = match (overwintered, version_group_id, number) {
             (false, _, _) => TxVersionGroup::PreOverwinter,
-            (true, OVERWINTER_VERSION_GROUP_ID, OVERWINTER_TX_VERSION) => TxVersionGroup::OverwinterV3,
+            (true, OVERWINTER_VERSION_GROUP_ID, OVERWINTER_TX_VERSION) => {
+                TxVersionGroup::OverwinterV3
+            }
             (true, SAPLING_VERSION_GROUP_ID, SAPLING_TX_VERSION) => TxVersionGroup::SaplingV4,
             (true, ZIP225_VERSION_GROUP_ID, ZIP225_TX_VERSION) => TxVersionGroup::Zip225V5,
             (true, ZFUTURE_VERSION_GROUP_ID, ZFUTURE_TX_VERSION) => TxVersionGroup::Future,
-            _ => bail!("Unsupported transaction format: overwintered={}, version={}, version_group_id={}", overwintered, number, version_group_id),
+            _ => bail!(
+                "Unsupported transaction format: overwintered={}, version={}, version_group_id={}",
+                overwintered,
+                number,
+                version_group_id
+            ),
         };
 
-        Ok(Self {
-            group,
-            number,
-        })
+        Ok(Self { group, number })
     }
 }

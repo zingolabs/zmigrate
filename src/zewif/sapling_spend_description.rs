@@ -1,4 +1,4 @@
-use crate::{impl_attachable, u256, Attachments, Amount, BlockHeight, Data};
+use crate::{Amount, Attachments, BlockHeight, Data, impl_attachable, u256};
 
 /// Data specific to Sapling spends.
 #[derive(Debug, Clone)]

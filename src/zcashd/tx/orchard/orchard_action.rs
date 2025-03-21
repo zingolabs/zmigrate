@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use crate::{parse, u256, Parse, Parser};
+use crate::{Parse, Parser, parse, u256};
 
 use super::{OrchardSignature, TransmittedNoteCiphertext};
 
@@ -15,7 +15,10 @@ pub struct OrchardAction {
 }
 
 impl Parse for OrchardAction {
-    fn parse(p: &mut Parser) -> Result<Self> where Self: Sized {
+    fn parse(p: &mut Parser) -> Result<Self>
+    where
+        Self: Sized,
+    {
         let cv_net = parse!(p, "cv_net")?;
         let nf_old = parse!(p, "nf")?;
         let rk = parse!(p, "rk")?;

@@ -1,6 +1,6 @@
-use anyhow::{ Result, Context };
+use anyhow::{Context, Result};
 
-use crate::{ parse, Blob32, Parse, Parser };
+use crate::{Blob32, Parse, Parser, parse};
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Default)]
 #[allow(non_camel_case_types)]

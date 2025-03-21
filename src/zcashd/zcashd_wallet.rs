@@ -2,12 +2,12 @@
 
 use std::collections::HashMap;
 
-use crate::{Bip39Mnemonic, TxId, SaplingIncomingViewingKey, Network};
+use crate::{Bip39Mnemonic, Network, SaplingIncomingViewingKey, TxId};
 
 use super::{
     Address, BlockLocator, ClientVersion, KeyPoolEntry, Keys, MnemonicHDChain, NetworkInfo,
-    OrchardNoteCommitmentTree, PubKey, RecipientMapping, SaplingKeys,
-    SaplingZPaymentAddress, SproutKeys, UnifiedAccounts, WalletTx,
+    OrchardNoteCommitmentTree, PubKey, RecipientMapping, SaplingKeys, SaplingZPaymentAddress,
+    SproutKeys, UnifiedAccounts, WalletTx,
 };
 
 #[derive(Debug)]

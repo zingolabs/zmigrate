@@ -100,11 +100,13 @@ macro_rules! blob {
         }
 
         impl $crate::Parse for $name {
-            fn parse(parser: &mut $crate::Parser) -> ::anyhow::Result<Self> where Self: Sized {
-                let bytes = ::anyhow::Context::with_context(
-                    parser.next($size),
-                    || format!("Parsing {}", stringify!($name)),
-                )?;
+            fn parse(parser: &mut $crate::Parser) -> ::anyhow::Result<Self>
+            where
+                Self: Sized,
+            {
+                let bytes = ::anyhow::Context::with_context(parser.next($size), || {
+                    format!("Parsing {}", stringify!($name))
+                })?;
                 Ok(Self($crate::Blob::from(bytes)))
             }
         }

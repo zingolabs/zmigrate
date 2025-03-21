@@ -1,6 +1,6 @@
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 
-use crate::{parse, Parse, Parser};
+use crate::{Parse, Parser, parse};
 
 pub fn parse_compact_size(p: &mut Parser) -> Result<usize> {
     match parse!(p, u8, "compact size")? {

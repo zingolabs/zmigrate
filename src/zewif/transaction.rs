@@ -1,7 +1,9 @@
-use crate::{impl_attachable, BlockHeight, Data, TxId};
+use crate::{BlockHeight, Data, TxId, impl_attachable};
 
-use super::{Attachments, JoinSplitDescription, OrchardActionDescription, SaplingOutputDescription, SaplingSpendDescription, TxIn, TxOut};
-
+use super::{
+    Attachments, JoinSplitDescription, OrchardActionDescription, SaplingOutputDescription,
+    SaplingSpendDescription, TxIn, TxOut,
+};
 
 /// A transaction that can combine both transparent and shielded components.
 #[derive(Debug, Clone)]
@@ -24,7 +26,6 @@ pub struct Transaction {
     // which keys). I don't see the point of duplicating the raw data in a
     // different format (that still needs to be parsed!)
     // -- Daira-Emma
-
     /// Optional data for transparent inputs
     inputs: Option<Vec<TxIn>>,
     /// Optional data for transparent outputs
@@ -108,7 +109,9 @@ impl Transaction {
     }
 
     pub fn add_sapling_output(&mut self, output: SaplingOutputDescription) {
-        self.sapling_outputs.get_or_insert_with(Vec::new).push(output);
+        self.sapling_outputs
+            .get_or_insert_with(Vec::new)
+            .push(output);
     }
 
     pub fn orchard_actions(&self) -> Option<&Vec<OrchardActionDescription>> {
@@ -116,7 +119,9 @@ impl Transaction {
     }
 
     pub fn add_orchard_action(&mut self, action: OrchardActionDescription) {
-        self.orchard_actions.get_or_insert_with(Vec::new).push(action);
+        self.orchard_actions
+            .get_or_insert_with(Vec::new)
+            .push(action);
     }
 
     pub fn sprout_joinsplits(&self) -> Option<&Vec<JoinSplitDescription>> {
@@ -124,6 +129,8 @@ impl Transaction {
     }
 
     pub fn add_sprout_joinsplit(&mut self, joinsplit: JoinSplitDescription) {
-        self.sprout_joinsplits.get_or_insert_with(Vec::new).push(joinsplit);
+        self.sprout_joinsplits
+            .get_or_insert_with(Vec::new)
+            .push(joinsplit);
     }
 }

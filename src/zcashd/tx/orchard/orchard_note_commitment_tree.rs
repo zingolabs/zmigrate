@@ -1,6 +1,6 @@
-use crate::{Data, Parser, u256};
-use anyhow::{bail, Context, Result};
 use crate::Parse;
+use crate::{Data, Parser, u256};
+use anyhow::{Context, Result, bail};
 use byteorder::{ByteOrder, LittleEndian};
 
 /// Represents a node in the Orchard note commitment tree
@@ -60,7 +60,7 @@ impl OrchardNoteCommitmentTree {
             if has_node {
                 // Read the 32-byte node hash
                 if position + 32 <= data.len() {
-                    let node_hash = u256::from_slice(&data[position..position+32])
+                    let node_hash = u256::from_slice(&data[position..position + 32])
                         .context("Failed to parse node hash")?;
                     self.nodes.push(Some(node_hash));
                     position += 32;
@@ -104,11 +104,7 @@ impl OrchardNoteCommitmentTree {
                 None
             };
 
-            Some(NoteCommitmentTreeNode {
-                hash,
-                left,
-                right,
-            })
+            Some(NoteCommitmentTreeNode { hash, left, right })
         } else {
             None
         }
@@ -116,11 +112,8 @@ impl OrchardNoteCommitmentTree {
 
     /// Convert to Zewif IncrementalMerkleTree format
     pub fn to_zewif_tree(&self) -> crate::zewif::IncrementalMerkleTree {
-        let mut tree = crate::zewif::IncrementalMerkleTree {
-            left: None,
-            right: None,
-            parents: Vec::new(),
-        };
+        let mut tree =
+            crate::zewif::IncrementalMerkleTree { left: None, right: None, parents: Vec::new() };
 
         // Convert the root node
         if let Some(root_node) = &self.root {

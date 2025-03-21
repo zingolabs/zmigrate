@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use crate::{parse, Blob32, Parse, Parser};
+use crate::{Blob32, Parse, Parser, parse};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct RedPallasSignature {
@@ -9,7 +9,10 @@ pub struct RedPallasSignature {
 }
 
 impl Parse for RedPallasSignature {
-    fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
+    fn parse(parser: &mut Parser) -> Result<Self>
+    where
+        Self: Sized,
+    {
         Ok(Self {
             r_bytes: parse!(parser, "r_bytes")?,
             s_bytes: parse!(parser, "s_bytes")?,

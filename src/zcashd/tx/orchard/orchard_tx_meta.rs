@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use anyhow::Result;
 
-use crate::{parse, Blob64, Parse, Parser};
+use crate::{Blob64, Parse, Parser, parse};
 
 use super::super::super::ClientVersion;
 

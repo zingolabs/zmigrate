@@ -5,7 +5,7 @@ use crate::SaplingIncomingViewingKey;
 use super::SaplingKey;
 
 #[derive(Clone, PartialEq)]
-pub struct SaplingKeys (pub HashMap<SaplingIncomingViewingKey, SaplingKey>);
+pub struct SaplingKeys(pub HashMap<SaplingIncomingViewingKey, SaplingKey>);
 
 impl SaplingKeys {
     pub fn new(map: HashMap<SaplingIncomingViewingKey, SaplingKey>) -> Self {

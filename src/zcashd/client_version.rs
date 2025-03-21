@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use crate::{parse, Parse, Parser};
+use crate::{Parse, Parser, parse};
 
 #[derive(Clone)]
 pub struct ClientVersion {

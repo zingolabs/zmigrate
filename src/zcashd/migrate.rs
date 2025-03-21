@@ -243,7 +243,7 @@ fn extract_transaction_addresses(
                 let mut sha256 = Sha256::new();
                 sha256.update(potential_pubkey);
                 let sha256_result = sha256.finalize();
-                
+
                 // Calculate RIPEMD160 hash of the SHA256 result
                 let mut ripemd160 = Ripemd160::new();
                 ripemd160.update(sha256_result);
@@ -252,7 +252,8 @@ fn extract_transaction_addresses(
                 // Create a transparent P2PKH address from this pubkey hash
                 // Create a KeyId for consistent address encoding
                 let key_id = zcashd::KeyId(
-                    crate::u160::from_slice(&pubkey_hash[..]).expect("Creating u160 from RIPEMD160 hash"),
+                    crate::u160::from_slice(&pubkey_hash[..])
+                        .expect("Creating u160 from RIPEMD160 hash"),
                 );
                 addresses.insert(key_id.to_string(wallet.network()));
             }

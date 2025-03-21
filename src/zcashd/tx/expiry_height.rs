@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use crate::{parse, Parse, Parser};
+use crate::{Parse, Parser, parse};
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub struct ExpiryHeight(pub u32);
@@ -11,11 +11,7 @@ impl ExpiryHeight {
     }
 
     pub fn as_option(self) -> Option<Self> {
-        if self.0 == 0 {
-            None
-        } else {
-            Some(self)
-        }
+        if self.0 == 0 { None } else { Some(self) }
     }
 }
 

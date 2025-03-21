@@ -8,6 +8,8 @@ mod account;
 pub use account::*;
 mod address;
 pub use address::*;
+mod address_id;
+pub use address_id::*;
 mod amount;
 pub use amount::*;
 mod anchor;

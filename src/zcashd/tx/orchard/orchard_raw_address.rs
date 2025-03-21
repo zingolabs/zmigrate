@@ -1,8 +1,8 @@
 use anyhow::Result;
 
-use zcash_address::{unified::Encoding, ToAddress, TryFromAddress, ZcashAddress};
+use zcash_address::{ToAddress, TryFromAddress, ZcashAddress, unified::Encoding};
 
-use crate::{parse, Blob, Blob32, Parse, Parser, Network};
+use crate::{Blob, Blob32, Network, Parse, Parser, parse};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct OrchardRawAddress {
@@ -21,9 +21,8 @@ impl OrchardRawAddress {
         let orchard_receiver = zcash_address::unified::Receiver::Orchard(bytes);
 
         // Create a Unified Address with just this receiver
-        let unified_addr = zcash_address::unified::Address::try_from_items(
-            vec![orchard_receiver]
-        ).expect("A single valid receiver should create a valid unified address");
+        let unified_addr = zcash_address::unified::Address::try_from_items(vec![orchard_receiver])
+            .expect("A single valid receiver should create a valid unified address");
 
         // Create a ZcashAddress from the unified address
         let addr = ZcashAddress::from_unified(network, unified_addr);

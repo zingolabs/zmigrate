@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use crate::{parse, Amount, Blob32, Data, Parse, Parser};
+use crate::{Amount, Blob32, Data, Parse, Parser, parse};
 
 use super::{OrchardAction, OrchardAuthorized, OrchardFlags};
 

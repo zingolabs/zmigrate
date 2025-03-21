@@ -1,6 +1,6 @@
-use anyhow::{ Result, Context };
+use anyhow::{Context, Result};
 
-use crate::{parse, Parse, Parser};
+use crate::{Parse, Parser, parse};
 
 use super::CompactSize;
 

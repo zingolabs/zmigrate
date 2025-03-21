@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use crate::{parse, Parse, Parser, SecondsSinceEpoch};
+use crate::{Parse, Parser, SecondsSinceEpoch, parse};
 
 use super::{ClientVersion, PubKey};
 

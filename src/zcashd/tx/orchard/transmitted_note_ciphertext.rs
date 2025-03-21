@@ -2,7 +2,7 @@ use anyhow::Result;
 
 use crate::{Blob, Blob32};
 
-use crate::{parse, Parse, Parser};
+use crate::{Parse, Parser, parse};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct TransmittedNoteCiphertext {
@@ -18,7 +18,10 @@ impl TransmittedNoteCiphertext {
 }
 
 impl Parse for TransmittedNoteCiphertext {
-    fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
+    fn parse(parser: &mut Parser) -> Result<Self>
+    where
+        Self: Sized,
+    {
         Ok(Self {
             epk_bytes: parse!(parser, "epk_bytes")?,
             enc_ciphertext: parse!(parser, "enc_ciphertext")?,

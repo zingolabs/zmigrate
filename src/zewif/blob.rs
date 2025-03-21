@@ -1,4 +1,4 @@
-use anyhow::{bail, Result, Context};
+use anyhow::{Context, Result, bail};
 
 use crate::{Parse, Parser};
 
@@ -89,8 +89,13 @@ impl<const N: usize> From<&[u8]> for Blob<N> {
 }
 
 impl<const N: usize> Parse for Blob<N> {
-    fn parse(parser: &mut Parser) -> Result<Self> where Self: Sized {
-        let data = parser.next(N).with_context(|| format!("Parsing Blob<{}>", N))?;
+    fn parse(parser: &mut Parser) -> Result<Self>
+    where
+        Self: Sized,
+    {
+        let data = parser
+            .next(N)
+            .with_context(|| format!("Parsing Blob<{}>", N))?;
         Self::from_slice(data)
     }
 }

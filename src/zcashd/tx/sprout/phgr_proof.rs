@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use crate::{parse, Blob, Parse, Parser};
+use crate::{Blob, Parse, Parser, parse};
 
 // Initial bool || Fq
 pub type CompressedG1 = Blob<33>;

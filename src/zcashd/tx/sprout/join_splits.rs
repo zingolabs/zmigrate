@@ -1,4 +1,4 @@
-use crate::{blob, parse, ParseWithParam, Parser};
+use crate::{ParseWithParam, Parser, blob, parse};
 use anyhow::Result;
 
 use super::JSDescription;

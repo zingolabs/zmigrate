@@ -1,6 +1,6 @@
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 
-use crate::{parse, CompactSize, Parse, Parser};
+use crate::{CompactSize, Parse, Parser, parse};
 
 impl Parse for String {
     fn parse(p: &mut Parser) -> Result<Self> {
@@ -16,7 +16,9 @@ where
     T::Error: std::error::Error + Send + Sync + 'static,
 {
     let parsed = parse!(p, T, "string length")?;
-    let length = parsed.try_into().context("converting string length to usize")?;
+    let length = parsed
+        .try_into()
+        .context("converting string length to usize")?;
     let bytes = parse!(p, bytes = length, "string data")?;
     String::from_utf8(bytes.to_vec()).context("string")
 }

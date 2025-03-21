@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use crate::{parse, Amount, Blob64, Parse, Parser};
+use crate::{Amount, Blob64, Parse, Parser, parse};
 
 use super::super::{OutputV4, SpendV4};
 

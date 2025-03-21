@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use crate::{parse, Bip39Mnemonic, Parse, Parser};
+use crate::{Bip39Mnemonic, Parse, Parser, parse};
 
 impl Parse for Bip39Mnemonic {
     fn parse(p: &mut Parser) -> Result<Self> {
