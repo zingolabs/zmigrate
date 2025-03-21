@@ -4,8 +4,18 @@ use crate::{CompactSize, Data, Parse, Parser, parse, u256};
 
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct PrivKey {
-    pub data: Data,
-    pub hash: u256,
+    data: Data,
+    hash: u256,
+}
+
+impl PrivKey {
+    pub fn data(&self) -> &Data {
+        &self.data
+    }
+
+    pub fn hash(&self) -> u256 {
+        self.hash
+    }
 }
 
 impl std::fmt::Debug for PrivKey {

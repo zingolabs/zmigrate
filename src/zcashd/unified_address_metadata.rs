@@ -6,9 +6,23 @@ use super::ReceiverType;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct UnifiedAddressMetadata {
-    pub key_id: u256,
-    pub diversifier_index: Blob<11>,
-    pub receiver_types: Vec<ReceiverType>,
+    key_id: u256,
+    diversifier_index: Blob<11>,
+    receiver_types: Vec<ReceiverType>,
+}
+
+impl UnifiedAddressMetadata {
+    pub fn key_id(&self) -> u256 {
+        self.key_id
+    }
+
+    pub fn diversifier_index(&self) -> &Blob<11> {
+        &self.diversifier_index
+    }
+
+    pub fn receiver_types(&self) -> &[ReceiverType] {
+        &self.receiver_types
+    }
 }
 
 impl Parse for UnifiedAddressMetadata {

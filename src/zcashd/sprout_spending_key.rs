@@ -4,8 +4,18 @@ use super::KeyMetadata;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct SproutSpendingKey {
-    pub key: u252,
-    pub metadata: KeyMetadata,
+    key: u252,
+    metadata: KeyMetadata,
+}
+
+impl SproutSpendingKey {
+    pub fn key(&self) -> u252 {
+        self.key
+    }
+
+    pub fn metadata(&self) -> &KeyMetadata {
+        &self.metadata
+    }
 }
 
 impl SproutSpendingKey {

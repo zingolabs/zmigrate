@@ -4,11 +4,11 @@ use crate::{Parse, Parser, parse};
 
 #[derive(Clone)]
 pub struct ClientVersion {
-    pub version: u32,
-    pub major: u32,
-    pub minor: u32,
-    pub revision: u32,
-    pub build: u32,
+    version: u32,
+    major: u32,
+    minor: u32,
+    revision: u32,
+    build: u32,
 }
 
 impl PartialEq for ClientVersion {
@@ -57,6 +57,31 @@ impl ClientVersion {
         let build = remainder % 100;
 
         ClientVersion { version, major, minor, revision, build }
+    }
+
+    /// Returns the combined version integer.
+    pub fn version(&self) -> u32 {
+        self.version
+    }
+
+    /// Returns the major version number.
+    pub fn major(&self) -> u32 {
+        self.major
+    }
+
+    /// Returns the minor version number.
+    pub fn minor(&self) -> u32 {
+        self.minor
+    }
+
+    /// Returns the revision number.
+    pub fn revision(&self) -> u32 {
+        self.revision
+    }
+
+    /// Returns the build number.
+    pub fn build(&self) -> u32 {
+        self.build
     }
 }
 

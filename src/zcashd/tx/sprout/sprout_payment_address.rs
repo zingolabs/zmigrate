@@ -4,8 +4,18 @@ use crate::{Parse, Parser, parse, u256};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SproutPaymentAddress {
-    pub a_pk: u256,
-    pub pk_enc: u256,
+    a_pk: u256,
+    pk_enc: u256,
+}
+
+impl SproutPaymentAddress {
+    pub fn a_pk(&self) -> u256 {
+        self.a_pk
+    }
+
+    pub fn pk_enc(&self) -> u256 {
+        self.pk_enc
+    }
 }
 
 impl Parse for SproutPaymentAddress {

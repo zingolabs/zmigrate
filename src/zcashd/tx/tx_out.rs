@@ -4,8 +4,18 @@ use crate::{Amount, Parse, Parser, Script, parse};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct TxOut {
-    pub value: Amount,
-    pub script_pub_key: Script,
+    value: Amount,
+    script_pub_key: Script,
+}
+
+impl TxOut {
+    pub fn value(&self) -> Amount {
+        self.value
+    }
+
+    pub fn script_pub_key(&self) -> &Script {
+        &self.script_pub_key
+    }
 }
 
 impl Parse for TxOut {

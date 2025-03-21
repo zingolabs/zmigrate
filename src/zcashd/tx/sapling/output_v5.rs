@@ -4,11 +4,11 @@ use crate::{Blob, GrothProof, Parse, Parser, parse, u256};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct OutputV5 {
-    pub cv: u256,
-    pub cmu: u256,
-    pub ephemeral_key: u256,
-    pub enc_ciphertext: Blob<580>,
-    pub out_ciphertext: Blob<80>,
+    cv: u256,
+    cmu: u256,
+    ephemeral_key: u256,
+    enc_ciphertext: Blob<580>,
+    out_ciphertext: Blob<80>,
 }
 
 impl OutputV5 {
@@ -21,6 +21,31 @@ impl OutputV5 {
             out_ciphertext: self.out_ciphertext,
             zkproof,
         }
+    }
+
+    #[allow(dead_code)]
+    pub fn cv(&self) -> u256 {
+        self.cv
+    }
+
+    #[allow(dead_code)]
+    pub fn cmu(&self) -> u256 {
+        self.cmu
+    }
+
+    #[allow(dead_code)]
+    pub fn ephemeral_key(&self) -> u256 {
+        self.ephemeral_key
+    }
+
+    #[allow(dead_code)]
+    pub fn enc_ciphertext(&self) -> &Blob<580> {
+        &self.enc_ciphertext
+    }
+
+    #[allow(dead_code)]
+    pub fn out_ciphertext(&self) -> &Blob<80> {
+        &self.out_ciphertext
     }
 }
 

@@ -3,11 +3,11 @@ use zcash_address::{ToAddress, ZcashAddress};
 
 use crate::{Network, Parse, Parser, parse, u160};
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct KeyId(pub u160);
 
 impl KeyId {
-    pub fn to_string(&self, network: Network) -> String {
+    pub fn to_string(self, network: Network) -> String {
         // Create proper 20-byte array for the pubkey hash
         let mut pubkey_hash = [0u8; 20];
         pubkey_hash.copy_from_slice(self.0.as_ref());

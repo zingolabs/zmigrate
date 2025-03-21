@@ -4,14 +4,48 @@ use crate::{Blob32, Parse, Parser, SecondsSinceEpoch, parse};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct MnemonicHDChain {
-    pub version: i32,
-    pub seed_fp: Blob32,
-    pub create_time: SecondsSinceEpoch,
-    pub account_counter: u32,
-    pub legacy_tkey_external_counter: u32,
-    pub legacy_tkey_internal_counter: u32,
-    pub legacy_sapling_key_counter: u32,
-    pub mnemonic_seed_backup_confirmed: bool,
+    version: i32,
+    seed_fp: Blob32,
+    create_time: SecondsSinceEpoch,
+    account_counter: u32,
+    legacy_tkey_external_counter: u32,
+    legacy_tkey_internal_counter: u32,
+    legacy_sapling_key_counter: u32,
+    mnemonic_seed_backup_confirmed: bool,
+}
+
+impl MnemonicHDChain {
+    pub fn version(&self) -> i32 {
+        self.version
+    }
+
+    pub fn seed_fp(&self) -> &Blob32 {
+        &self.seed_fp
+    }
+
+    pub fn create_time(&self) -> SecondsSinceEpoch {
+        self.create_time
+    }
+
+    pub fn account_counter(&self) -> u32 {
+        self.account_counter
+    }
+
+    pub fn legacy_tkey_external_counter(&self) -> u32 {
+        self.legacy_tkey_external_counter
+    }
+
+    pub fn legacy_tkey_internal_counter(&self) -> u32 {
+        self.legacy_tkey_internal_counter
+    }
+
+    pub fn legacy_sapling_key_counter(&self) -> u32 {
+        self.legacy_sapling_key_counter
+    }
+
+    pub fn mnemonic_seed_backup_confirmed(&self) -> bool {
+        self.mnemonic_seed_backup_confirmed
+    }
 }
 
 impl Parse for MnemonicHDChain {

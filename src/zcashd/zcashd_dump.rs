@@ -7,16 +7,26 @@ use crate::{BDBDump, Data, Parser, parse};
 
 #[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct DBKey {
-    pub keyname: String,
-    pub data: Data,
+    keyname: String,
+    data: Data,
+}
+
+impl DBKey {
+    pub fn keyname(&self) -> &str {
+        &self.keyname
+    }
+
+    pub fn data(&self) -> &Data {
+        &self.data
+    }
 }
 
 impl std::fmt::Display for DBKey {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        if self.data.is_empty() {
-            write!(f, "{}", self.keyname)
+        if self.data().is_empty() {
+            write!(f, "{}", self.keyname())
         } else {
-            write!(f, "{}-{}", self.keyname, hex::encode(&self.data))
+            write!(f, "{}-{}", self.keyname(), hex::encode(self.data()))
         }
     }
 }

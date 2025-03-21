@@ -20,11 +20,19 @@ use super::{
 
 #[derive(Debug)]
 pub struct ZcashdParser<'a> {
-    pub dump: &'a ZcashdDump,
-    pub unparsed_keys: RefCell<HashSet<DBKey>>,
+    dump: &'a ZcashdDump,
+    unparsed_keys: RefCell<HashSet<DBKey>>,
 }
 
 impl<'a> ZcashdParser<'a> {
+    pub fn dump(&self) -> &'a ZcashdDump {
+        self.dump
+    }
+
+    pub fn unparsed_keys(&self) -> RefCell<HashSet<DBKey>> {
+        self.unparsed_keys.clone()
+    }
+
     pub fn parse_dump(dump: &ZcashdDump) -> Result<(ZcashdWallet, HashSet<DBKey>)> {
         let parser = ZcashdParser::new(dump);
         parser.parse()
@@ -37,13 +45,13 @@ impl<'a> ZcashdParser<'a> {
 
     // Keep track of which keys have been parsed
     fn mark_key_parsed(&self, key: &DBKey) {
-        self.unparsed_keys.borrow_mut().remove(key);
+        self.unparsed_keys().borrow_mut().remove(key);
     }
 
     fn value_for_keyname(&self, keyname: &str) -> Result<&DBValue> {
-        let key = self.dump.key_for_keyname(keyname);
+        let key = self.dump().key_for_keyname(keyname);
         self.mark_key_parsed(&key);
-        self.dump.value_for_keyname(keyname)
+        self.dump().value_for_keyname(keyname)
     }
 
     fn parse(&self) -> Result<(ZcashdWallet, HashSet<DBKey>)> {
@@ -183,7 +191,7 @@ impl<'a> ZcashdParser<'a> {
             witnesscachesize,
         };
 
-        Ok((wallet, self.unparsed_keys.borrow().clone()))
+        Ok((wallet, self.unparsed_keys().borrow().clone()))
     }
 
     fn parse_i64(&self, keyname: &str) -> Result<i64> {
@@ -192,7 +200,7 @@ impl<'a> ZcashdParser<'a> {
     }
 
     fn parse_opt_i64(&self, keyname: &str) -> Result<Option<i64>> {
-        if self.dump.has_value_for_keyname(keyname) {
+        if self.dump().has_value_for_keyname(keyname) {
             self.parse_i64(keyname).map(Some)
         } else {
             Ok(None)
@@ -218,7 +226,7 @@ impl<'a> ZcashdParser<'a> {
     }
 
     fn parse_opt_block_locator(&self, keyname: &str) -> Result<Option<BlockLocator>> {
-        if self.dump.has_value_for_keyname(keyname) {
+        if self.dump().has_value_for_keyname(keyname) {
             self.parse_block_locator(keyname).map(Some)
         } else {
             Ok(None)
@@ -239,9 +247,9 @@ impl<'a> ZcashdParser<'a> {
         }
         let mut keys_map = HashMap::new();
         for (key, value) in key_records {
-            let pubkey = parse!(buf = &key.data, PubKey, "pubkey")?;
+            let pubkey = parse!(buf = key.data(), PubKey, "pubkey")?;
             let privkey = parse!(buf = value.as_data(), PrivKey, "privkey")?;
-            let metakey = DBKey::new("keymeta", &key.data);
+            let metakey = DBKey::new("keymeta", key.data());
             let metadata_binary = self
                 .dump
                 .value_for_key(&metakey)
@@ -259,7 +267,7 @@ impl<'a> ZcashdParser<'a> {
 
     fn parse_sapling_keys(&self) -> Result<SaplingKeys> {
         let mut keys_map = HashMap::new();
-        if !self.dump.has_keys_for_keyname("sapzkey") {
+        if !self.dump().has_keys_for_keyname("sapzkey") {
             return Ok(SaplingKeys::new(keys_map));
         }
         let key_records = self
@@ -274,13 +282,13 @@ impl<'a> ZcashdParser<'a> {
             bail!("Mismatched sapzkey and sapzkeymeta records");
         }
         for (key, value) in key_records {
-            let ivk = parse!(buf = &key.data, SaplingIncomingViewingKey, "ivk")?;
+            let ivk = parse!(buf = key.data(), SaplingIncomingViewingKey, "ivk")?;
             let spending_key = parse!(
                 buf = value.as_data(),
                 SaplingExtendedSpendingKey,
                 "spending_key"
             )?;
-            let metakey = DBKey::new("sapzkeymeta", &key.data);
+            let metakey = DBKey::new("sapzkeymeta", key.data());
             let metadata_binary = self
                 .dump
                 .value_for_key(&metakey)
@@ -297,7 +305,7 @@ impl<'a> ZcashdParser<'a> {
     }
 
     fn parse_sprout_keys(&self) -> Result<Option<SproutKeys>> {
-        if !self.dump.has_keys_for_keyname("zkey") {
+        if !self.dump().has_keys_for_keyname("zkey") {
             return Ok(None);
         }
         let zkey_records = self
@@ -313,9 +321,9 @@ impl<'a> ZcashdParser<'a> {
         }
         let mut zkeys_map = HashMap::new();
         for (key, value) in zkey_records {
-            let payment_address = parse!(buf = &key.data, SproutPaymentAddress, "payment_address")?;
+            let payment_address = parse!(buf = key.data(), SproutPaymentAddress, "payment_address")?;
             let spending_key = parse!(buf = value.as_data(), u252, "spending_key")?;
-            let metakey = DBKey::new("zkeymeta", &key.data);
+            let metakey = DBKey::new("zkeymeta", key.data());
             let metadata_binary = self
                 .dump
                 .value_for_key(&metakey)
@@ -342,7 +350,7 @@ impl<'a> ZcashdParser<'a> {
 
     fn parse_send_recipients(&self) -> Result<HashMap<TxId, Vec<RecipientMapping>>> {
         let mut send_recipients: HashMap<TxId, Vec<RecipientMapping>> = HashMap::new();
-        if !self.dump.has_keys_for_keyname("recipientmapping") {
+        if !self.dump().has_keys_for_keyname("recipientmapping") {
             return Ok(send_recipients);
         }
         let records = self
@@ -350,7 +358,7 @@ impl<'a> ZcashdParser<'a> {
             .records_for_keyname("recipientmapping")
             .context("Getting 'recipientmapping' records")?;
         for (key, value) in records {
-            let mut p = Parser::new(&key.data);
+            let mut p = Parser::new(key.data());
             let txid = parse!(&mut p, TxId, "txid")?;
             let recipient_address = parse!(&mut p, RecipientAddress, "recipient_address")?;
             p.check_finished()?;
@@ -367,18 +375,18 @@ impl<'a> ZcashdParser<'a> {
     }
 
     fn parse_unified_accounts(&self) -> Result<Option<UnifiedAccounts>> {
-        if !self.dump.has_keys_for_keyname("unifiedaddrmeta") {
+        if !self.dump().has_keys_for_keyname("unifiedaddrmeta") {
             return Ok(None);
         }
-        let address_metadata_records = self.dump.records_for_keyname("unifiedaddrmeta")?;
+        let address_metadata_records = self.dump().records_for_keyname("unifiedaddrmeta")?;
         let mut address_metadata: HashMap<u256, UnifiedAddressMetadata> = HashMap::new();
         for (key, value) in address_metadata_records {
             let metadata = parse!(
-                buf = &key.data,
+                buf = key.data(),
                 UnifiedAddressMetadata,
                 "UnifiedAddressMetadata key"
             )?;
-            address_metadata.insert(metadata.key_id, metadata);
+            address_metadata.insert(metadata.key_id(), metadata);
             let v: u32 = parse!(buf = value.as_data(), u32, "UnifiedAddressMetadata value")?;
             if v != 0 {
                 bail!("Unexpected value for UnifiedAddressMetadata: 0x{:08x}", v);
@@ -386,15 +394,15 @@ impl<'a> ZcashdParser<'a> {
             self.mark_key_parsed(&key);
         }
 
-        let account_metadata_records = self.dump.records_for_keyname("unifiedaccount")?;
+        let account_metadata_records = self.dump().records_for_keyname("unifiedaccount")?;
         let mut account_metadata: HashMap<u256, UnifiedAccountMetadata> = HashMap::new();
         for (key, value) in account_metadata_records {
             let metadata = parse!(
-                buf = &key.data,
+                buf = key.data(),
                 UnifiedAccountMetadata,
                 "UnifiedAccountMetadata key"
             )?;
-            account_metadata.insert(metadata.key_id, metadata);
+            account_metadata.insert(metadata.key_id(), metadata);
             let v: u32 = parse!(buf = value.as_data(), u32, "UnifiedAccountMetadata value")?;
             if v != 0 {
                 bail!("Unexpected value for UnifiedAccountMetadata: 0x{:08x}", v);
@@ -402,10 +410,10 @@ impl<'a> ZcashdParser<'a> {
             self.mark_key_parsed(&key);
         }
 
-        let full_viewing_keys_records = self.dump.records_for_keyname("unifiedfvk")?;
+        let full_viewing_keys_records = self.dump().records_for_keyname("unifiedfvk")?;
         let mut full_viewing_keys: HashMap<u256, String> = HashMap::new();
         for (key, value) in full_viewing_keys_records {
-            let key_id = parse!(buf = &key.data, u256, "UnifiedFullViewingKey key")?;
+            let key_id = parse!(buf = key.data(), u256, "UnifiedFullViewingKey key")?;
             let fvk = parse!(buf = value.as_data(), String, "UnifiedFullViewingKey value")?;
             full_viewing_keys.insert(key_id, fvk);
             self.mark_key_parsed(&key);
@@ -430,7 +438,7 @@ impl<'a> ZcashdParser<'a> {
             .dump
             .record_for_keyname("mnemonicphrase")
             .context("Getting 'mnemonicphrase' record")?;
-        let fingerprint = parse!(buf = &key.data, u256, "seed fingerprint")?;
+        let fingerprint = parse!(buf = key.data(), u256, "seed fingerprint")?;
         let mut bip39_mnemonic = parse!(buf = &value, Bip39Mnemonic, "mnemonic phrase")?;
         bip39_mnemonic.set_fingerprint(fingerprint);
         self.mark_key_parsed(&key);
@@ -444,7 +452,7 @@ impl<'a> ZcashdParser<'a> {
             .context("Getting 'name' records")?;
         let mut address_names = HashMap::new();
         for (key, value) in records {
-            let address = parse!(buf = &key.data, Address, "address")?;
+            let address = parse!(buf = key.data(), Address, "address")?;
             let name = parse!(buf = value.as_data(), String, "name")?;
             if address_names.contains_key(&address) {
                 bail!("Duplicate address found: {}", address);
@@ -463,7 +471,7 @@ impl<'a> ZcashdParser<'a> {
             .context("Getting 'purpose' records")?;
         let mut address_purposes = HashMap::new();
         for (key, value) in records {
-            let address = parse!(buf = &key.data, Address, "address")?;
+            let address = parse!(buf = key.data(), Address, "address")?;
             let purpose = parse!(buf = value.as_data(), String, "purpose")?;
             if address_purposes.contains_key(&address) {
                 bail!("Duplicate address found: {}", address);
@@ -479,7 +487,7 @@ impl<'a> ZcashdParser<'a> {
         &self,
     ) -> Result<HashMap<SaplingZPaymentAddress, SaplingIncomingViewingKey>> {
         let mut sapling_z_addresses = HashMap::new();
-        if !self.dump.has_keys_for_keyname("sapzaddr") {
+        if !self.dump().has_keys_for_keyname("sapzaddr") {
             return Ok(sapling_z_addresses);
         }
         let records = self
@@ -488,7 +496,7 @@ impl<'a> ZcashdParser<'a> {
             .context("Getting 'sapzaddr' records")?;
         for (key, value) in records {
             let payment_address =
-                parse!(buf = &key.data, SaplingZPaymentAddress, "payment address")?;
+                parse!(buf = key.data(), SaplingZPaymentAddress, "payment address")?;
             let viewing_key = parse!(
                 buf = value.as_data(),
                 SaplingIncomingViewingKey,
@@ -531,7 +539,7 @@ impl<'a> ZcashdParser<'a> {
             .context("Getting 'pool' records")?;
         let mut key_pool = HashMap::new();
         for (key, value) in records {
-            let index = parse!(buf = &key.data, i64, "key pool index")?;
+            let index = parse!(buf = key.data(), i64, "key pool index")?;
             let entry = parse!(buf = value.as_data(), KeyPoolEntry, "key pool entry")?;
             key_pool.insert(index, entry);
 
@@ -543,15 +551,15 @@ impl<'a> ZcashdParser<'a> {
     fn parse_transactions(&self) -> Result<HashMap<TxId, WalletTx>> {
         let mut transactions = HashMap::new();
         // Some wallet files don't have any transactions
-        if self.dump.has_keys_for_keyname("tx") {
+        if self.dump().has_keys_for_keyname("tx") {
             let records = self
                 .dump
                 .records_for_keyname("tx")
                 .context("Getting 'tx' records")?;
             let mut sorted_records: Vec<_> = records.into_iter().collect();
-            sorted_records.sort_by(|(key1, _), (key2, _)| key1.data.cmp(&key2.data));
+            sorted_records.sort_by(|(key1, _), (key2, _)| key1.data().cmp(key2.data()));
             for (key, value) in sorted_records {
-                let txid = parse!(buf = &key.data, TxId, "transaction ID")?;
+                let txid = parse!(buf = key.data(), TxId, "transaction ID")?;
                 let trace = false;
                 let transaction = parse!(buf = value.as_data(), WalletTx, "transaction", trace)?;
                 if transactions.contains_key(&txid) {

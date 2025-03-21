@@ -4,10 +4,28 @@ use crate::{Parse, Parser, parse, u256};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct UnifiedAccountMetadata {
-    pub seed_fingerprint: u256,
-    pub bip_44_coin_type: u32,
-    pub account_id: u32,
-    pub key_id: u256,
+    seed_fingerprint: u256,
+    bip_44_coin_type: u32,
+    account_id: u32,
+    key_id: u256,
+}
+
+impl UnifiedAccountMetadata {
+    pub fn seed_fingerprint(&self) -> u256 {
+        self.seed_fingerprint
+    }
+
+    pub fn bip_44_coin_type(&self) -> u32 {
+        self.bip_44_coin_type
+    }
+
+    pub fn account_id(&self) -> u32 {
+        self.account_id
+    }
+
+    pub fn key_id(&self) -> u256 {
+        self.key_id
+    }
 }
 
 impl Parse for UnifiedAccountMetadata {

@@ -2,8 +2,18 @@ use super::RecipientAddress;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct RecipientMapping {
-    pub recipient_address: RecipientAddress,
-    pub unified_address: String,
+    recipient_address: RecipientAddress,
+    unified_address: String,
+}
+
+impl RecipientMapping {
+    pub fn recipient_address(&self) -> &RecipientAddress {
+        &self.recipient_address
+    }
+
+    pub fn unified_address(&self) -> &str {
+        &self.unified_address
+    }
 }
 
 impl RecipientMapping {

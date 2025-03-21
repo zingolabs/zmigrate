@@ -4,9 +4,23 @@ use crate::{Parse, Parser, parse, u256};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct JSOutPoint {
-    pub hash: u256,
-    pub js: u64,
-    pub n: u8,
+    hash: u256,
+    js: u64,
+    n: u8,
+}
+
+impl JSOutPoint {
+    pub fn hash(&self) -> u256 {
+        self.hash
+    }
+
+    pub fn js(&self) -> u64 {
+        self.js
+    }
+
+    pub fn n(&self) -> u8 {
+        self.n
+    }
 }
 
 impl Parse for JSOutPoint {

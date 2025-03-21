@@ -4,9 +4,26 @@ use crate::{Blob64, GrothProof, Parse, Parser, parse, u256};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct SpendV5 {
-    pub cv: u256,
-    pub nullifier: u256,
-    pub rk: u256,
+    cv: u256,
+    nullifier: u256,
+    rk: u256,
+}
+
+impl SpendV5 {
+    #[allow(dead_code)]
+    pub fn cv(&self) -> u256 {
+        self.cv
+    }
+
+    #[allow(dead_code)]
+    pub fn nullifier(&self) -> u256 {
+        self.nullifier
+    }
+
+    #[allow(dead_code)]
+    pub fn rk(&self) -> u256 {
+        self.rk
+    }
 }
 
 impl SpendV5 {

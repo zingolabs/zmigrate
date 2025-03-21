@@ -13,7 +13,7 @@ pub const ZIP225_TX_VERSION: u32 = 5;
 const ZFUTURE_VERSION_GROUP_ID: IntID = IntID(0xffffffff);
 const ZFUTURE_TX_VERSION: u32 = 0x0000ffff;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum TxVersionGroup {
     PreOverwinter,
     OverwinterV3,
@@ -24,8 +24,18 @@ pub enum TxVersionGroup {
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct TxVersion {
-    pub group: TxVersionGroup,
-    pub number: u32,
+    group: TxVersionGroup,
+    number: u32,
+}
+
+impl TxVersion {
+    pub fn group(&self) -> TxVersionGroup {
+        self.group
+    }
+
+    pub fn number(&self) -> u32 {
+        self.number
+    }
 }
 
 impl TxVersion {

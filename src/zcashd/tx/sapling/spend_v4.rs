@@ -4,12 +4,38 @@ use crate::{Blob, GrothProof, Parse, Parser, parse, u256};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct SpendV4 {
-    pub cv: u256,
-    pub anchor: u256,
-    pub nullifier: u256,
-    pub rk: u256,
-    pub zkproof: GrothProof,
-    pub spend_auth_sig: Blob<64>,
+    cv: u256,
+    anchor: u256,
+    nullifier: u256,
+    rk: u256,
+    zkproof: GrothProof,
+    spend_auth_sig: Blob<64>,
+}
+
+impl SpendV4 {
+    pub fn cv(&self) -> u256 {
+        self.cv
+    }
+
+    pub fn anchor(&self) -> u256 {
+        self.anchor
+    }
+
+    pub fn nullifier(&self) -> u256 {
+        self.nullifier
+    }
+
+    pub fn rk(&self) -> u256 {
+        self.rk
+    }
+
+    pub fn zkproof(&self) -> &GrothProof {
+        &self.zkproof
+    }
+
+    pub fn spend_auth_sig(&self) -> &Blob<64> {
+        &self.spend_auth_sig
+    }
 }
 
 impl Parse for SpendV4 {

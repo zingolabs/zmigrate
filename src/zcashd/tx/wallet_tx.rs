@@ -88,14 +88,14 @@ impl Parse for WalletTx {
             .transpose()?
             .unwrap_or_default();
 
-            if version.number >= 2 {
-                let use_groth = version.is_overwinter() && version.number >= SAPLING_TX_VERSION;
+            if version.number() >= 2 {
+                let use_groth = version.is_overwinter() && version.number() >= SAPLING_TX_VERSION;
                 join_splits = Some(parse!(p, param = use_groth, "join_splits")?);
             }
 
             if (version.is_sapling() || version.is_future()) && sapling_bundle_v4.have_actions() {
                 let binding_sig = parse!(p, "binding_sig")?;
-                sapling_bundle_v4.binding_sig = binding_sig;
+                sapling_bundle_v4.set_binding_sig(binding_sig);
             }
 
             sapling_bundle = SaplingBundle::V4(sapling_bundle_v4);
@@ -122,12 +122,12 @@ impl Parse for WalletTx {
         let is_spent = parse!(p, "is_spent")?;
 
         let mut sapling_note_data = None;
-        if version.is_overwinter() && version.number >= SAPLING_TX_VERSION {
+        if version.is_overwinter() && version.number() >= SAPLING_TX_VERSION {
             sapling_note_data = parse!(p, "sapling_note_data")?;
         }
 
         let mut orchard_tx_meta: Option<OrchardTxMeta> = None;
-        if version.is_overwinter() && version.number >= ZIP225_TX_VERSION {
+        if version.is_overwinter() && version.number() >= ZIP225_TX_VERSION {
             let meta = parse!(p, "orchard_tx_meta")?;
             orchard_tx_meta = Some(meta);
         }
