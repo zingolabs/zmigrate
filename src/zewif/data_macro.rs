@@ -8,10 +8,12 @@ macro_rules! data {
                 Self($crate::Data::from_vec(data))
             }
 
+            #[must_use]
             pub fn len(&self) -> usize {
                 self.0.len()
             }
 
+            #[must_use]
             pub fn is_empty(&self) -> bool {
                 self.0.is_empty()
             }

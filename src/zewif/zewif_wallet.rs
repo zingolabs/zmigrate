@@ -11,7 +11,7 @@ use super::{Account, Attachments, Identifiable, SeedMaterial};
 /// material for generating cryptographic keys.
 ///
 /// This is *not* the top level of the interchange format hierarchy. That is
-/// the `ZewifDB` type.
+/// the `ZewifTop` type.
 #[derive(Debug, Clone)]
 pub struct ZewifWallet {
     id: ARID,

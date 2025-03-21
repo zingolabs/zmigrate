@@ -57,6 +57,7 @@ impl Attachments {
         self.envelopes.clear();
     }
 
+    #[must_use]
     pub fn is_empty(&self) -> bool {
         self.envelopes.is_empty()
     }

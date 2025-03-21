@@ -1,8 +1,8 @@
 use anyhow::Result;
 
-use crate::{Parse, Parser, parse};
+use crate::{Parse, Parser, Script, parse};
 
-use super::{OutPoint, Script};
+use super::OutPoint;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TxIn {

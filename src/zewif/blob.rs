@@ -1,3 +1,5 @@
+use std::ops::{Index, IndexMut, Range, RangeFrom, RangeFull, RangeInclusive, RangeTo, RangeToInclusive};
+
 use anyhow::{Context, Result, bail};
 
 use crate::{Parse, Parser};
@@ -11,10 +13,12 @@ impl<const N: usize> Blob<N> {
         Self(data)
     }
 
+    #[must_use]
     pub fn len(&self) -> usize {
         N
     }
 
+    #[must_use]
     pub fn is_empty(&self) -> bool {
         N == 0
     }
@@ -49,6 +53,68 @@ impl<const N: usize> Blob<N> {
 impl<const N: usize> Default for Blob<N> {
     fn default() -> Self {
         Self([0u8; N])
+    }
+}
+
+impl<const N: usize> Index<usize> for Blob<N> {
+    type Output = u8;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.0[index]
+    }
+}
+
+impl<const N: usize> IndexMut<usize> for Blob<N> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        &mut self.0[index]
+    }
+}
+
+impl<const N: usize> Index<Range<usize>> for Blob<N> {
+    type Output = [u8];
+
+    fn index(&self, range: Range<usize>) -> &Self::Output {
+        &self.0[range]
+    }
+}
+
+impl<const N: usize> Index<RangeTo<usize>> for Blob<N> {
+    type Output = [u8];
+
+    fn index(&self, range: RangeTo<usize>) -> &Self::Output {
+        &self.0[range]
+    }
+}
+
+impl<const N: usize> Index<RangeFrom<usize>> for Blob<N> {
+    type Output = [u8];
+
+    fn index(&self, range: RangeFrom<usize>) -> &Self::Output {
+        &self.0[range]
+    }
+}
+
+impl<const N: usize> Index<RangeFull> for Blob<N> {
+    type Output = [u8];
+
+    fn index(&self, range: RangeFull) -> &Self::Output {
+        &self.0[range]
+    }
+}
+
+impl<const N: usize> Index<RangeInclusive<usize>> for Blob<N> {
+    type Output = [u8];
+
+    fn index(&self, range: RangeInclusive<usize>) -> &Self::Output {
+        &self.0[range]
+    }
+}
+
+impl<const N: usize> Index<RangeToInclusive<usize>> for Blob<N> {
+    type Output = [u8];
+
+    fn index(&self, range: RangeToInclusive<usize>) -> &Self::Output {
+        &self.0[range]
     }
 }
 

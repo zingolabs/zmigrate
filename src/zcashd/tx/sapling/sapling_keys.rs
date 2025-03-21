@@ -15,6 +15,10 @@ impl SaplingKeys {
     pub fn keypairs(&self) -> impl Iterator<Item = &SaplingKey> {
         self.0.values()
     }
+
+    pub fn get(&self, ivk: &SaplingIncomingViewingKey) -> Option<&SaplingKey> {
+        self.0.get(ivk)
+    }
 }
 
 impl std::fmt::Debug for SaplingKeys {

@@ -15,7 +15,7 @@ use crate::{
 
 /// Migrate a ZCashd wallet to the Zewif wallet format
 pub fn migrate_to_zewif(wallet: &ZcashdWallet) -> Result<ZewifTop> {
-    // Create a new ZewifDB
+    // Create a new ZewifTop
     let mut zewif_top = ZewifTop::new();
 
     // Convert seed material (mnemonic phrase)
@@ -32,12 +32,7 @@ pub fn migrate_to_zewif(wallet: &ZcashdWallet) -> Result<ZewifTop> {
     let mut transactions = convert_transactions(wallet)?;
 
     // Convert orchard note commitment tree if available
-    if !wallet
-        .orchard_note_commitment_tree
-        .unparsed_data
-        .0
-        .is_empty()
-    {
+    if !wallet.orchard_note_commitment_tree.unparsed_data.is_empty() {
         // Update transaction outputs with note positions from the note commitment tree
         update_transaction_positions(wallet, &mut transactions)?;
     }
@@ -45,7 +40,38 @@ pub fn migrate_to_zewif(wallet: &ZcashdWallet) -> Result<ZewifTop> {
     // If there are unified accounts, process them
     if let Some(unified_accounts) = &wallet.unified_accounts {
         // Create accounts based on unified_accounts structure
-        let accounts_map = convert_unified_accounts(wallet, unified_accounts, &transactions)?;
+        let mut accounts_map = convert_unified_accounts(wallet, unified_accounts, &transactions)?;
+
+        // Initialize address registry to track address-to-account relationships
+        let address_registry = initialize_address_registry(wallet, unified_accounts)?;
+
+        // Create a default account for addresses not associated with any other account
+        let mut default_account = Account::new();
+        default_account.set_name("Default Account");
+
+        // Create a mutable reference for accounts_map to use in the conversion functions
+        let mut accounts_map_ref = Some(&mut accounts_map);
+
+        // Convert transparent addresses using the registry to assign to correct accounts
+        convert_transparent_addresses(
+            wallet,
+            &mut default_account,
+            Some(&address_registry),
+            &mut accounts_map_ref,
+        )?;
+
+        // Convert sapling addresses using the registry to assign to correct accounts
+        convert_sapling_addresses(
+            wallet,
+            &mut default_account,
+            Some(&address_registry),
+            &mut accounts_map_ref,
+        )?;
+
+        // Add the default account to accounts_map if it has any addresses
+        if !default_account.addresses().is_empty() {
+            accounts_map.insert(u256::default(), default_account);
+        }
 
         // Add all accounts to the wallet
         for account in accounts_map.values() {
@@ -56,11 +82,14 @@ pub fn migrate_to_zewif(wallet: &ZcashdWallet) -> Result<ZewifTop> {
         let mut default_account = Account::new();
         default_account.set_name("Default Account");
 
-        // Convert transparent addresses
-        convert_transparent_addresses(wallet, &mut default_account)?;
+        // Create a None reference for accounts_map
+        let mut accounts_map_ref = None;
 
-        // Convert sapling addresses
-        convert_sapling_addresses(wallet, &mut default_account)?;
+        // Convert transparent addresses (single account mode)
+        convert_transparent_addresses(wallet, &mut default_account, None, &mut accounts_map_ref)?;
+
+        // Convert sapling addresses (single account mode)
+        convert_sapling_addresses(wallet, &mut default_account, None, &mut accounts_map_ref)?;
 
         // Add all transaction IDs to the default account's relevant transactions
         for txid in transactions.keys() {
@@ -71,9 +100,9 @@ pub fn migrate_to_zewif(wallet: &ZcashdWallet) -> Result<ZewifTop> {
         zewif_wallet.add_account(default_account);
     }
 
-    // Add wallet and transactions to the ZewifDB
+    // Add wallet and transactions to the ZewifTop
     zewif_top.add_wallet(zewif_wallet);
-    zewif_top.transactions = transactions;
+    zewif_top.set_transactions(transactions);
 
     Ok(zewif_top)
 }
@@ -91,16 +120,23 @@ fn convert_seed_material(wallet: &ZcashdWallet) -> Result<Option<zewif::SeedMate
 }
 
 /// Convert ZCashd transparent addresses to Zewif format
-/// This version is used only when there are no unified accounts
+///
+/// This function handles transparent address assignment:
+/// - If registry is available, tries to map addresses to accounts
+/// - Otherwise assigns all addresses to the default account
 fn convert_transparent_addresses(
     wallet: &ZcashdWallet,
-    account: &mut zewif::Account,
+    default_account: &mut zewif::Account,
+    address_registry: Option<&AddressRegistry>,
+    accounts_map: &mut Option<&mut HashMap<u256, Account>>,
 ) -> Result<()> {
+    // Flag for multi-account mode
+    let multi_account_mode = address_registry.is_some() && accounts_map.is_some();
+
     // Process address_names which contain transparent addresses
     for (zcashd_address, name) in &wallet.address_names {
-        let transparent_address = zewif::TransparentAddress::new(zcashd_address.0.clone());
-
-        // Create a ZewifAddress from the TransparentAddress
+        // Create address components
+        let transparent_address = zewif::TransparentAddress::new(zcashd_address.clone());
         let protocol_address = ProtocolAddress::Transparent(transparent_address);
         let mut zewif_address = zewif::Address::new(protocol_address);
         zewif_address.set_name(name.clone());
@@ -110,16 +146,47 @@ fn convert_transparent_addresses(
             zewif_address.set_purpose(purpose.clone());
         }
 
-        // Add the address to the account with its string representation as key
-        account.add_address(zewif_address);
+        // In multi-account mode, try to assign to the correct account
+        let mut assigned = false;
+
+        if multi_account_mode {
+            let registry = address_registry.unwrap();
+            let addr_id = AddressId::Transparent(zcashd_address.clone().into());
+
+            if let Some(account_id) = registry.find_account(&addr_id) {
+                if let Some(accounts) = accounts_map.as_mut() {
+                    if let Some(target_account) = accounts.get_mut(account_id) {
+                        // Add to the specified account
+                        target_account.add_address(zewif_address.clone());
+                        assigned = true;
+                    }
+                }
+            }
+        }
+
+        // If not assigned to an account or in single-account mode, add to default account
+        if !assigned {
+            default_account.add_address(zewif_address);
+        }
     }
 
     Ok(())
 }
 
 /// Convert ZCashd sapling addresses to Zewif format
-/// This version is used only when there are no unified accounts
-fn convert_sapling_addresses(wallet: &ZcashdWallet, account: &mut zewif::Account) -> Result<()> {
+///
+/// This function handles sapling address assignment:
+/// - If registry is available, tries to map addresses to accounts
+/// - Otherwise assigns all addresses to the default account
+fn convert_sapling_addresses(
+    wallet: &ZcashdWallet,
+    default_account: &mut zewif::Account,
+    address_registry: Option<&AddressRegistry>,
+    accounts_map: &mut Option<&mut HashMap<u256, Account>>,
+) -> Result<()> {
+    // Flag for multi-account mode
+    let multi_account_mode = address_registry.is_some() && accounts_map.is_some();
+
     // Process sapling_z_addresses
     for (sapling_address, viewing_key) in &wallet.sapling_z_addresses {
         let address_str = sapling_address.to_string(wallet.network());
@@ -145,8 +212,28 @@ fn convert_sapling_addresses(wallet: &ZcashdWallet, account: &mut zewif::Account
             zewif_address.set_purpose(purpose.clone());
         }
 
-        // Add the address to the account with its string representation as key
-        account.add_address(zewif_address);
+        // In multi-account mode, try to assign to the correct account
+        let mut assigned = false;
+
+        if multi_account_mode {
+            let registry = address_registry.unwrap();
+            let addr_id = AddressId::Sapling(address_str.clone());
+
+            if let Some(account_id) = registry.find_account(&addr_id) {
+                if let Some(accounts) = accounts_map.as_mut() {
+                    if let Some(target_account) = accounts.get_mut(account_id) {
+                        // Add to the specified account
+                        target_account.add_address(zewif_address.clone());
+                        assigned = true;
+                    }
+                }
+            }
+        }
+
+        // If not assigned to an account or in single-account mode, add to default account
+        if !assigned {
+            default_account.add_address(zewif_address);
+        }
     }
 
     Ok(())
@@ -157,7 +244,7 @@ fn find_sapling_key_for_ivk<'a>(
     wallet: &'a ZcashdWallet,
     ivk: &SaplingIncomingViewingKey,
 ) -> Option<&'a zcashd::SaplingKey> {
-    wallet.sapling_keys.0.get(ivk)
+    wallet.sapling_keys.get(ivk)
 }
 
 /// Convert ZCashd SaplingExtendedSpendingKey to Zewif SpendingKey
@@ -183,13 +270,13 @@ fn convert_sapling_spending_key(
 /// Extract all addresses involved in a transaction
 fn extract_transaction_addresses(
     wallet: &ZcashdWallet,
-    tx_id: &TxId,
+    tx_id: TxId,
     tx: &zcashd::WalletTx,
 ) -> Result<HashSet<String>> {
     let mut addresses = HashSet::new();
 
     // Check if we have recipient mappings for this transaction
-    if let Some(recipients) = wallet.send_recipients.get(tx_id) {
+    if let Some(recipients) = wallet.send_recipients.get(&tx_id) {
         for recipient in recipients {
             // Add the unified address if it exists
             if !recipient.unified_address.is_empty() {
@@ -228,7 +315,7 @@ fn extract_transaction_addresses(
         addresses.insert(input_addr);
 
         // Extract potential P2PKH or P2SH addresses from script signatures
-        let script_data = &tx_in.script_sig.0.0;
+        let script_data = &tx_in.script_sig;
 
         // We're looking for common script signature patterns that might contain addresses
         // P2PKH scriptSigs typically have format: <sig> <pubkey>
@@ -265,7 +352,7 @@ fn extract_transaction_addresses(
 
     // For transparent outputs, extract addresses from the scriptPubKey
     for (vout_idx, tx_out) in tx.vout.iter().enumerate() {
-        let script_data = &tx_out.script_pub_key.0.0;
+        let script_data = &tx_out.script_pub_key;
 
         // P2PKH detection - match the pattern: OP_DUP OP_HASH160 <pubKeyHash> OP_EQUALVERIFY OP_CHECKSIG
         if script_data.len() >= 25 && script_data[0] == 0x76 && script_data[1] == 0xA9 {
@@ -427,7 +514,7 @@ fn extract_transaction_addresses(
 
         // Also add transparent addresses if any are associated with this wallet
         for addr in wallet.address_names.keys() {
-            addresses.insert(addr.0.clone());
+            addresses.insert(addr.clone().into());
         }
     }
 
@@ -465,23 +552,20 @@ fn convert_transaction(tx_id: TxId, tx: &zcashd::WalletTx) -> Result<zewif::Tran
 
     // Convert transparent inputs
     for tx_in in &tx.vin {
-        let zewif_tx_in = zewif::TxIn {
-            previous_output: zewif::TxOutPoint {
-                txid: tx_in.prevout.txid,
-                index: tx_in.prevout.vout,
-            },
-            script_sig: Data(tx_in.script_sig.0.0.clone()),
-            sequence: tx_in.sequence,
-        };
+        let zewif_tx_in = zewif::TxIn::new(
+            zewif::TxOutPoint::new(tx_in.prevout.txid, tx_in.prevout.vout),
+            tx_in.script_sig.clone(),
+            tx_in.sequence,
+        );
         zewif_tx.add_input(zewif_tx_in);
     }
 
     // Convert transparent outputs
     for tx_out in &tx.vout {
         let amount = tx_out.value;
-        let script_pubkey = Data(tx_out.script_pub_key.0.0.clone());
+        let script_pubkey = tx_out.script_pub_key.clone();
 
-        let zewif_tx_out = zewif::TxOut { value: amount, script_pubkey };
+        let zewif_tx_out = zewif::TxOut::new(amount, script_pubkey);
         zewif_tx.add_output(zewif_tx_out);
     }
 
@@ -490,60 +574,40 @@ fn convert_transaction(tx_id: TxId, tx: &zcashd::WalletTx) -> Result<zewif::Tran
         zcashd::SaplingBundle::V4(bundle_v4) => {
             // Convert Sapling spends
             for (idx, spend) in bundle_v4.spends.iter().enumerate() {
-                let sapling_spend = zewif::SaplingSpendDescription {
-                    spend_index: idx as u32,
-                    value: Some(
-                        zewif::Amount::try_from(i64::from(bundle_v4.amount))
-                            .with_context(|| "Converting spend value")?,
-                    ),
-                    anchor_height: None, // Don't have this data
-                    nullifier: spend.nullifier,
-                    zkproof: Data(spend.zkproof.0.to_vec()),
-                    attachments: Attachments::new(),
-                };
+                let mut sapling_spend = zewif::SaplingSpendDescription::new();
+                sapling_spend.set_spend_index(idx as u32);
+                sapling_spend.set_value(Some(bundle_v4.amount));
+                sapling_spend.set_nullifier(spend.nullifier);
+                sapling_spend.set_zkproof(spend.zkproof.clone());
                 zewif_tx.add_sapling_spend(sapling_spend);
             }
 
             // Convert Sapling outputs
             for (idx, output) in bundle_v4.outputs.iter().enumerate() {
-                let sapling_output = zewif::SaplingOutputDescription {
-                    output_index: idx as u32,
-                    commitment: output.cmu,
-                    ephemeral_key: output.ephemeral_key,
-                    enc_ciphertext: Data(output.enc_ciphertext.0.to_vec()),
-                    memo: None, // We don't have this decrypted
-                    note_commitment_tree_position: zewif::Position(0), // Placeholder
-                    witness: None, // Don't have witness data
-                    attachments: Attachments::new(),
-                };
+                let mut sapling_output = zewif::SaplingOutputDescription::new();
+                sapling_output.set_output_index(idx as u32);
+                sapling_output.set_commitment(output.cmu);
+                sapling_output.set_ephemeral_key(output.ephemeral_key);
+                sapling_output.set_enc_ciphertext(output.enc_ciphertext.clone());
                 zewif_tx.add_sapling_output(sapling_output);
             }
         }
         zcashd::SaplingBundle::V5(bundle_v5) => {
             // Processing for V5 bundles
             for (idx, spend) in bundle_v5.shielded_spends.iter().enumerate() {
-                let sapling_spend = zewif::SaplingSpendDescription {
-                    spend_index: idx as u32,
-                    value: None, // V5 doesn't expose values
-                    anchor_height: None,
-                    nullifier: spend.nullifier(),
-                    zkproof: Data(spend.zkproof().0.to_vec()),
-                    attachments: Attachments::new(),
-                };
+                let mut sapling_spend = zewif::SaplingSpendDescription::new();
+                sapling_spend.set_spend_index(idx as u32);
+                sapling_spend.set_nullifier(spend.nullifier());
+                sapling_spend.set_zkproof(spend.zkproof().clone());
                 zewif_tx.add_sapling_spend(sapling_spend);
             }
 
             for (idx, output) in bundle_v5.shielded_outputs.iter().enumerate() {
-                let sapling_output = zewif::SaplingOutputDescription {
-                    output_index: idx as u32,
-                    commitment: output.cmu(),
-                    ephemeral_key: output.ephemeral_key(),
-                    enc_ciphertext: Data(output.enc_ciphertext().to_vec()),
-                    memo: None,
-                    note_commitment_tree_position: zewif::Position(0), // Placeholder
-                    witness: None,
-                    attachments: Attachments::new(),
-                };
+                let mut sapling_output = zewif::SaplingOutputDescription::new();
+                sapling_output.set_output_index(idx as u32);
+                sapling_output.set_commitment(output.cmu());
+                sapling_output.set_ephemeral_key(output.ephemeral_key());
+                sapling_output.set_enc_ciphertext(output.enc_ciphertext().clone());
                 zewif_tx.add_sapling_output(sapling_output);
             }
         }
@@ -552,19 +616,11 @@ fn convert_transaction(tx_id: TxId, tx: &zcashd::WalletTx) -> Result<zewif::Tran
     // Convert Orchard actions
     if let zcashd::OrchardBundle(Some(orchard_bundle)) = &tx.orchard_bundle {
         for (idx, action) in orchard_bundle.actions.iter().enumerate() {
-            let orchard_action = zewif::OrchardActionDescription {
-                action_index: idx as u32,
-                anchor: u256::default(), // Anchor not directly available in OrchardAction
-                nullifier: action.nf_old,
-                zkproof: Data(Vec::new()), // Proof not directly available in OrchardAction
-                commitment: action.cmx,    // Using cmx as commitment
-                ephemeral_key: u256::default(), // Not available
-                enc_ciphertext: Data(action.encrypted_note.enc_ciphertext().to_vec()),
-                memo: None,
-                note_commitment_tree_position: zewif::Position(0), // Placeholder
-                witness: None,
-                attachments: Attachments::new(),
-            };
+            let mut orchard_action = zewif::OrchardActionDescription::new();
+            orchard_action.set_action_index(idx as u32);
+            orchard_action.set_nullifier(action.nf_old);
+            orchard_action.set_commitment(action.cmx);
+            orchard_action.set_enc_ciphertext(action.encrypted_note.enc_ciphertext().clone());
             zewif_tx.add_orchard_action(orchard_action);
         }
     }
@@ -612,9 +668,9 @@ fn initialize_address_registry(
     }
 
     // Step 2: For each known transparent address, try to find its account
-    for (zcashd_address, _name) in &wallet.address_names {
+    for zcashd_address in wallet.address_names.keys() {
         // Create an AddressId for this transparent address
-        let addr_id = AddressId::Transparent(zcashd_address.0.clone());
+        let _addr_id = AddressId::Transparent(zcashd_address.0.clone());
 
         // TODO: When we have explicit mappings, use those here
         // For now, this will be done in the convert_transparent_addresses function
@@ -622,10 +678,10 @@ fn initialize_address_registry(
     }
 
     // Step 3: For each known sapling address, try to find its account
-    for (sapling_address, _viewing_key) in &wallet.sapling_z_addresses {
+    for sapling_address in wallet.sapling_z_addresses.keys() {
         // Create an AddressId for this sapling address
         let addr_str = sapling_address.to_string(wallet.network());
-        let addr_id = AddressId::Sapling(addr_str);
+        let _addr_id = AddressId::Sapling(addr_str);
 
         // TODO: When we have explicit mappings, use those here
         // For now, this will be done in the convert_sapling_addresses function
@@ -780,7 +836,7 @@ fn convert_unified_accounts(
     // Analyze each transaction to find which addresses are involved
     for (txid, wallet_tx) in &wallet.transactions {
         // Extract all addresses involved in this transaction
-        match extract_transaction_addresses(wallet, txid, wallet_tx) {
+        match extract_transaction_addresses(wallet, *txid, wallet_tx) {
             Ok(tx_addresses) => {
                 let mut relevant_accounts = HashSet::new();
 
@@ -866,14 +922,14 @@ fn update_transaction_positions(
 
                                 // Create a new action with the updated position
                                 let mut updated_action = action.clone();
-                                updated_action.note_commitment_tree_position = position;
+                                updated_action.set_note_commitment_tree_position(position);
 
                                 // Here, we would normally update the action in the vector,
                                 // but we can't because we only have an immutable reference through orchard_actions()
                                 // For a real implementation, we'd need a mutable access method
 
                                 // For now, we'll just record the position for later use
-                                commitment_positions.insert(action.commitment, position);
+                                commitment_positions.insert(*action.commitment(), position);
                             }
                         }
                     }
@@ -901,13 +957,13 @@ fn update_transaction_positions(
 
                                     // Create a new output with the updated position
                                     let mut updated_output = output.clone();
-                                    updated_output.note_commitment_tree_position = position;
+                                    updated_output.set_note_commitment_tree_position(position);
 
                                     // Again, we can't update the output directly due to immutable reference
                                     // For a real implementation, we'd need a mutable access method
 
                                     // Record the position for later use
-                                    commitment_positions.insert(output.commitment, position);
+                                    commitment_positions.insert(*output.commitment(), position);
                                 }
                             }
                         }

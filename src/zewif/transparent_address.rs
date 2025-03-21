@@ -8,9 +8,9 @@ pub struct TransparentAddress {
 }
 
 impl TransparentAddress {
-    pub fn new(address: String) -> Self {
+    pub fn new(address: impl Into<String>) -> Self {
         TransparentAddress {
-            address,
+            address: address.into(),
             spend_authority: None,
             derivation_info: None,
         }

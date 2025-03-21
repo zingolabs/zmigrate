@@ -205,13 +205,13 @@ The following items represent unfinished components specifically related to in-m
         - ✅ Improved `convert_unified_accounts` function to use the AddressRegistry
         - ✅ Updated transaction assignment logic to use the registry for account mapping
 
-     3. **Fix Transparent Address Assignment**
-        - Update the code in `convert_transparent_addresses` to use the account mapping instead of default account
-        - Make this function work with both unified and non-unified account scenarios
+     3. **Fix Transparent Address Assignment** (COMPLETED)
+        - ✅ Updated the code in `convert_transparent_addresses` to use the AddressRegistry for account mapping
+        - ✅ Added support for both unified and non-unified account scenarios with a flexible API
 
-     4. **Fix Shielded Address Assignment**
-        - Similarly update the `convert_sapling_addresses` function to use proper account mapping
-        - Ensure shielded addresses are assigned to the correct accounts
+     4. **Fix Shielded Address Assignment** (COMPLETED)
+        - ✅ Updated the `convert_sapling_addresses` function to use proper account mapping via AddressRegistry
+        - ✅ Implemented consistent logic to ensure addresses are assigned to correct accounts
 
      5. **Update Transaction Assignment Logic**
         - Refine how transactions are assigned to accounts based on address involvement

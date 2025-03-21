@@ -2,8 +2,6 @@
 
 mod expiry_height;
 pub use expiry_height::*;
-mod groth_proof;
-pub use groth_proof::*;
 mod incremental_merkle_tree;
 pub use incremental_merkle_tree::*;
 mod incremental_witness;
@@ -18,8 +16,6 @@ mod out_point;
 pub use out_point::*;
 mod sapling;
 pub use sapling::*;
-mod script;
-pub use script::*;
 mod sprout;
 pub use sprout::*;
 mod tx_in;

@@ -1,4 +1,3 @@
-use crate::Blob;
+use crate::blob;
 
-#[derive(Debug, Clone)]
-pub struct Anchor(pub Blob<32>);
+blob!(Anchor, 32);

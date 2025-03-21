@@ -60,8 +60,8 @@ impl Transaction {
         }
     }
 
-    pub fn txid(&self) -> &TxId {
-        &self.txid
+    pub fn txid(&self) -> TxId {
+        self.txid
     }
 
     pub fn raw(&self) -> Option<&Data> {

@@ -1,3 +1,5 @@
+use std::ops::{Index, IndexMut, Range, RangeFrom, RangeFull, RangeInclusive, RangeTo, RangeToInclusive};
+
 use anyhow::{Context, Result};
 
 use crate::{Parse, Parser, parse};
@@ -17,10 +19,12 @@ impl Data {
         Self(data.as_ref().to_vec())
     }
 
+    #[must_use]
     pub fn len(&self) -> usize {
         self.0.len()
     }
 
+    #[must_use]
     pub fn is_empty(&self) -> bool {
         self.0.is_empty()
     }
@@ -67,6 +71,104 @@ impl Parse for Data {
 impl Default for Data {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl Index<usize> for Data {
+    type Output = u8;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.0[index]
+    }
+}
+
+impl IndexMut<usize> for Data {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        &mut self.0[index]
+    }
+}
+
+impl Index<Range<usize>> for Data {
+    type Output = [u8];
+
+    fn index(&self, range: Range<usize>) -> &Self::Output {
+        &self.0[range]
+    }
+}
+
+impl IndexMut<Range<usize>> for Data {
+    fn index_mut(&mut self, range: Range<usize>) -> &mut Self::Output {
+        &mut self.0[range]
+    }
+}
+
+impl Index<RangeTo<usize>> for Data {
+    type Output = [u8];
+
+    fn index(&self, range: RangeTo<usize>) -> &Self::Output {
+        &self.0[range]
+    }
+}
+
+impl IndexMut<RangeTo<usize>> for Data {
+    fn index_mut(&mut self, range: RangeTo<usize>) -> &mut Self::Output {
+        &mut self.0[range]
+    }
+}
+
+impl Index<RangeFrom<usize>> for Data {
+    type Output = [u8];
+
+    fn index(&self, range: RangeFrom<usize>) -> &Self::Output {
+        &self.0[range]
+    }
+}
+
+impl IndexMut<RangeFrom<usize>> for Data {
+    fn index_mut(&mut self, range: RangeFrom<usize>) -> &mut Self::Output {
+        &mut self.0[range]
+    }
+}
+
+impl Index<RangeFull> for Data {
+    type Output = [u8];
+
+    fn index(&self, range: RangeFull) -> &Self::Output {
+        &self.0[range]
+    }
+}
+
+impl IndexMut<RangeFull> for Data {
+    fn index_mut(&mut self, range: RangeFull) -> &mut Self::Output {
+        &mut self.0[range]
+    }
+}
+
+impl Index<RangeInclusive<usize>> for Data {
+    type Output = [u8];
+
+    fn index(&self, range: RangeInclusive<usize>) -> &Self::Output {
+        &self.0[range]
+    }
+}
+
+impl IndexMut<RangeInclusive<usize>> for Data {
+    fn index_mut(&mut self, range: RangeInclusive<usize>) -> &mut Self::Output {
+        &mut self.0[range]
+    }
+}
+
+impl Index<RangeToInclusive<usize>> for Data {
+    type Output = [u8];
+
+    fn index(&self, range: RangeToInclusive<usize>) -> &Self::Output {
+        &self.0[range]
+    }
+}
+
+impl IndexMut<RangeToInclusive<usize>> for Data {
+    fn index_mut(&mut self, range: RangeToInclusive<usize>) -> &mut Self::Output {
+        &mut self.0[range]
     }
 }
 

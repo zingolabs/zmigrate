@@ -90,6 +90,10 @@ mod u256_type;
 pub use u256_type::*;
 mod zewif_wallet;
 pub use zewif_wallet::*;
+mod script;
+pub use script::*;
+mod groth_proof;
+pub use groth_proof::*;
 
 use std::collections::HashMap;
 
@@ -102,15 +106,14 @@ use crate::impl_attachable;
 /// history.
 #[derive(Debug, Clone)]
 pub struct ZewifTop {
-    pub wallets: HashMap<ARID, ZewifWallet>,
-    pub transactions: HashMap<TxId, Transaction>,
-    pub attachments: Attachments,
+    wallets: HashMap<ARID, ZewifWallet>,
+    transactions: HashMap<TxId, Transaction>,
+    attachments: Attachments,
 }
 
 impl_attachable!(ZewifTop);
 
 impl ZewifTop {
-    /// Create a new, empty `ZewifDB` instance.
     pub fn new() -> Self {
         Self {
             wallets: HashMap::new(),
@@ -139,8 +142,12 @@ impl ZewifTop {
         self.transactions.insert(txid, transaction);
     }
 
-    pub fn get_transaction(&self, txid: &TxId) -> Option<&Transaction> {
-        self.transactions.get(txid)
+    pub fn get_transaction(&self, txid: TxId) -> Option<&Transaction> {
+        self.transactions.get(&txid)
+    }
+
+    pub fn set_transactions(&mut self, transactions: HashMap<TxId, Transaction>) {
+        self.transactions = transactions;
     }
 }
 

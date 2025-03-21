@@ -46,5 +46,23 @@ macro_rules! string {
                 Ok(Self($crate::parse!(p, "string")?))
             }
         }
+
+        impl From<$name> for String {
+            fn from(s: $name) -> Self {
+                s.0
+            }
+        }
+
+        impl From<&$name> for String {
+            fn from(s: &$name) -> Self {
+                s.0.clone()
+            }
+        }
+
+        impl From<String> for $name {
+            fn from(s: String) -> Self {
+                Self(s)
+            }
+        }
     };
 }

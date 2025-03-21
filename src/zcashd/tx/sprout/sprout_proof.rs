@@ -1,8 +1,8 @@
 use anyhow::Result;
 
-use crate::{ParseWithParam, Parser, parse};
+use crate::{GrothProof, ParseWithParam, Parser, parse};
 
-use super::{super::GrothProof, PHGRProof};
+use super::PHGRProof;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum SproutProof {
