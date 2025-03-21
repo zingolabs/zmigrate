@@ -6,7 +6,7 @@ use crate::{Parse, Parser};
 
 /// A fixed-size byte array.
 #[derive(Clone, PartialEq, Eq, Hash)]
-pub struct Blob<const N: usize>(pub [u8; N]);
+pub struct Blob<const N: usize>([u8; N]);
 
 impl<const N: usize> Blob<N> {
     pub fn new(data: [u8; N]) -> Self {
@@ -163,6 +163,14 @@ impl<const N: usize> Parse for Blob<N> {
             .next(N)
             .with_context(|| format!("Parsing Blob<{}>", N))?;
         Self::from_slice(data)
+    }
+}
+
+// Blanket implementation to allow a `Blob` of any size to be converted to its array
+// representation.
+impl<const N: usize> From<Blob<N>> for [u8; N] {
+    fn from(blob: Blob<N>) -> [u8; N] {
+        blob.0
     }
 }
 

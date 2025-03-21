@@ -8,12 +8,12 @@ pub struct u160([u8; 20]);
 
 impl u160 {
     pub fn from_blob(blob: Blob20) -> Self {
-        Self(blob.0)
+        Self(blob.into())
     }
 
     pub fn from_slice(bytes: &[u8]) -> Result<Self> {
         let blob = Blob20::from_slice(bytes).context("Creating U160 from slice")?;
-        Ok(Self(blob.0))
+        Ok(Self(blob.into()))
     }
 }
 

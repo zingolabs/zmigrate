@@ -101,7 +101,7 @@ impl ZcashdDump {
         let mut records: HashMap<DBKey, DBValue> = HashMap::new();
         let mut keys_by_keyname: HashMap<String, HashSet<DBKey>> = HashMap::new();
 
-        for (key_data, value_data) in &berkeley_dump.data_records {
+        for (key_data, value_data) in berkeley_dump.data_records() {
             let key = DBKey::parse_data(key_data)?;
             let value = DBValue::new(value_data.clone());
             records.insert(key.clone(), value.clone());
