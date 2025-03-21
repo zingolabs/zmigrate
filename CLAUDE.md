@@ -73,6 +73,10 @@ The format is structured to capture the hierarchical nature of wallet data, from
 - Always prefer "fail fast" error handling. If a function cannot proceed due to an error, return early.
 - Don't mark items complete below until they are fully implemented.
 - Make sure all errors and lints are fixed in files you modify.
+- When recommending a next task:
+  - Ensure that no other tasks are blocking the recommended task.
+  - Determine whether the task requires any dependencies that aren't yet present.
+  - Determine whether the task should be broken down into subtasks.
 
 ## Migration Plan: ZCashd to ZeWIF
 
