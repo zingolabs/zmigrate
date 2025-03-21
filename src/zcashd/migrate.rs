@@ -1,6 +1,8 @@
 use std::collections::{HashMap, HashSet};
 
 use anyhow::{Context, Result};
+use ripemd::{Digest, Ripemd160};
+use sha2::Sha256;
 
 use crate::{
     Blob32, Data, ProtocolAddress, SaplingIncomingViewingKey, TxId, u256,
@@ -237,19 +239,20 @@ fn extract_transaction_addresses(
             // Check if it could be a compressed pubkey (starts with 0x02 or 0x03)
             if potential_pubkey[0] == 0x02 || potential_pubkey[0] == 0x03 {
                 // Hash the pubkey to get the pubkey hash (RIPEMD160(SHA256(pubkey)))
-                use sha2::{Digest, Sha256};
+                // First calculate SHA256 hash
                 let mut sha256 = Sha256::new();
                 sha256.update(potential_pubkey);
                 let sha256_result = sha256.finalize();
-
-                // We would need RIPEMD160 but we'll use the first 20 bytes as a substitute
-                // In production code we'd use the actual RIPEMD160 hash
-                let pubkey_hash = &sha256_result[0..20];
+                
+                // Calculate RIPEMD160 hash of the SHA256 result
+                let mut ripemd160 = Ripemd160::new();
+                ripemd160.update(sha256_result);
+                let pubkey_hash = ripemd160.finalize();
 
                 // Create a transparent P2PKH address from this pubkey hash
                 // Create a KeyId for consistent address encoding
                 let key_id = zcashd::KeyId(
-                    crate::u160::from_slice(pubkey_hash).expect("Creating u160 from 20-byte slice"),
+                    crate::u160::from_slice(&pubkey_hash[..]).expect("Creating u160 from RIPEMD160 hash"),
                 );
                 addresses.insert(key_id.to_string(wallet.network()));
             }
@@ -268,7 +271,7 @@ fn extract_transaction_addresses(
 
                 // Convert to a proper P2PKH Zcash address using KeyId
                 let key_id = zcashd::KeyId(
-                    crate::u160::from_slice(pubkey_hash).expect("Creating u160 from 20-byte slice"),
+                    crate::u160::from_slice(pubkey_hash).expect("Creating u160 from pubkey hash"),
                 );
                 addresses.insert(key_id.to_string(wallet.network()));
             }
@@ -284,7 +287,7 @@ fn extract_transaction_addresses(
 
             // Convert to a proper P2SH Zcash address using ScriptId
             let script_id = zcashd::ScriptId(
-                crate::u160::from_slice(script_hash).expect("Creating u160 from 20-byte slice"),
+                crate::u160::from_slice(script_hash).expect("Creating u160 from script hash"),
             );
             addresses.insert(script_id.to_string(wallet.network()));
         }
