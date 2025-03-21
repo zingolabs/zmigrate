@@ -271,41 +271,48 @@ fn convert_sapling_spending_key(
     Ok(spending_key)
 }
 
-/// Extract all addresses involved in a transaction
+/// Extract all addresses involved in a transaction and return as AddressId values
 fn extract_transaction_addresses(
     wallet: &ZcashdWallet,
     tx_id: TxId,
     tx: &zcashd::WalletTx,
-) -> Result<HashSet<String>> {
-    let mut addresses: HashSet<String> = HashSet::new();
+) -> Result<HashSet<AddressId>> {
+    let mut addresses: HashSet<AddressId> = HashSet::new();
+    // Temporary storage for string addresses (used for metadata addresses that can't be converted to AddressId)
+    let mut meta_addresses: HashSet<String> = HashSet::new();
 
     // Check if we have recipient mappings for this transaction
     if let Some(recipients) = wallet.send_recipients().get(&tx_id) {
         for recipient in recipients {
             // Add the unified address if it exists
             if !recipient.unified_address().is_empty() {
-                addresses.insert(recipient.unified_address().to_string());
+                if let Ok(addr_id) = AddressId::from_address_string(
+                    recipient.unified_address(),
+                    wallet.network(),
+                ) {
+                    addresses.insert(addr_id);
+                }
             }
 
             // Add the recipient address based on the type
             match recipient.recipient_address() {
                 zcashd::RecipientAddress::Sapling(addr) => {
                     let addr_str = addr.to_string(wallet.network());
-                    addresses.insert(addr_str);
+                    addresses.insert(AddressId::Sapling(addr_str));
                 }
                 zcashd::RecipientAddress::Orchard(addr) => {
                     let addr_str = addr.to_string(wallet.network());
-                    addresses.insert(addr_str);
+                    addresses.insert(AddressId::Orchard(addr_str));
                 }
                 zcashd::RecipientAddress::KeyId(key_id) => {
                     // Convert P2PKH key hash to a Zcash address
                     let addr_str = key_id.to_string(wallet.network());
-                    addresses.insert(addr_str);
+                    addresses.insert(AddressId::Transparent(addr_str));
                 }
                 zcashd::RecipientAddress::ScriptId(script_id) => {
                     // Convert P2SH script hash to a Zcash address
                     let addr_str = script_id.to_string(wallet.network());
-                    addresses.insert(addr_str);
+                    addresses.insert(AddressId::Transparent(addr_str));
                 }
             }
         }
@@ -316,7 +323,7 @@ fn extract_transaction_addresses(
         // We'll derive a unique identifier from the previous outpoint to ensure we capture this transaction
         let txid_str = format!("{}", tx_in.prevout().txid());
         let input_addr = format!("input:{}:{}", txid_str, tx_in.prevout().vout());
-        addresses.insert(input_addr);
+        meta_addresses.insert(input_addr);
 
         // Extract potential P2PKH or P2SH addresses from script signatures
         let script_data = &tx_in.script_sig();
@@ -349,7 +356,8 @@ fn extract_transaction_addresses(
                     crate::u160::from_slice(&pubkey_hash[..])
                         .expect("Creating u160 from RIPEMD160 hash"),
                 );
-                addresses.insert(key_id.to_string(wallet.network()));
+                let addr_str = key_id.to_string(wallet.network());
+                addresses.insert(AddressId::Transparent(addr_str));
             }
         }
     }
@@ -368,7 +376,8 @@ fn extract_transaction_addresses(
                 let key_id = zcashd::KeyId(
                     crate::u160::from_slice(pubkey_hash).expect("Creating u160 from pubkey hash"),
                 );
-                addresses.insert(key_id.to_string(wallet.network()));
+                let addr_str = key_id.to_string(wallet.network());
+                addresses.insert(AddressId::Transparent(addr_str));
             }
         }
         // P2SH detection - match the pattern: OP_HASH160 <scriptHash> OP_EQUAL
@@ -384,12 +393,13 @@ fn extract_transaction_addresses(
             let script_id = zcashd::ScriptId(
                 crate::u160::from_slice(script_hash).expect("Creating u160 from script hash"),
             );
-            addresses.insert(script_id.to_string(wallet.network()));
+            let addr_str = script_id.to_string(wallet.network());
+            addresses.insert(AddressId::Transparent(addr_str));
         }
 
         // Always add an output identifier that links to this transaction
         let output_addr = format!("output:{}:{}", tx_id, vout_idx);
-        addresses.insert(output_addr);
+        meta_addresses.insert(output_addr);
     }
 
     // For Sapling spends and outputs
@@ -399,7 +409,7 @@ fn extract_transaction_addresses(
                 // The nullifier uniquely identifies the spend
                 // Use AsRef to get a reference to the underlying bytes
                 let nullifier_hex = hex::encode(spend.nullifier().as_ref() as &[u8]);
-                addresses.insert(format!("sapling_spend:{}", nullifier_hex));
+                meta_addresses.insert(format!("sapling_spend:{}", nullifier_hex));
 
                 // If we have note data for this nullifier, we might find the address
                 if let Some(sapling_note_data) = &tx.sapling_note_data {
@@ -410,7 +420,7 @@ fn extract_transaction_addresses(
                                 for (addr, ivk) in wallet.sapling_z_addresses() {
                                     if note_data.incoming_viewing_key() == ivk {
                                         let addr_str = addr.to_string(wallet.network());
-                                        addresses.insert(addr_str);
+                                        addresses.insert(AddressId::Sapling(addr_str));
                                         break;
                                     }
                                 }
@@ -424,7 +434,7 @@ fn extract_transaction_addresses(
                 // The commitment uniquely identifies the output
                 // Use AsRef to get a reference to the underlying bytes
                 let cm_hex = hex::encode(output.cmu().as_ref() as &[u8]);
-                addresses.insert(format!("sapling_output:{}", cm_hex));
+                meta_addresses.insert(format!("sapling_output:{}", cm_hex));
 
                 // If we have note data for this output, we might find the address
                 if let Some(sapling_note_data) = &tx.sapling_note_data {
@@ -434,7 +444,7 @@ fn extract_transaction_addresses(
                         for (addr, ivk) in wallet.sapling_z_addresses() {
                             if note_data.incoming_viewing_key() == ivk {
                                 let addr_str = addr.to_string(wallet.network());
-                                addresses.insert(addr_str);
+                                addresses.insert(AddressId::Sapling(addr_str));
                                 break;
                             }
                         }
@@ -448,13 +458,13 @@ fn extract_transaction_addresses(
             for spend in bundle_v5.shielded_spends() {
                 // Use AsRef to get a reference to the underlying bytes
                 let nullifier_hex = hex::encode(spend.nullifier().as_ref() as &[u8]);
-                addresses.insert(format!("sapling_spend_v5:{}", nullifier_hex));
+                meta_addresses.insert(format!("sapling_spend_v5:{}", nullifier_hex));
             }
 
             for output in bundle_v5.shielded_outputs() {
                 // Use AsRef to get a reference to the underlying bytes
                 let cm_hex = hex::encode(output.cmu().as_ref() as &[u8]);
-                addresses.insert(format!("sapling_output_v5:{}", cm_hex));
+                meta_addresses.insert(format!("sapling_output_v5:{}", cm_hex));
             }
         }
     }
@@ -466,7 +476,7 @@ fn extract_transaction_addresses(
             for (addr, ivk) in wallet.sapling_z_addresses() {
                 if note_data.incoming_viewing_key() == ivk {
                     let addr_str = addr.to_string(wallet.network());
-                    addresses.insert(addr_str);
+                    addresses.insert(AddressId::Sapling(addr_str));
                     break;
                 }
             }
@@ -479,7 +489,7 @@ fn extract_transaction_addresses(
         for (idx, action) in orchard_bundle.actions.iter().enumerate() {
             // Add standard identifiers like nullifier and commitment
             let nullifier_hex = hex::encode(action.nf_old);
-            addresses.insert(format!("orchard_nullifier:{}", nullifier_hex));
+            meta_addresses.insert(format!("orchard_nullifier:{}", nullifier_hex));
 
             // Extract potential address information if available
             if let Some(orchard_meta) = &tx.orchard_tx_meta {
@@ -492,7 +502,7 @@ fn extract_transaction_addresses(
                     // For now, since we're missing the full path, we'll use what we have
                     // to create a unique identifier that links to metadata
                     let output_id = format!("orchard_output:{}:{}", tx_id, idx);
-                    addresses.insert(output_id);
+                    meta_addresses.insert(output_id);
 
                     // If the outgoing viewing key is related to ours, we can possibly
                     // derive additional information, but that's complex and
@@ -504,7 +514,7 @@ fn extract_transaction_addresses(
             // which would have been added already when processing recipient_mappings
 
             // Also add the action index as a unique identifier
-            addresses.insert(format!("orchard_action_idx:{}:{}", tx_id, idx));
+            meta_addresses.insert(format!("orchard_action_idx:{}:{}", tx_id, idx));
         }
     }
 
@@ -513,18 +523,23 @@ fn extract_transaction_addresses(
     if tx.from_me && addresses.is_empty() {
         for addr in wallet.sapling_z_addresses().keys() {
             let addr_str = addr.to_string(wallet.network());
-            addresses.insert(addr_str);
+            addresses.insert(AddressId::Sapling(addr_str));
         }
 
         // Also add transparent addresses if any are associated with this wallet
         for addr in wallet.address_names().keys() {
-            addresses.insert(addr.clone().into());
+            addresses.insert(AddressId::Transparent(addr.0.clone()));
         }
     }
 
     // Add the transaction ID itself as a last resort identifier
-    addresses.insert(format!("tx:{}", tx_id));
-
+    meta_addresses.insert(format!("tx:{}", tx_id));
+    
+    // If we didn't find any direct addresses, but have metadata addresses,
+    // try to look up any addresses that could be related to these transaction components
+    // This is just a stub for future implementation where we'd have a more
+    // sophisticated lookup mechanism
+    
     Ok(addresses)
 }
 
@@ -698,7 +713,7 @@ fn initialize_address_registry(
 fn convert_unified_accounts(
     wallet: &ZcashdWallet,
     unified_accounts: &zcashd::UnifiedAccounts,
-    _transactions: &HashMap<TxId, zewif::Transaction>,
+    transactions: &HashMap<TxId, zewif::Transaction>,
 ) -> Result<HashMap<u256, Account>> {
     let mut accounts_map = HashMap::new();
 
@@ -839,25 +854,17 @@ fn convert_unified_accounts(
 
     // Analyze each transaction to find which addresses are involved
     for (txid, wallet_tx) in wallet.transactions() {
-        // Extract all addresses involved in this transaction
+        // Extract all addresses involved in this transaction as AddressId values
         match extract_transaction_addresses(wallet, *txid, wallet_tx) {
-            Ok(tx_addresses) => {
+            Ok(address_ids) => {
                 let mut relevant_accounts = HashSet::new();
 
-                // Determine which accounts the transaction is relevant to
-                for address_str in tx_addresses {
-                    // Try to convert the address string to an AddressId
-                    if let Ok(addr_id) =
-                        AddressId::from_address_string(&address_str, wallet.network())
-                    {
-                        // Look up the account in our registry
-                        if let Some(account_id) = address_registry.find_account(&addr_id) {
-                            relevant_accounts.insert(*account_id);
-                        }
+                // Determine which accounts the transaction is relevant to by looking up
+                // each extracted AddressId in the registry
+                for addr_id in address_ids {
+                    if let Some(account_id) = address_registry.find_account(&addr_id) {
+                        relevant_accounts.insert(*account_id);
                     }
-
-                    // For any addresses we didn't find in the registry,
-                    // we'll rely on the accounts we've already collected
                 }
 
                 // If we couldn't determine relevant accounts, add to all accounts as fallback
@@ -882,6 +889,31 @@ fn convert_unified_accounts(
                 }
             }
         }
+    }
+
+    // Step 6: Perform validation to ensure all transactions have appropriate associations
+    let total_tx_count = transactions.len();
+    let mut total_account_tx_count = 0;
+    let mut accounts_with_txs = 0;
+
+    for account in accounts_map.values() {
+        let account_tx_count = account.relevant_transactions().len();
+        total_account_tx_count += account_tx_count;
+        
+        if account_tx_count > 0 {
+            accounts_with_txs += 1;
+        }
+    }
+
+    // Log statistics to help verify transaction assignment
+    eprintln!("Transaction assignment complete:");
+    eprintln!("Total transactions: {}", total_tx_count);
+    eprintln!("Total account transactions: {}", total_account_tx_count);
+    eprintln!("Accounts with transactions: {}/{}", accounts_with_txs, accounts_map.len());
+
+    // If there are no account assignments at all, something might be wrong
+    if total_account_tx_count == 0 && total_tx_count > 0 {
+        eprintln!("Warning: No transactions were assigned to any accounts!");
     }
 
     Ok(accounts_map)
@@ -986,5 +1018,67 @@ fn update_transaction_positions(
 impl From<&ZcashdWallet> for Result<ZewifTop> {
     fn from(wallet: &ZcashdWallet) -> Self {
         migrate_to_zewif(wallet)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    
+    // Test the AddressRegistry-to-Account mapping
+    #[test]
+    fn test_address_registry_account_mapping() {
+        // Create a simple address registry
+        let mut registry = AddressRegistry::new();
+        
+        // Create test address IDs and account IDs
+        let addr1 = AddressId::Transparent("t1example1".to_string());
+        let addr2 = AddressId::Sapling("zs1example1".to_string());
+        let addr3 = AddressId::Transparent("t1example2".to_string());
+        
+        let account1 = u256::default();
+        let mut bytes = [0u8; 32];
+        bytes[0] = 1;
+        let account2 = u256::from_slice(&bytes).unwrap();
+        
+        // Register addresses to accounts
+        registry.register(addr1.clone(), account1);
+        registry.register(addr2.clone(), account1);
+        registry.register(addr3.clone(), account2);
+        
+        // Test the mapping functions
+        let addrs_for_acct1 = registry.find_addresses_for_account(&account1);
+        assert_eq!(addrs_for_acct1.len(), 2);
+        assert!(addrs_for_acct1.contains(&&addr1));
+        assert!(addrs_for_acct1.contains(&&addr2));
+        
+        let account_for_addr3 = registry.find_account(&addr3);
+        assert_eq!(account_for_addr3, Some(&account2));
+        
+        // Test that address type is preserved in lookup results
+        assert!(addrs_for_acct1.iter().any(|addr| matches!(*addr, AddressId::Transparent(_))));
+        assert!(addrs_for_acct1.iter().any(|addr| matches!(*addr, AddressId::Sapling(_))));
+    }
+    
+    // Test the AddressId conversion from string
+    #[test]
+    fn test_address_id_string_conversions() {
+        // Test different address types
+        let test_cases = [
+            ("t1example", AddressId::Transparent("t1example".to_string())),
+            ("zs1example", AddressId::Sapling("zs1example".to_string())),
+            ("zo1example", AddressId::Orchard("zo1example".to_string())),
+            ("u1example", AddressId::Unified("u1example".to_string())),
+        ];
+        
+        for (addr_str, expected_id) in test_cases {
+            let result = AddressId::from_address_string(addr_str, crate::zewif::Network::Test);
+            assert!(result.is_ok());
+            let addr_id = result.unwrap();
+            assert_eq!(addr_id, expected_id);
+            
+            // Test that string conversion preserves the original address
+            assert_eq!(addr_id.address_string().unwrap(), addr_str);
+        }
     }
 }

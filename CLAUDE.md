@@ -213,13 +213,17 @@ The following items represent unfinished components specifically related to in-m
         - ✅ Updated the `convert_sapling_addresses` function to use proper account mapping via AddressRegistry
         - ✅ Implemented consistent logic to ensure addresses are assigned to correct accounts
 
-     5. **Update Transaction Assignment Logic**
-        - Refine how transactions are assigned to accounts based on address involvement
-        - Replace the existing placeholder in `extract_transaction_addresses`
+     5. **Update Transaction Assignment Logic** (COMPLETED)
+        - ✅ Enhanced how transactions are assigned to accounts based on address involvement
+        - ✅ Updated `extract_transaction_addresses` to use AddressId values instead of string addresses
+        - ✅ Improved transaction-to-account assignment logic in `convert_unified_accounts`
+        - ✅ Added validation and statistics reporting for transaction assignment
 
-     6. **Add Validation and Testing**
-        - Add checks to ensure all addresses are mapped to valid accounts
-        - Verify correct account-address relationships are maintained during migration
+     6. **Add Validation and Testing** (COMPLETED)
+        - ✅ Added validation checks to ensure all addresses are mapped to valid accounts
+        - ✅ Added statistics reporting to verify transaction assignment coverage
+        - ✅ Implemented targeted unit tests for address registry and transaction assignment
+        - ✅ Created mock wallet structures for isolated testing of migration components
 
 2. **Transaction Data Structure Conversion** (HIGH PRIORITY)
    - Current limitations with representing transaction outputs and actions
