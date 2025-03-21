@@ -194,10 +194,30 @@ The following items represent unfinished components specifically related to in-m
 
 1. **Address-to-Account Mapping** (HIGH PRIORITY)
    - Current placeholders at several locations using default account
-   - Implementation plan:
-     - Create temporary mapping during migration to connect addresses to their accounts
-     - Replace placeholder default account references
-     - Preserve address-account relationships in the ZeWIF format
+   - Implementation plan (breakdown into subtasks):
+     1. **Create a Universal Address Identifier System**
+        - Design a consistent way to identify addresses across different protocols (transparent, sapling, orchard)
+        - Ensure this identifier system works with the existing `address_to_account_map`
+     
+     2. **Enhance the Unified Accounts Parser**
+        - Improve the `convert_unified_accounts` function to properly extract all account-address relationships
+        - Create a more robust mapping between ZCash addresses and account IDs
+     
+     3. **Fix Transparent Address Assignment**
+        - Update the code in `convert_transparent_addresses` to use the account mapping instead of default account
+        - Make this function work with both unified and non-unified account scenarios
+     
+     4. **Fix Shielded Address Assignment**
+        - Similarly update the `convert_sapling_addresses` function to use proper account mapping
+        - Ensure shielded addresses are assigned to the correct accounts
+     
+     5. **Update Transaction Assignment Logic**
+        - Refine how transactions are assigned to accounts based on address involvement
+        - Replace the existing placeholder in `extract_transaction_addresses`
+     
+     6. **Add Validation and Testing**
+        - Add checks to ensure all addresses are mapped to valid accounts
+        - Verify correct account-address relationships are maintained during migration
 
 2. **Transaction Data Structure Conversion** (HIGH PRIORITY)
    - Current limitations with representing transaction outputs and actions
@@ -205,11 +225,6 @@ The following items represent unfinished components specifically related to in-m
      - Complete proper transaction data conversion to in-memory ZeWIF structures
      - Improve in-memory representation of transaction components
      - Fix note position placeholder values during migration
-
-3. **Cryptography Compatibility** (COMPLETED)
-   - ✅ Implemented proper RIPEMD160 hashing (previously used first 20 bytes of SHA256 as substitute)
-   - ✅ Added proper hash implementation for migration compatibility using the ripemd crate
-   - ✅ Ensured cryptographic values are correctly preserved during format conversion
 
 ### Medium-Priority Migration Components
 
