@@ -195,9 +195,10 @@ The following items represent unfinished components specifically related to in-m
 1. **Address-to-Account Mapping** (HIGH PRIORITY)
    - Current placeholders at several locations using default account
    - Implementation plan (breakdown into subtasks):
-     1. **Create a Universal Address Identifier System**
-        - Design a consistent way to identify addresses across different protocols (transparent, sapling, orchard)
-        - Ensure this identifier system works with the existing `address_to_account_map`
+     1. **Create a Universal Address Identifier System** (COMPLETED)
+        - ✅ Designed a consistent way to identify addresses across different protocols (transparent, sapling, orchard)
+        - ✅ Created `AddressId` enum and `AddressRegistry` in `src/zewif/address_id.rs`
+        - ✅ Implemented conversion functions and comprehensive unit tests
 
      2. **Enhance the Unified Accounts Parser**
         - Improve the `convert_unified_accounts` function to properly extract all account-address relationships
