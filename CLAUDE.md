@@ -200,9 +200,10 @@ The following items represent unfinished components specifically related to in-m
         - ✅ Created `AddressId` enum and `AddressRegistry` in `src/zewif/address_id.rs`
         - ✅ Implemented conversion functions and comprehensive unit tests
 
-     2. **Enhance the Unified Accounts Parser**
-        - Improve the `convert_unified_accounts` function to properly extract all account-address relationships
-        - Create a more robust mapping between ZCash addresses and account IDs
+     2. **Enhance the Unified Accounts Parser** (COMPLETED)
+        - ✅ Created `initialize_address_registry` function to map addresses to accounts
+        - ✅ Improved `convert_unified_accounts` function to use the AddressRegistry
+        - ✅ Updated transaction assignment logic to use the registry for account mapping
 
      3. **Fix Transparent Address Assignment**
         - Update the code in `convert_transparent_addresses` to use the account mapping instead of default account

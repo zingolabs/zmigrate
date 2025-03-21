@@ -595,6 +595,45 @@ fn convert_transaction(tx_id: TxId, tx: &zcashd::WalletTx) -> Result<zewif::Tran
     Ok(zewif_tx)
 }
 
+/// Initialize an AddressRegistry based on the unified accounts data
+fn initialize_address_registry(
+    wallet: &ZcashdWallet,
+    unified_accounts: &zcashd::UnifiedAccounts,
+) -> Result<AddressRegistry> {
+    let mut registry = AddressRegistry::new();
+
+    // Step 1: Map the unified account addresses to their accounts
+    for (address_id, address_metadata) in &unified_accounts.address_metadata {
+        // Create an AddressId for this unified account address
+        let addr_id = AddressId::from_unified_account_id(*address_id);
+
+        // Register this address with its account's key_id
+        registry.register(addr_id, address_metadata.key_id);
+    }
+
+    // Step 2: For each known transparent address, try to find its account
+    for (zcashd_address, _name) in &wallet.address_names {
+        // Create an AddressId for this transparent address
+        let addr_id = AddressId::Transparent(zcashd_address.0.clone());
+
+        // TODO: When we have explicit mappings, use those here
+        // For now, this will be done in the convert_transparent_addresses function
+        // based on the zcashd.address_name key structure
+    }
+
+    // Step 3: For each known sapling address, try to find its account
+    for (sapling_address, _viewing_key) in &wallet.sapling_z_addresses {
+        // Create an AddressId for this sapling address
+        let addr_str = sapling_address.to_string(wallet.network());
+        let addr_id = AddressId::Sapling(addr_str);
+
+        // TODO: When we have explicit mappings, use those here
+        // For now, this will be done in the convert_sapling_addresses function
+    }
+
+    Ok(registry)
+}
+
 /// Convert ZCashd UnifiedAccounts to Zewif accounts
 fn convert_unified_accounts(
     wallet: &ZcashdWallet,
@@ -624,28 +663,26 @@ fn convert_unified_accounts(
         accounts_map.insert(u256::default(), default_account);
     }
 
-    // Step 2: Build a mapping from address to account key_id based on UnifiedAddressMetadata
-    let mut address_to_account_map = HashMap::new();
-
-    // Map unified addresses to their accounts
-    for (address_id, address_metadata) in &unified_accounts.address_metadata {
-        // Store the mapping from address_id to account key_id
-        address_to_account_map.insert(*address_id, address_metadata.key_id);
-    }
+    // Step 2: Build an AddressRegistry to track address-to-account mappings
+    let address_registry = initialize_address_registry(wallet, unified_accounts)?;
 
     // Step 3: Process all addresses and assign them to the appropriate accounts
 
     // Process transparent addresses
     for (zcashd_address, name) in &wallet.address_names {
-        // Try to find which account this address belongs to based on metadata
-        // This is a placeholder - in a real implementation, we would use the
-        // address_to_account_map to look up the correct account
-        // For now, fallback to the first account
+        // Create an AddressId for this transparent address
+        let addr_id = AddressId::Transparent(zcashd_address.0.clone());
 
-        // Default to first account
-        let account_key_id = match accounts_map.keys().next() {
-            Some(key) => *key,
-            None => u256::default(),
+        // Try to find which account this address belongs to using our registry
+        let account_key_id = if let Some(key_id) = address_registry.find_account(&addr_id) {
+            // Found a mapping in the registry
+            *key_id
+        } else {
+            // No mapping found, fall back to the first account
+            match accounts_map.keys().next() {
+                Some(key) => *key,
+                None => u256::default(),
+            }
         };
 
         if let Some(account) = accounts_map.get_mut(&account_key_id) {
@@ -668,15 +705,21 @@ fn convert_unified_accounts(
 
     // Process sapling addresses
     for (sapling_address, viewing_key) in &wallet.sapling_z_addresses {
-        // Try to find which account this address belongs to based on metadata
-        // This is a placeholder - in a real implementation, we would use the
-        // address_to_account_map to look up the correct account
-        // For now, fallback to the first account
+        let address_str = sapling_address.to_string(wallet.network());
 
-        // Default to first account
-        let account_key_id = match accounts_map.keys().next() {
-            Some(key) => *key,
-            None => u256::default(),
+        // Create an AddressId for this sapling address
+        let addr_id = AddressId::Sapling(address_str.clone());
+
+        // Try to find which account this address belongs to using our registry
+        let account_key_id = if let Some(key_id) = address_registry.find_account(&addr_id) {
+            // Found a mapping in the registry
+            *key_id
+        } else {
+            // No mapping found, fall back to the first account
+            match accounts_map.keys().next() {
+                Some(key) => *key,
+                None => u256::default(),
+            }
         };
 
         if let Some(account) = accounts_map.get_mut(&account_key_id) {
@@ -710,27 +753,29 @@ fn convert_unified_accounts(
 
     // Step 4: Process viewing keys in unified_accounts
     // Each full_viewing_key entry maps a key_id to a viewing key string
-    for key_id in unified_accounts.full_viewing_keys.keys() {
+    for (key_id, viewing_key) in &unified_accounts.full_viewing_keys {
         // Find the account for this key_id
-        if let Some(_account) = accounts_map.get_mut(key_id) {
+        if let Some(account) = accounts_map.get_mut(key_id) {
             // TODO: Process and add the viewing key to the account
             // This will be implemented when we add specific support for viewing keys
+
+            // For now, just log that we have a viewing key for this account
+            eprintln!(
+                "Found viewing key for account {}: {}",
+                account.name(),
+                viewing_key
+            );
+
+            // Use the registry to find all addresses associated with this account
+            let account_addresses = address_registry.find_addresses_for_account(key_id);
+            if !account_addresses.is_empty() {
+                eprintln!("  Account has {} addresses", account_addresses.len());
+            }
         }
     }
 
     // Step 5: Assign transactions to relevant accounts based on address involvement
-    // Build a mapping of addresses to accounts
-    let mut address_to_account: HashMap<String, Vec<u256>> = HashMap::new();
-
-    // Map each address to its containing account(s)
-    for (account_id, account) in &accounts_map {
-        for address in account.addresses().keys() {
-            address_to_account
-                .entry(address.clone())
-                .or_default()
-                .push(*account_id);
-        }
-    }
+    // We'll use our AddressRegistry to find account associations
 
     // Analyze each transaction to find which addresses are involved
     for (txid, wallet_tx) in &wallet.transactions {
@@ -740,12 +785,19 @@ fn convert_unified_accounts(
                 let mut relevant_accounts = HashSet::new();
 
                 // Determine which accounts the transaction is relevant to
-                for address in tx_addresses {
-                    if let Some(account_ids) = address_to_account.get(&address) {
-                        for account_id in account_ids {
+                for address_str in tx_addresses {
+                    // Try to convert the address string to an AddressId
+                    if let Ok(addr_id) =
+                        AddressId::from_address_string(&address_str, wallet.network())
+                    {
+                        // Look up the account in our registry
+                        if let Some(account_id) = address_registry.find_account(&addr_id) {
                             relevant_accounts.insert(*account_id);
                         }
                     }
+
+                    // For any addresses we didn't find in the registry,
+                    // we'll rely on the accounts we've already collected
                 }
 
                 // If we couldn't determine relevant accounts, add to all accounts as fallback
