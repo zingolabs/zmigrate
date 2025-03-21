@@ -107,6 +107,10 @@ impl Transaction {
     pub fn sapling_outputs(&self) -> Option<&Vec<SaplingOutputDescription>> {
         self.sapling_outputs.as_ref()
     }
+    
+    pub fn sapling_outputs_mut(&mut self) -> Option<&mut Vec<SaplingOutputDescription>> {
+        self.sapling_outputs.as_mut()
+    }
 
     pub fn add_sapling_output(&mut self, output: SaplingOutputDescription) {
         self.sapling_outputs
@@ -116,6 +120,10 @@ impl Transaction {
 
     pub fn orchard_actions(&self) -> Option<&Vec<OrchardActionDescription>> {
         self.orchard_actions.as_ref()
+    }
+    
+    pub fn orchard_actions_mut(&mut self) -> Option<&mut Vec<OrchardActionDescription>> {
+        self.orchard_actions.as_mut()
     }
 
     pub fn add_orchard_action(&mut self, action: OrchardActionDescription) {

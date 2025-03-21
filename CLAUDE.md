@@ -93,12 +93,12 @@ The format is structured to capture the hierarchical nature of wallet data, from
 
 #### Current Tasks
 - 🔄 **Note Commitment Trees Migration** (HIGH PRIORITY)
-  - Initial implementation for parsing and converting Orchard note commitment tree completed
-  - Required improvements:
-    - Complete binary tree format parser with proper error handling
-    - Add detailed mapping between commitments and their positions in the tree
+  - ✅ Enhanced implementation for parsing and converting Orchard note commitment tree completed
+  - ✅ Completed binary tree format parser with proper error handling
+  - ✅ Added detailed mapping between commitments and their positions in the tree
+  - ✅ Implemented mutable access methods to update transaction outputs with correct positions
+  - Remaining improvements:
     - Create proper witness data structures for each output
-    - Implement mutable access methods to update transaction outputs with correct positions
     - Test with real-world tree structures from various wallet implementations
 
 #### Future Tasks
