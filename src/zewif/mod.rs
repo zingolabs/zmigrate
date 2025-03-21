@@ -94,6 +94,10 @@ mod script;
 pub use script::*;
 mod groth_proof;
 pub use groth_proof::*;
+mod phgr_proof;
+pub use phgr_proof::*;
+mod sprout_proof;
+pub use sprout_proof::*;
 
 use std::collections::HashMap;
 

@@ -15,7 +15,7 @@ pub struct NoteCommitmentTreeNode {
 }
 
 /// Represents the complete Orchard note commitment tree
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Default)]
 pub struct OrchardNoteCommitmentTree {
     pub unparsed_data: Data,
     pub root: Option<NoteCommitmentTreeNode>,
@@ -65,7 +65,7 @@ impl OrchardNoteCommitmentTree {
         // The depth of the tree - 1 byte
         let depth = data[12] as usize;
         self.depth = depth;
-        
+
         // Validate reasonable tree depth (protects against memory allocation attacks)
         if depth > 64 {
             bail!("Invalid tree depth: {} (maximum supported is 64)", depth);
@@ -74,14 +74,14 @@ impl OrchardNoteCommitmentTree {
         // The rest of the data is the serialized tree structure
         // A valid tree should have at least (2^depth - 1) possible node positions
         let expected_node_count = (1 << depth) - 1;
-        
+
         // Calculate expected data size based on node count
         // Each node needs 1 byte for presence flag + up to 32 bytes for the hash
         let _min_expected_data_size = 13; // Header size
         let max_expected_data_size = 13 + expected_node_count * 33; // Header + max possible node data
-        
+
         if data.len() > max_expected_data_size {
-            bail!("Invalid tree data: too large (got {} bytes, expected at most {})", 
+            bail!("Invalid tree data: too large (got {} bytes, expected at most {})",
                   data.len(), max_expected_data_size);
         }
 
@@ -96,7 +96,7 @@ impl OrchardNoteCommitmentTree {
             if position >= data.len() {
                 bail!("Invalid tree data: truncated at node presence flag");
             }
-            
+
             let has_node = data[position] != 0;
             position += 1;
 
@@ -114,10 +114,10 @@ impl OrchardNoteCommitmentTree {
                 // No node at this position
                 self.nodes.push(None);
             }
-            
+
             node_count += 1;
         }
-        
+
         // Validate node count
         if node_count == 0 {
             // Empty tree is valid but unusual, log a warning
@@ -146,7 +146,7 @@ impl OrchardNoteCommitmentTree {
             // Calculate left and right child indices
             let left_idx = 2 * index + 1;
             let right_idx = 2 * index + 2;
-            
+
             // Calculate left and right child positions
             let left_pos = 2 * position + 1;
             let right_pos = 2 * position + 2;
@@ -163,9 +163,9 @@ impl OrchardNoteCommitmentTree {
                 None
             };
 
-            Some(NoteCommitmentTreeNode { 
-                hash, 
-                left, 
+            Some(NoteCommitmentTreeNode {
+                hash,
+                left,
                 right,
                 position,
             })
@@ -173,34 +173,34 @@ impl OrchardNoteCommitmentTree {
             None
         }
     }
-    
+
     /// Build a mapping between commitments and their positions in the tree
     fn build_commitment_position_map(&mut self) {
         self.commitment_positions.clear();
-        
+
         // Clone the root to avoid borrowing issues
         if let Some(root) = self.root.clone() {
             // Collect all commitments from the tree recursively
             let mut commitments = Vec::new();
             Self::collect_commitments_recursive(&root, &mut commitments);
-            
+
             // Add all collected commitments to the map
             for (hash, position) in commitments {
                 self.commitment_positions.insert(hash, Position(position as u32));
             }
         }
     }
-    
+
     /// Recursively collect commitments and their positions without mutating self
     fn collect_commitments_recursive(node: &NoteCommitmentTreeNode, results: &mut Vec<(u256, usize)>) {
         // Add this node's commitment and position
         results.push((node.hash, node.position));
-        
+
         // Process left child if present
         if let Some(left) = &node.left {
             Self::collect_commitments_recursive(left, results);
         }
-        
+
         // Process right child if present
         if let Some(right) = &node.right {
             Self::collect_commitments_recursive(right, results);
@@ -232,18 +232,18 @@ impl OrchardNoteCommitmentTree {
             // In a full implementation, we need to add all parent nodes in the correct order
             // to properly represent the tree structure
             let mut parents = Vec::with_capacity(self.depth.saturating_sub(1));
-            
+
             // For each level of the tree (excluding the root and the bottom level)
             for level in 0..self.depth.saturating_sub(1) {
                 // Calculate the starting index for this level in a complete binary tree
                 let start_idx = (1 << level) - 1;
-                
+
                 // For a complete level, we'd have 2^level nodes
                 let level_size = 1 << level;
-                
+
                 // Collect all nodes from this level
                 let mut level_nodes = Vec::with_capacity(level_size);
-                
+
                 for i in 0..level_size {
                     let node_idx = start_idx + i;
                     if node_idx < self.nodes.len() {
@@ -252,11 +252,11 @@ impl OrchardNoteCommitmentTree {
                         level_nodes.push(None);
                     }
                 }
-                
+
                 // Add all nodes from this level to the parents vector
                 parents.extend(level_nodes);
             }
-            
+
             tree.parents = parents;
         }
 
@@ -295,42 +295,42 @@ mod tests {
     // Helper function to create a mock tree for testing
     fn create_mock_tree_data(depth: u8, num_nodes: usize) -> Vec<u8> {
         let mut data = Vec::new();
-        
+
         // Format version (4 bytes, LE)
         let version: u32 = 1;
         let mut version_bytes = [0u8; 4];
         LittleEndian::write_u32(&mut version_bytes, version);
         data.extend_from_slice(&version_bytes);
-        
+
         // Tree size (8 bytes, LE)
         let tree_size: u64 = num_nodes as u64;
         let mut size_bytes = [0u8; 8];
         LittleEndian::write_u64(&mut size_bytes, tree_size);
         data.extend_from_slice(&size_bytes);
-        
+
         // Depth (1 byte)
         data.push(depth);
-        
+
         // Add node data
         for i in 0..num_nodes {
             // Node presence flag (1 = present)
             data.push(1);
-            
+
             // Node hash (32 bytes)
             let mut hash = [0u8; 32];
             // Just put the index in the first byte to make each hash unique
             hash[0] = (i % 255) as u8;
             data.extend_from_slice(&hash);
         }
-        
+
         data
     }
-    
+
     #[test]
     fn test_tree_parsing() {
         // Create a mock tree with depth 3 and 7 nodes (a complete binary tree would have 7 nodes)
         let mock_data = create_mock_tree_data(3, 7);
-        
+
         // Create a tree with this data
         let mut tree = OrchardNoteCommitmentTree {
             unparsed_data: Data(mock_data),
@@ -340,38 +340,38 @@ mod tests {
             depth: 0,
             commitment_positions: HashMap::new(),
         };
-        
+
         // Parse the tree data
         let result = tree.parse_tree_data();
         assert!(result.is_ok(), "Tree parsing should succeed");
-        
+
         // Verify the parsed data
         assert_eq!(tree.depth, 3, "Tree depth should be 3");
         assert_eq!(tree.tree_size, 7, "Tree size should be 7");
         assert_eq!(tree.nodes.len(), 7, "There should be 7 nodes");
-        
+
         // Check that all nodes are present (Some)
         for node in &tree.nodes {
             assert!(node.is_some(), "All nodes should be present");
         }
-        
+
         // Verify the root node was constructed
         assert!(tree.root.is_some(), "Root node should be constructed");
-        
+
         // Check the commitment position mapping
         assert_eq!(tree.commitment_positions.len(), 7, "All nodes should have positions");
-        
+
         // Verify we can find positions by commitment
         if let Some(root_node) = &tree.root {
             let position = tree.find_position(&root_node.hash);
             assert_eq!(position, Some(Position(0)), "Root should be at position 0");
-            
+
             // Check left child if it exists
             if let Some(left_child) = &root_node.left {
                 let position = tree.find_position(&left_child.hash);
                 assert_eq!(position, Some(Position(1)), "Left child should be at position 1");
             }
-            
+
             // Check right child if it exists
             if let Some(right_child) = &root_node.right {
                 let position = tree.find_position(&right_child.hash);
@@ -379,7 +379,7 @@ mod tests {
             }
         }
     }
-    
+
     #[test]
     fn test_error_handling() {
         // Test with too small data (less than header)
@@ -392,15 +392,15 @@ mod tests {
             depth: 0,
             commitment_positions: HashMap::new(),
         };
-        
+
         let result = tree.parse_tree_data();
         assert!(result.is_err(), "Parsing too small data should fail");
-        
+
         // Test with invalid version
         let mut invalid_version = create_mock_tree_data(3, 7);
         // Change version to 2 (unsupported)
         invalid_version[0] = 2;
-        
+
         let mut tree = OrchardNoteCommitmentTree {
             unparsed_data: Data(invalid_version),
             root: None,
@@ -409,15 +409,15 @@ mod tests {
             depth: 0,
             commitment_positions: HashMap::new(),
         };
-        
+
         let result = tree.parse_tree_data();
         assert!(result.is_err(), "Parsing invalid version should fail");
-        
+
         // Test with truncated node data
         let mut truncated = create_mock_tree_data(3, 7);
         // Remove the last few bytes to truncate a node
         truncated.truncate(truncated.len() - 10);
-        
+
         let mut tree = OrchardNoteCommitmentTree {
             unparsed_data: Data(truncated),
             root: None,
@@ -426,16 +426,16 @@ mod tests {
             depth: 0,
             commitment_positions: HashMap::new(),
         };
-        
+
         let result = tree.parse_tree_data();
         assert!(result.is_err(), "Parsing truncated data should fail");
     }
-    
+
     #[test]
     fn test_zewif_tree_conversion() {
         // Create a mock tree
         let mock_data = create_mock_tree_data(3, 7);
-        
+
         // Create and parse a tree
         let mut tree = OrchardNoteCommitmentTree {
             unparsed_data: Data(mock_data),
@@ -445,17 +445,17 @@ mod tests {
             depth: 0,
             commitment_positions: HashMap::new(),
         };
-        
+
         let result = tree.parse_tree_data();
         assert!(result.is_ok(), "Tree parsing should succeed");
-        
+
         // Convert to Zewif format
         let zewif_tree = tree.to_zewif_tree();
-        
+
         // Verify the conversion
         assert!(zewif_tree.left.is_some(), "Zewif tree should have left node");
         assert!(zewif_tree.right.is_some(), "Zewif tree should have right node");
-        
+
         // Our improved implementation includes all levels from 0 to depth-2
         // For depth=3, we have nodes from levels 0, 1 (total of 3 nodes: 1+2)
         assert_eq!(zewif_tree.parents.len(), 3, "Should have 3 parents for depth 3");

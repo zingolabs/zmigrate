@@ -6,7 +6,7 @@ use sha2::Sha256;
 
 #[allow(unused_imports)]
 use crate::{
-    Blob32, Data, ProtocolAddress, SaplingIncomingViewingKey, TxId, u256,
+    Blob32, Data, ProtocolAddress, SaplingIncomingViewingKey, SproutProof, TxId, u256,
     zcashd::{self, ZcashdWallet},
     zewif::{
         self, Account, AddressId, AddressRegistry, Attachments, Position, ZewifTop, ZewifWallet,
@@ -286,10 +286,9 @@ fn extract_transaction_addresses(
         for recipient in recipients {
             // Add the unified address if it exists
             if !recipient.unified_address().is_empty() {
-                if let Ok(addr_id) = AddressId::from_address_string(
-                    recipient.unified_address(),
-                    wallet.network(),
-                ) {
+                if let Ok(addr_id) =
+                    AddressId::from_address_string(recipient.unified_address(), wallet.network())
+                {
                     addresses.insert(addr_id);
                 }
             }
@@ -534,12 +533,12 @@ fn extract_transaction_addresses(
 
     // Add the transaction ID itself as a last resort identifier
     meta_addresses.insert(format!("tx:{}", tx_id));
-    
+
     // If we didn't find any direct addresses, but have metadata addresses,
     // try to look up any addresses that could be related to these transaction components
     // This is just a stub for future implementation where we'd have a more
     // sophisticated lookup mechanism
-    
+
     Ok(addresses)
 }
 
@@ -651,18 +650,12 @@ fn convert_transaction(tx_id: TxId, tx: &zcashd::WalletTx) -> Result<zewif::Tran
             let nullifiers = js.nullifiers();
             let commitments = js.commitments();
 
-            let join_split = zewif::JoinSplitDescription {
-                anchor: zewif::Anchor(
-                    Blob32::from_slice(js.anchor().as_ref()).expect("Converting anchor"),
-                ),
+            let join_split = zewif::JoinSplitDescription::new(
+                js.anchor(),
                 nullifiers,
                 commitments,
-                zkproof: Data(match js.zkproof() {
-                    zcashd::SproutProof::PHGRProof(proof) => proof.to_bytes(),
-                    zcashd::SproutProof::GrothProof(proof) => proof.0.to_vec(),
-                }),
-                attachments: Attachments::new(),
-            };
+                js.zkproof().clone(),
+            );
             zewif_tx.add_sprout_joinsplit(join_split);
         }
     }
@@ -899,7 +892,7 @@ fn convert_unified_accounts(
     for account in accounts_map.values() {
         let account_tx_count = account.relevant_transactions().len();
         total_account_tx_count += account_tx_count;
-        
+
         if account_tx_count > 0 {
             accounts_with_txs += 1;
         }
@@ -909,7 +902,11 @@ fn convert_unified_accounts(
     eprintln!("Transaction assignment complete:");
     eprintln!("Total transactions: {}", total_tx_count);
     eprintln!("Total account transactions: {}", total_account_tx_count);
-    eprintln!("Accounts with transactions: {}/{}", accounts_with_txs, accounts_map.len());
+    eprintln!(
+        "Accounts with transactions: {}/{}",
+        accounts_with_txs,
+        accounts_map.len()
+    );
 
     // If there are no account assignments at all, something might be wrong
     if total_account_tx_count == 0 && total_tx_count > 0 {
@@ -934,7 +931,7 @@ fn update_transaction_positions(
     if orchard_tree.commitment_positions.is_empty() && !orchard_tree.unparsed_data.is_empty() {
         eprintln!("Warning: Orchard note commitment tree has data but no parsed positions");
     }
-    
+
     // Track statistics for reporting
     let mut orchard_positions_updated = 0;
     let mut sapling_positions_updated = 0;
@@ -949,10 +946,10 @@ fn update_transaction_positions(
             if let zcashd::OrchardBundle(Some(_orchard_bundle)) = &zcashd_tx.orchard_bundle {
                 // Check if we have mutable access to actions in the zewif transaction
                 let orchard_actions = zewif_tx.orchard_actions_mut();
-                
+
                 if let Some(actions) = orchard_actions {
                     total_orchard_actions += actions.len();
-                    
+
                     // Process each Orchard action
                     for action in actions {
                         // Use our tree to find the position for this commitment
@@ -964,7 +961,9 @@ fn update_transaction_positions(
                             // If we don't find a position in the tree, try to use metadata
                             if let Some(orchard_meta) = &zcashd_tx.orchard_tx_meta {
                                 let action_idx = action.action_index();
-                                if let Some(_action_data) = orchard_meta.action_data.get(&action_idx) {
+                                if let Some(_action_data) =
+                                    orchard_meta.action_data.get(&action_idx)
+                                {
                                     // As a fallback, use the action index as a relative position
                                     // This isn't ideal but preserves some ordering information
                                     let fallback_position = Position(action_idx + 1); // Add 1 to avoid Position(0)
@@ -980,7 +979,7 @@ fn update_transaction_positions(
             let sapling_outputs = zewif_tx.sapling_outputs_mut();
             if let Some(outputs) = sapling_outputs {
                 total_sapling_outputs += outputs.len();
-                
+
                 // Try to set positions for sapling outputs
                 for output in outputs {
                     // First, try to find the position in our Orchard tree (if commitments are shared)
@@ -992,7 +991,7 @@ fn update_transaction_positions(
                         // Look up position from sapling note data if available
                         if let Some(sapling_note_data) = &zcashd_tx.sapling_note_data {
                             let output_idx = output.output_index();
-                            
+
                             // Find matching note data for this output
                             for (outpoint, note_data) in sapling_note_data.iter() {
                                 if outpoint.txid() == *tx_id && outpoint.vout() == output_idx {
@@ -1019,8 +1018,14 @@ fn update_transaction_positions(
 
     // Report statistics on how many positions were updated
     eprintln!("Note commitment tree position update complete:");
-    eprintln!("Orchard actions updated: {}/{}", orchard_positions_updated, total_orchard_actions);
-    eprintln!("Sapling outputs updated: {}/{}", sapling_positions_updated, total_sapling_outputs);
+    eprintln!(
+        "Orchard actions updated: {}/{}",
+        orchard_positions_updated, total_orchard_actions
+    );
+    eprintln!(
+        "Sapling outputs updated: {}/{}",
+        sapling_positions_updated, total_sapling_outputs
+    );
 
     Ok(())
 }
@@ -1034,42 +1039,50 @@ impl From<&ZcashdWallet> for Result<ZewifTop> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     // Test the AddressRegistry-to-Account mapping
     #[test]
     fn test_address_registry_account_mapping() {
         // Create a simple address registry
         let mut registry = AddressRegistry::new();
-        
+
         // Create test address IDs and account IDs
         let addr1 = AddressId::Transparent("t1example1".to_string());
         let addr2 = AddressId::Sapling("zs1example1".to_string());
         let addr3 = AddressId::Transparent("t1example2".to_string());
-        
+
         let account1 = u256::default();
         let mut bytes = [0u8; 32];
         bytes[0] = 1;
         let account2 = u256::from_slice(&bytes).unwrap();
-        
+
         // Register addresses to accounts
         registry.register(addr1.clone(), account1);
         registry.register(addr2.clone(), account1);
         registry.register(addr3.clone(), account2);
-        
+
         // Test the mapping functions
         let addrs_for_acct1 = registry.find_addresses_for_account(&account1);
         assert_eq!(addrs_for_acct1.len(), 2);
         assert!(addrs_for_acct1.contains(&&addr1));
         assert!(addrs_for_acct1.contains(&&addr2));
-        
+
         let account_for_addr3 = registry.find_account(&addr3);
         assert_eq!(account_for_addr3, Some(&account2));
-        
+
         // Test that address type is preserved in lookup results
-        assert!(addrs_for_acct1.iter().any(|addr| matches!(*addr, AddressId::Transparent(_))));
-        assert!(addrs_for_acct1.iter().any(|addr| matches!(*addr, AddressId::Sapling(_))));
+        assert!(
+            addrs_for_acct1
+                .iter()
+                .any(|addr| matches!(*addr, AddressId::Transparent(_)))
+        );
+        assert!(
+            addrs_for_acct1
+                .iter()
+                .any(|addr| matches!(*addr, AddressId::Sapling(_)))
+        );
     }
-    
+
     // Test the AddressId conversion from string
     #[test]
     fn test_address_id_string_conversions() {
@@ -1080,30 +1093,30 @@ mod tests {
             ("zo1example", AddressId::Orchard("zo1example".to_string())),
             ("u1example", AddressId::Unified("u1example".to_string())),
         ];
-        
+
         for (addr_str, expected_id) in test_cases {
             let result = AddressId::from_address_string(addr_str, crate::zewif::Network::Test);
             assert!(result.is_ok());
             let addr_id = result.unwrap();
             assert_eq!(addr_id, expected_id);
-            
+
             // Test that string conversion preserves the original address
             assert_eq!(addr_id.address_string().unwrap(), addr_str);
         }
     }
-    
+
     // Test the update_transaction_positions functionality
     // This is just a simplified test since we can't access private modules in the test
     #[test]
     fn test_position_update_logic() {
-        use crate::zewif::{OrchardActionDescription, Transaction, Position};
+        use crate::zewif::{OrchardActionDescription, Position, Transaction};
         use std::collections::HashMap;
-        
+
         // Create a simple transaction with orchard actions
         let tx_bytes = [0u8; 32];
         let tx_id = TxId::from_bytes(tx_bytes);
         let mut zewif_tx = Transaction::new(tx_id);
-        
+
         // Create test commitments
         let mut test_commitments = Vec::new();
         for i in 0..3 {
@@ -1112,23 +1125,23 @@ mod tests {
             let commitment = u256::from_slice(&bytes).unwrap();
             test_commitments.push(commitment);
         }
-        
+
         // Add orchard actions with the test commitments
         let mut action1 = OrchardActionDescription::new();
         action1.set_action_index(0);
         action1.set_commitment(test_commitments[1]);
-        
+
         let mut action2 = OrchardActionDescription::new();
         action2.set_action_index(1);
         action2.set_commitment(test_commitments[2]);
-        
+
         zewif_tx.add_orchard_action(action1);
         zewif_tx.add_orchard_action(action2);
-        
+
         // Create transaction collection
         let mut transactions = HashMap::new();
         transactions.insert(tx_id, zewif_tx);
-        
+
         // Verify initial state - default positions (0)
         {
             let tx = &transactions[&tx_id];
@@ -1136,7 +1149,7 @@ mod tests {
             assert_eq!(actions[0].note_commitment_tree_position().0, 0);
             assert_eq!(actions[1].note_commitment_tree_position().0, 0);
         }
-        
+
         // Set the position manually (what update_transaction_positions would do)
         {
             let tx = transactions.get_mut(&tx_id).unwrap();
@@ -1145,11 +1158,11 @@ mod tests {
                 actions[1].set_note_commitment_tree_position(Position(2));
             }
         }
-        
+
         // Verify that positions were updated
         let updated_tx = &transactions[&tx_id];
         let updated_actions = updated_tx.orchard_actions().unwrap();
-        
+
         // Check the positions were set correctly
         assert_eq!(updated_actions[0].note_commitment_tree_position().0, 1);
         assert_eq!(updated_actions[1].note_commitment_tree_position().0, 2);

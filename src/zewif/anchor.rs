@@ -1,3 +1,1 @@
-use crate::blob;
-
-blob!(Anchor, 32);
+pub type Anchor = crate::u256;
