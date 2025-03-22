@@ -73,6 +73,7 @@ The format is structured to capture the hierarchical nature of wallet data, from
 - Always prefer "fail fast" error handling. If a function cannot proceed due to an error, return early.
 - Don't mark items complete below until they are fully implemented.
 - Make sure all errors and lints are fixed in files you modify.
+- Make sure you update CLAUDE.md (this file) with recently completed tasks, upcoming tasks, and any other relevant information. Remove outdated information as needed.
 - When recommending a next task:
   - Ensure that no other tasks are blocking the recommended task.
   - Determine whether the task requires any dependencies that aren't yet present.
@@ -104,7 +105,7 @@ Current high-priority tasks:
 - 🔄 **Sapling Note Commitment Trees Implementation** (HIGH PRIORITY)
   - Implement a parser for Sapling note commitment trees
   - Add conversions to appropriate ZeWIF structures
-  - Update position tracking for Sapling outputs 
+  - Update position tracking for Sapling outputs
   - Integrate with transaction migration code
   - Test with real-world tree structures from various wallet implementations
 
