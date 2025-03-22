@@ -3,17 +3,17 @@ use std::{
     collections::{HashMap, HashSet},
 };
 
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 
-use crate::{parse, sapling::SaplingExtendedSpendingKey, u252, u256, Parser, TxId};
+use crate::{Parser, TxId, parse, sapling::SaplingExtendedSpendingKey, u252, u256};
 
 use super::{
-    zcashd_dump::DBKey, Address, BlockLocator, ClientVersion, DBValue, Key, KeyMetadata,
-    KeyPoolEntry, Keys, MnemonicHDChain, MnemonicSeed, NetworkInfo, OrchardNoteCommitmentTree,
-    PrivKey, PubKey, RecipientAddress, RecipientMapping,
-    SaplingIncomingViewingKey, SaplingKey, SaplingKeys, SaplingZPaymentAddress, SproutKeys,
-    SproutPaymentAddress, SproutSpendingKey, UnifiedAccountMetadata, UnifiedAccounts,
-    UnifiedAddressMetadata, WalletTx, ZcashdDump, ZcashdWallet,
+    Address, BlockLocator, ClientVersion, DBValue, Key, KeyMetadata, KeyPoolEntry, Keys,
+    MnemonicHDChain, MnemonicSeed, NetworkInfo, OrchardNoteCommitmentTree, PrivKey, PubKey,
+    RecipientAddress, RecipientMapping, SaplingIncomingViewingKey, SaplingKey, SaplingKeys,
+    SaplingZPaymentAddress, SproutKeys, SproutPaymentAddress, SproutSpendingKey,
+    UnifiedAccountMetadata, UnifiedAccounts, UnifiedAddressMetadata, WalletTx, ZcashdDump,
+    ZcashdWallet, zcashd_dump::DBKey,
 };
 
 #[derive(Debug)]
@@ -30,7 +30,10 @@ impl<'a> ZcashdParser<'a> {
 
     fn new(dump: &'a ZcashdDump) -> Self {
         let unparsed_keys = RefCell::new(dump.records().keys().cloned().collect());
-        Self { dump, unparsed_keys }
+        Self {
+            dump,
+            unparsed_keys,
+        }
     }
 
     // Keep track of which keys have been parsed
@@ -199,12 +202,20 @@ impl<'a> ZcashdParser<'a> {
 
     fn parse_client_version(&self, keyname: &str) -> Result<ClientVersion> {
         let value = self.value_for_keyname(keyname)?;
-        parse!(buf = value, ClientVersion, format!("client version for keyname: {}", keyname))
+        parse!(
+            buf = value,
+            ClientVersion,
+            format!("client version for keyname: {}", keyname)
+        )
     }
 
     fn parse_block_locator(&self, keyname: &str) -> Result<BlockLocator> {
         let value = self.value_for_keyname(keyname)?;
-        parse!(buf = value, BlockLocator, format!("block locator for keyname: {}", keyname))
+        parse!(
+            buf = value,
+            BlockLocator,
+            format!("block locator for keyname: {}", keyname)
+        )
     }
 
     fn parse_opt_block_locator(&self, keyname: &str) -> Result<Option<BlockLocator>> {
@@ -229,7 +240,7 @@ impl<'a> ZcashdParser<'a> {
         }
         let mut keys_map = HashMap::new();
         for (key, value) in key_records {
-            let pubkey = parse!(buf = & key.data, PubKey, "pubkey")?;
+            let pubkey = parse!(buf = &key.data, PubKey, "pubkey")?;
             let privkey = parse!(buf = value.as_data(), PrivKey, "privkey")?;
             let metakey = DBKey::new("keymeta", &key.data);
             let metadata_binary = self
@@ -264,9 +275,12 @@ impl<'a> ZcashdParser<'a> {
             bail!("Mismatched sapzkey and sapzkeymeta records");
         }
         for (key, value) in key_records {
-            let ivk = parse!(buf = & key.data, SaplingIncomingViewingKey, "ivk")?;
-            let spending_key =
-            parse!(buf = value.as_data(), SaplingExtendedSpendingKey, "spending_key")?;
+            let ivk = parse!(buf = &key.data, SaplingIncomingViewingKey, "ivk")?;
+            let spending_key = parse!(
+                buf = value.as_data(),
+                SaplingExtendedSpendingKey,
+                "spending_key"
+            )?;
             let metakey = DBKey::new("sapzkeymeta", &key.data);
             let metadata_binary = self
                 .dump
@@ -300,7 +314,7 @@ impl<'a> ZcashdParser<'a> {
         }
         let mut zkeys_map = HashMap::new();
         for (key, value) in zkey_records {
-            let payment_address = parse!(buf = & key.data, SproutPaymentAddress, "payment_address")?;
+            let payment_address = parse!(buf = &key.data, SproutPaymentAddress, "payment_address")?;
             let spending_key = parse!(buf = value.as_data(), u252, "spending_key")?;
             let metakey = DBKey::new("zkeymeta", &key.data);
             let metadata_binary = self
@@ -341,7 +355,7 @@ impl<'a> ZcashdParser<'a> {
             let txid = parse!(&mut p, TxId, "txid")?;
             let recipient_address = parse!(&mut p, RecipientAddress, "recipient_address")?;
             p.check_finished()?;
-            let unified_address = parse!(buf = & value, String, "unified_address")?;
+            let unified_address = parse!(buf = &value, String, "unified_address")?;
             let recipient_mapping = RecipientMapping::new(recipient_address, unified_address);
             send_recipients
                 .entry(txid)
@@ -392,7 +406,7 @@ impl<'a> ZcashdParser<'a> {
         let full_viewing_keys_records = self.dump.records_for_keyname("unifiedfvk")?;
         let mut full_viewing_keys: HashMap<u256, String> = HashMap::new();
         for (key, value) in full_viewing_keys_records {
-            let key_id = parse!(buf = & key.data, u256, "UnifiedFullViewingKey key")?;
+            let key_id = parse!(buf = &key.data, u256, "UnifiedFullViewingKey key")?;
             let fvk = parse!(buf = value.as_data(), String, "UnifiedFullViewingKey value")?;
             full_viewing_keys.insert(key_id, fvk);
             self.mark_key_parsed(&key);
@@ -475,8 +489,11 @@ impl<'a> ZcashdParser<'a> {
         for (key, value) in records {
             let payment_address =
                 parse!(buf = &key.data, SaplingZPaymentAddress, "payment address")?;
-            let viewing_key =
-                parse!(buf = value.as_data(), SaplingIncomingViewingKey, "viewing key")?;
+            let viewing_key = parse!(
+                buf = value.as_data(),
+                SaplingIncomingViewingKey,
+                "viewing key"
+            )?;
             if sapling_z_addresses.contains_key(&payment_address) {
                 bail!("Duplicate payment address found: {:?}", payment_address);
             }
@@ -499,8 +516,11 @@ impl<'a> ZcashdParser<'a> {
         let value = self
             .value_for_keyname("orchard_note_commitment_tree")
             .context("Getting 'orchard_note_commitment_tree' record")?;
-        let orchard_note_commitment_tree =
-            parse!(buf = value.as_data(), OrchardNoteCommitmentTree, "orchard note commitment tree")?;
+        let orchard_note_commitment_tree = parse!(
+            buf = value.as_data(),
+            OrchardNoteCommitmentTree,
+            "orchard note commitment tree"
+        )?;
         Ok(orchard_note_commitment_tree)
     }
 
@@ -543,5 +563,83 @@ impl<'a> ZcashdParser<'a> {
             }
         }
         Ok(transactions)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use anyhow::Context;
+    use std::{env, path::Path};
+    use test_case::test_case;
+
+    use crate::{
+        BDBDump,
+        zcashd::{ZcashdDump, zcashd_parser::ZcashdParser},
+    };
+
+    // Original wallets
+    #[test_case("wallet0.dat" ; "wallet0")]
+    #[test_case("wallet1.dat" ; "wallet1")]
+    #[test_case("wallet2.dat" ; "wallet2")]
+    #[test_case("wallet3.dat" ; "wallet3")]
+    #[test_case("wallet4.dat" ; "wallet4")]
+    #[test_case("wallet5.dat" ; "wallet5")]
+    #[test_case("wallet6.dat" ; "wallet6")]
+    #[test_case("wallet7.dat" ; "wallet7")]
+    // Tarnished
+    #[test_case("tarnished-v5.6.0_node0_wallet" ; "tarnished-v5.6.0_node0_wallet")]
+    #[test_case("tarnished-v5.6.0_node1_wallet" ; "tarnished-v5.6.0_node1_wallet")]
+    #[test_case("tarnished-v5.6.0_node2_wallet" ; "tarnished-v5.6.0_node2_wallet")]
+    #[test_case("tarnished-v5.6.0_node3_wallet" ; "tarnished-v5.6.0_node3_wallet")]
+    // Sprout
+    #[test_case("sprout_node0_wallet" ; "sprout_node0_wallet")]
+    #[test_case("sprout_node1_wallet" ; "sprout_node1_wallet")]
+    #[test_case("sprout_node2_wallet" ; "sprout_node2_wallet")]
+    #[test_case("sprout_node3_wallet" ; "sprout_node3_wallet")]
+    // Golden
+    #[test_case("golden-v5.6.0_node0_wallet" ; "golden-v5.6.0_node0_wallet")]
+    #[test_case("golden-v5.6.0_node1_wallet" ; "golden-v5.6.0_node1_wallet")]
+    #[test_case("golden-v5.6.0_node2_wallet" ; "golden-v5.6.0_node2_wallet")]
+    #[test_case("golden-v5.6.0_node3_wallet" ; "golden-v5.6.0_node3_wallet")]
+    fn test_parser_does_not_panic(filename: &str) {
+        let project_root = env::current_dir().expect("Failed to get current directory");
+        let data_dir = project_root.join("src/zcashd/tests/data");
+        assert!(
+            Path::new(&data_dir).exists(),
+            "Data directory missing: {:?}",
+            data_dir
+        );
+
+        // Paths to wallet files
+        let file = data_dir.join(filename);
+
+        let path = Path::new(&file);
+        assert!(path.exists(), "Wallet file missing: {:?}", path);
+
+        let db_dump = BDBDump::from_file(path)
+            .context("Parsing BerkeleyDB file")
+            .unwrap();
+
+        let zcashd_dump = ZcashdDump::from_bdb_dump(&db_dump)
+            .context("Parsing Zcashd dump")
+            .unwrap();
+
+        let parsed_dump = ZcashdParser::parse_dump(&zcashd_dump).context("Parsing Zcashd dump");
+
+        assert!(parsed_dump.is_ok(), "Parsing failed for file: {:?}", path);
+
+        let (_, unparsed_keys) = parsed_dump.unwrap();
+
+        assert_eq!(
+            unparsed_keys.len(),
+            0,
+            "Parsing failed for file: {:?}",
+            path
+        );
+    }
+
+    #[test]
+    fn test_parser_expected_wallets() {
+        todo!()
     }
 }
