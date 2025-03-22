@@ -29,6 +29,11 @@ fn convert_transaction(tx_id: TxId, tx: &zcashd::WalletTx) -> Result<zewif::Tran
     // Add basic transaction metadata
     // Convert block height if we can infer it from hash_block
     // For this prototype, we'll just leave it as None
+    
+    // Set lock time if available
+    if let Some(lock_time) = tx.lock_time {
+        zewif_tx.set_lock_time(lock_time);
+    }
 
     // Convert transparent inputs
     for tx_in in &tx.vin {

@@ -17,6 +17,7 @@ mod identifiable; pub use identifiable::*;
 mod incremental_merkle_tree; pub use incremental_merkle_tree::*;
 mod incremental_witness; pub use incremental_witness::*;
 mod join_split_description; pub use join_split_description::*;
+mod lock_time; pub use lock_time::*;
 mod mnemonic_language; pub use mnemonic_language::*;
 mod network; pub use network::*;
 mod orchard_action_description; pub use orchard_action_description::*;

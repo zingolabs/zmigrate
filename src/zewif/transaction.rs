@@ -1,4 +1,4 @@
-use crate::{BlockHeight, Data, TxId, impl_attachable};
+use crate::{BlockHeight, Data, LockTime, TxId, impl_attachable};
 
 use super::{
     Attachments, JoinSplitDescription, OrchardActionDescription, SaplingOutputDescription,
@@ -17,6 +17,9 @@ pub struct Transaction {
     /// export, the transaction could have been unmined, and possibly
     /// remined at a different height.
     mined_height: Option<BlockHeight>,
+    /// The transaction lock time, if any.
+    /// If None, there is no lock time.
+    lock_time: Option<LockTime>,
 
     // Design issue: do we want to parse out all of this? All wallets will
     // necessarily have code to parse a transaction. The only information
@@ -50,6 +53,7 @@ impl Transaction {
             txid,
             raw: None,
             mined_height: None,
+            lock_time: None,
             inputs: None,
             outputs: None,
             sapling_spends: None,
@@ -78,6 +82,14 @@ impl Transaction {
 
     pub fn set_mined_height(&mut self, height: BlockHeight) {
         self.mined_height = Some(height);
+    }
+    
+    pub fn lock_time(&self) -> Option<&LockTime> {
+        self.lock_time.as_ref()
+    }
+    
+    pub fn set_lock_time(&mut self, lock_time: LockTime) {
+        self.lock_time = Some(lock_time);
     }
 
     pub fn inputs(&self) -> Option<&Vec<TxIn>> {
