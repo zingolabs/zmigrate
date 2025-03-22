@@ -1,10 +1,6 @@
 use crate::{Blob, Data, impl_attachable, u256};
 
-use super::{Anchor, Attachments, IncrementalWitness, Position};
-
-const ORCHARD_INCREMENTAL_MERKLE_TREE_DEPTH: usize = 32;
-pub type SinsemillaHash = u256;
-pub type OrchardWitness = IncrementalWitness<ORCHARD_INCREMENTAL_MERKLE_TREE_DEPTH, SinsemillaHash>;
+use super::{Anchor, Attachments, Position, OrchardWitness};
 
 /// Data specific to Orchard actions.
 #[derive(Debug, Clone)]

@@ -214,8 +214,7 @@ impl OrchardNoteCommitmentTree {
 
     /// Convert to Zewif IncrementalMerkleTree format
     pub fn to_zewif_tree(&self) -> crate::zewif::IncrementalMerkleTree {
-        let mut tree =
-            crate::zewif::IncrementalMerkleTree { left: None, right: None, parents: Vec::new() };
+        let mut tree = crate::zewif::IncrementalMerkleTree::new();
 
         // Convert the root node
         if let Some(root_node) = &self.root {
@@ -261,6 +260,37 @@ impl OrchardNoteCommitmentTree {
         }
 
         tree
+    }
+    
+    /// Create a witness for a commitment that exists in the tree.
+    /// 
+    /// This method:
+    /// 1. Verifies that the commitment exists in the tree
+    /// 2. Converts the tree structure to the ZeWIF format
+    /// 3. Creates a witness object containing the tree state
+    /// 4. Returns both the anchor (root hash) and the witness
+    /// 
+    /// The witness data is essential for proving that a note exists in the commitment tree,
+    /// which is required for spending notes in ZCash's shielded pools.
+    /// 
+    /// Returns None if the commitment is not found in the tree.
+    pub fn create_witness(&self, commitment: &u256) -> Option<(crate::zewif::Anchor, crate::zewif::OrchardWitness)> {
+        // Find the position of the commitment in the tree - needed to make sure the commitment exists
+        self.find_position(commitment)?;
+        
+        // Convert the tree to Zewif format
+        let zewif_tree = self.to_zewif_tree();
+        
+        // Create a witness using the tree
+        let witness = crate::zewif::OrchardWitness::from_tree(zewif_tree);
+        
+        // Get the root to use as an anchor
+        if let Some(root_node) = &self.root {
+            let anchor = root_node.hash;
+            return Some((anchor, witness));
+        }
+        
+        None
     }
 }
 

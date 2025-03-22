@@ -23,6 +23,7 @@ mod mnemonic_language; pub use mnemonic_language::*;
 mod network; pub use network::*;
 mod orchard_action_description; pub use orchard_action_description::*;
 mod orchard_sent_output; pub use orchard_sent_output::*;
+mod orchard_witness; pub use orchard_witness::*;
 mod parseable_types; pub use parseable_types::*;
 mod phgr_proof; pub use phgr_proof::*;
 mod position; pub use position::*;
