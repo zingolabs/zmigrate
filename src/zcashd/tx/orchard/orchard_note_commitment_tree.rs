@@ -6,19 +6,63 @@ use byteorder::{ByteOrder, LittleEndian};
 /// Represents a node in the Orchard note commitment tree
 #[derive(Debug, Clone, PartialEq)]
 pub struct NoteCommitmentTreeNode {
-    pub hash: u256,
-    pub left: Option<Box<NoteCommitmentTreeNode>>,
-    pub right: Option<Box<NoteCommitmentTreeNode>>,
+    hash: u256,
+    left: Option<Box<NoteCommitmentTreeNode>>,
+    right: Option<Box<NoteCommitmentTreeNode>>,
+}
+
+impl NoteCommitmentTreeNode {
+    /// Get the node hash
+    pub fn hash(&self) -> u256 {
+        self.hash
+    }
+
+    /// Get the left child node, if any
+    pub fn left(&self) -> Option<&NoteCommitmentTreeNode> {
+        self.left.as_deref()
+    }
+
+    /// Get the right child node, if any
+    pub fn right(&self) -> Option<&NoteCommitmentTreeNode> {
+        self.right.as_deref()
+    }
 }
 
 /// Represents the complete Orchard note commitment tree
 #[derive(Debug, Clone, PartialEq)]
 pub struct OrchardNoteCommitmentTree {
-    pub unparsed_data: Data,
-    pub root: Option<NoteCommitmentTreeNode>,
-    pub tree_size: u64,
-    pub nodes: Vec<Option<u256>>,
-    pub depth: usize,
+    unparsed_data: Data,
+    root: Option<NoteCommitmentTreeNode>,
+    tree_size: u64,
+    nodes: Vec<Option<u256>>,
+    depth: usize,
+}
+
+impl OrchardNoteCommitmentTree {
+    /// Get the root node of the tree, if any
+    pub fn root(&self) -> Option<&NoteCommitmentTreeNode> {
+        self.root.as_ref()
+    }
+
+    /// Get the size of the tree (number of notes)
+    pub fn tree_size(&self) -> u64 {
+        self.tree_size
+    }
+
+    /// Get the nodes vector
+    pub fn nodes(&self) -> &[Option<u256>] {
+        &self.nodes
+    }
+
+    /// Get the depth of the tree
+    pub fn depth(&self) -> usize {
+        self.depth
+    }
+
+    /// Get the unparsed raw data
+    pub fn unparsed_data(&self) -> &Data {
+        &self.unparsed_data
+    }
 }
 
 impl OrchardNoteCommitmentTree {

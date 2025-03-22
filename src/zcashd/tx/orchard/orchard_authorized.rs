@@ -6,8 +6,25 @@ use super::RedPallasSignature;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct OrchardAuthorized {
-    pub proof: Data,
-    pub binding_signature: RedPallasSignature,
+    proof: Data,
+    binding_signature: RedPallasSignature,
+}
+
+impl OrchardAuthorized {
+    pub fn new(proof: Data, binding_signature: RedPallasSignature) -> Self {
+        Self {
+            proof,
+            binding_signature,
+        }
+    }
+    
+    pub fn proof(&self) -> &Data {
+        &self.proof
+    }
+
+    pub fn binding_signature(&self) -> &RedPallasSignature {
+        &self.binding_signature
+    }
 }
 
 impl Parse for OrchardAuthorized {

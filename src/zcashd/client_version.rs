@@ -2,7 +2,7 @@ use anyhow::Result;
 
 use crate::{Parse, Parser, parse};
 
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub struct ClientVersion {
     pub version: u32,
     pub major: u32,

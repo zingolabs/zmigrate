@@ -8,9 +8,31 @@ use super::super::super::ClientVersion;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct OrchardTxMeta {
-    pub version: ClientVersion,
-    pub action_data: HashMap<u32, Blob64>,
-    pub actions_spending_my_nodes: Vec<u32>,
+    version: ClientVersion,
+    action_data: HashMap<u32, Blob64>,
+    actions_spending_my_nodes: Vec<u32>,
+}
+
+impl OrchardTxMeta {
+    /// Returns the client version
+    pub fn version(&self) -> ClientVersion {
+        self.version
+    }
+
+    /// Returns action data for the given index
+    pub fn action_data(&self, index: u32) -> Option<&Blob64> {
+        self.action_data.get(&index)
+    }
+
+    /// Returns the entire action data map
+    pub fn all_action_data(&self) -> &HashMap<u32, Blob64> {
+        &self.action_data
+    }
+
+    /// Returns the list of actions spending nodes owned by this wallet
+    pub fn actions_spending_my_nodes(&self) -> &[u32] {
+        &self.actions_spending_my_nodes
+    }
 }
 
 impl Parse for OrchardTxMeta {

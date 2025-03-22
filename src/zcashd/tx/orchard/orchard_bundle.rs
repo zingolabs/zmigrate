@@ -31,14 +31,14 @@ impl Parse for OrchardBundle {
             .into_iter()
             .map(|mut action| {
                 let spend_auth_sig = parse!(p, "spend_auth_sig")?;
-                action.authorization = Some(spend_auth_sig);
+                action.set_authorization(spend_auth_sig);
                 Ok(action)
             })
             .collect::<Result<Vec<OrchardAction>>>()?;
 
         let binding_sig = parse!(p, "binding_sig")?;
         let authorization =
-            OrchardAuthorized { proof: proof_bytes, binding_signature: binding_sig };
+            OrchardAuthorized::new(proof_bytes, binding_sig);
 
         Ok(Self(Some(OrchardBundleInner {
             actions,

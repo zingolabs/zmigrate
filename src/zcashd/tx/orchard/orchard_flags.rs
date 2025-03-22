@@ -8,6 +8,16 @@ pub struct OrchardFlags {
     outputs_enabled: bool,
 }
 
+impl OrchardFlags {
+    pub fn spends_enabled(&self) -> bool {
+        self.spends_enabled
+    }
+
+    pub fn outputs_enabled(&self) -> bool {
+        self.outputs_enabled
+    }
+}
+
 const FLAG_SPENDS_ENABLED: u8 = 0b0000_0001;
 const FLAG_OUTPUTS_ENABLED: u8 = 0b0000_0010;
 

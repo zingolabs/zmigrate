@@ -32,7 +32,7 @@ pub fn migrate_to_zewif(wallet: &ZcashdWallet) -> Result<ZewifTop> {
     let mut transactions = convert_transactions(wallet)?;
 
     // Convert orchard note commitment tree if available
-    if !wallet.orchard_note_commitment_tree.unparsed_data.is_empty() {
+    if !wallet.orchard_note_commitment_tree.unparsed_data().is_empty() {
         // Update transaction outputs with note positions from the note commitment tree
         update_transaction_positions(wallet, &mut transactions)?;
     }
@@ -474,12 +474,12 @@ fn extract_transaction_addresses(
         // Extract data from Orchard actions
         for (idx, action) in orchard_bundle.actions.iter().enumerate() {
             // Add standard identifiers like nullifier and commitment
-            let nullifier_hex = hex::encode(action.nf_old);
+            let nullifier_hex = hex::encode(action.nf_old());
             addresses.insert(format!("orchard_nullifier:{}", nullifier_hex));
 
             // Extract potential address information if available
             if let Some(orchard_meta) = &tx.orchard_tx_meta {
-                if let Some(_action_data) = orchard_meta.action_data.get(&(idx as u32)) {
+                if let Some(_action_data) = orchard_meta.action_data(idx as u32) {
                     // Try to recover the Orchard address components if we have enough data
                     // We don't have direct access to the receiver's complete address data here,
                     // but in a complete implementation, we'd follow the path:
@@ -618,9 +618,9 @@ fn convert_transaction(tx_id: TxId, tx: &zcashd::WalletTx) -> Result<zewif::Tran
         for (idx, action) in orchard_bundle.actions.iter().enumerate() {
             let mut orchard_action = zewif::OrchardActionDescription::new();
             orchard_action.set_action_index(idx as u32);
-            orchard_action.set_nullifier(action.nf_old);
-            orchard_action.set_commitment(action.cmx);
-            orchard_action.set_enc_ciphertext(action.encrypted_note.enc_ciphertext().clone());
+            orchard_action.set_nullifier(action.nf_old());
+            orchard_action.set_commitment(action.cmx());
+            orchard_action.set_enc_ciphertext(action.encrypted_note().enc_ciphertext().clone());
             zewif_tx.add_orchard_action(orchard_action);
         }
     }
@@ -891,7 +891,7 @@ fn update_transaction_positions(
     // Check if we have a valid tree to process
     if wallet
         .orchard_note_commitment_tree
-        .unparsed_data
+        .unparsed_data()
         .0
         .is_empty()
     {
@@ -914,7 +914,7 @@ fn update_transaction_positions(
                     if let Some(orchard_actions) = zewif_tx.orchard_actions() {
                         for (idx, action) in orchard_actions.iter().enumerate() {
                             // Use idx as action_index because it's the only identifier we have for now
-                            if let Some(_action_data) = orchard_meta.action_data.get(&(idx as u32))
+                            if let Some(_action_data) = orchard_meta.action_data(idx as u32)
                             {
                                 // Generate a placeholder position based on the action index
                                 // In a real implementation, we'd extract this from the tree structure

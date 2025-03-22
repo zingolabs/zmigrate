@@ -1,14 +1,24 @@
 use anyhow::Result;
 
-use crate::{Blob, Blob32};
+use crate::{Blob, u256};
 
 use crate::{Parse, Parser, parse};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct TransmittedNoteCiphertext {
-    epk_bytes: Blob32,
+    epk_bytes: u256,
     enc_ciphertext: Blob<580>,
     out_ciphertext: Blob<80>,
+}
+
+impl TransmittedNoteCiphertext {
+    pub fn epk_bytes(&self) -> u256 {
+        self.epk_bytes
+    }
+
+    pub fn out_ciphertext(&self) -> &Blob<80> {
+        &self.out_ciphertext
+    }
 }
 
 impl TransmittedNoteCiphertext {

@@ -6,8 +6,18 @@ use crate::{Blob, Blob32, Network, Parse, Parser, parse};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct OrchardRawAddress {
-    pub diversifier: Blob<11>,
-    pub pk_d: Blob32,
+    diversifier: Blob<11>,
+    pk_d: Blob32,
+}
+
+impl OrchardRawAddress {
+    pub fn diversifier(&self) -> &Blob<11> {
+        &self.diversifier
+    }
+
+    pub fn pk_d(&self) -> &Blob32 {
+        &self.pk_d
+    }
 }
 
 impl OrchardRawAddress {

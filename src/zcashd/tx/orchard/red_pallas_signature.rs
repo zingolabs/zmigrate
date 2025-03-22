@@ -1,11 +1,23 @@
 use anyhow::Result;
 
-use crate::{Blob32, Parse, Parser, parse};
+use crate::{u256, Parse, Parser, parse};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct RedPallasSignature {
-    r_bytes: Blob32,
-    s_bytes: Blob32,
+    r_bytes: u256,
+    s_bytes: u256,
+}
+
+impl RedPallasSignature {
+    /// Returns the r component of the signature.
+    pub fn r_bytes(&self) -> u256 {
+        self.r_bytes
+    }
+
+    /// Returns the s component of the signature.
+    pub fn s_bytes(&self) -> u256 {
+        self.s_bytes
+    }
 }
 
 impl Parse for RedPallasSignature {
