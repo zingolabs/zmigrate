@@ -14,7 +14,7 @@ Currently it parses the `zcashd` and `zingo` formats into memory, and outputs a 
 
 ## Prerequisites
 
-You will need a `zcashd` or `zingo` wallet.dat file to test with. Some `wallet.dat` files may be found in the `zcash-wallet-formats` repo [here](https://github.com/zingolabs/zcash-wallet-formats/tree/master/zcashd/dat_files).
+You will need a `zcashd` or `zingo` wallet.dat file to test with. Some `wallet.dat` files may be found in the `zcash-wallet-formats` repo [here](https://github.com/zingolabs/zcash-wallet-formats/tree/master/zcashd/dat_files). They have been copied into this repo at `test/fixtures/`.
 
 Because `zcashd` uses BerkelyDB, you will need to have the `db_dump` tool installed on your system. On macOS, `db-dump` is part of the `berkeley-db` package, which can be installed with Homebrew:
 

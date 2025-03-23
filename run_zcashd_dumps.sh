@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SRC=dat_files/zcashd
+SRC=test/fixtures/zcashd
 TARGET=dumps/zcashd
 
 VERSION=golden-v5.6.0
