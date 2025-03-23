@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 use anyhow::Result;
 
 use crate::{Blob, GrothProof, Parse, Parser, parse, u256};
@@ -14,22 +12,27 @@ pub struct OutputV5 {
 }
 
 impl OutputV5 {
+    #[allow(dead_code)]
     pub fn cv(&self) -> u256 {
         self.cv
     }
 
+    #[allow(dead_code)]
     pub fn cmu(&self) -> u256 {
         self.cmu
     }
 
+    #[allow(dead_code)]
     pub fn ephemeral_key(&self) -> u256 {
         self.ephemeral_key
     }
 
+    #[allow(dead_code)]
     pub fn enc_ciphertext(&self) -> &Blob<580> {
         &self.enc_ciphertext
     }
 
+    #[allow(dead_code)]
     pub fn out_ciphertext(&self) -> &Blob<80> {
         &self.out_ciphertext
     }

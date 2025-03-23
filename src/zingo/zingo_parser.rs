@@ -142,7 +142,7 @@ impl<'a> ZingoParser<'a> {
 
         let remaining = p.remaining();
 
-        Ok(ZingoWallet {
+        Ok(ZingoWallet::new(
             external_version,
             chain_name,
             birthday,
@@ -151,8 +151,8 @@ impl<'a> ZingoParser<'a> {
             wallet_capability,
             verified_tree,
             price,
-            last_100_blocks: blocks,
+            blocks,
             remaining,
-        })
+        ))
     }
 }

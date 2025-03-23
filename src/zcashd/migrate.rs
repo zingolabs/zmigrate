@@ -4,9 +4,8 @@ use anyhow::{Context, Result};
 use ripemd::{Digest, Ripemd160};
 use sha2::Sha256;
 
-#[allow(unused_imports)]
 use crate::{
-    Blob32, Data, ProtocolAddress, SaplingIncomingViewingKey, TxId, u256,
+    Data, ProtocolAddress, SaplingIncomingViewingKey, TxId, u256,
     zcashd::{self, ZcashdWallet},
     zewif::{
         self, Account, AddressId, AddressRegistry, Attachments, Position, ZewifTop, ZewifWallet,

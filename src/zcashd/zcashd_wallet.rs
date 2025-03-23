@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 use std::collections::HashMap;
 
 use crate::{Bip39Mnemonic, Network, SaplingIncomingViewingKey, TxId};
