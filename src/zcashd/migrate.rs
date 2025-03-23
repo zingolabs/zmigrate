@@ -907,7 +907,7 @@ fn update_transaction_positions(
                             if let Some(_action_data) = orchard_meta.action_data(idx as u32) {
                                 // Generate a placeholder position based on the action index
                                 // In a real implementation, we'd extract this from the tree structure
-                                let position = Position((idx as u32) + 1); // Placeholder, starting from 1
+                                let position = Position::from(idx + 1); // Placeholder, starting from 1
 
                                 // Create a new action with the updated position
                                 let mut updated_action = action.clone();
@@ -942,7 +942,7 @@ fn update_transaction_positions(
 
                                     // Create a position using the witness information
                                     // For now, just use a placeholder based on the index
-                                    let position = Position((idx as u32) + 1); // Placeholder, starting from 1
+                                    let position = Position::from(idx + 1); // Placeholder, starting from 1
 
                                     // Create a new output with the updated position
                                     let mut updated_output = output.clone();

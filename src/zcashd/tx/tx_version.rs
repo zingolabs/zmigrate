@@ -2,13 +2,13 @@ use anyhow::{Result, bail};
 
 use crate::{IntID, Parse, Parser, parse};
 
-const OVERWINTER_VERSION_GROUP_ID: IntID = IntID(0x03c48270);
+const OVERWINTER_VERSION_GROUP_ID: IntID = IntID::new(0x03c48270);
 const OVERWINTER_TX_VERSION: u32 = 3;
-const SAPLING_VERSION_GROUP_ID: IntID = IntID(0x892f2085);
+const SAPLING_VERSION_GROUP_ID: IntID = IntID::new(0x892f2085);
 pub const SAPLING_TX_VERSION: u32 = 4;
-const ZIP225_VERSION_GROUP_ID: IntID = IntID(0x26a7270a);
+const ZIP225_VERSION_GROUP_ID: IntID = IntID::new(0x26a7270a);
 pub const ZIP225_TX_VERSION: u32 = 5;
-const ZFUTURE_VERSION_GROUP_ID: IntID = IntID(0xffffffff);
+const ZFUTURE_VERSION_GROUP_ID: IntID = IntID::new(0xffffffff);
 const ZFUTURE_TX_VERSION: u32 = 0x0000ffff;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
