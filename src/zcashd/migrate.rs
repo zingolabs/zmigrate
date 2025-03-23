@@ -883,7 +883,6 @@ fn update_transaction_positions(
     if wallet
         .orchard_note_commitment_tree()
         .unparsed_data()
-        .0
         .is_empty()
     {
         return Ok(());

@@ -36,7 +36,7 @@ pub fn parse_compact_size(p: &mut Parser) -> Result<usize> {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct CompactSize(pub usize);
+pub struct CompactSize(usize);
 
 impl std::fmt::Display for CompactSize {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {

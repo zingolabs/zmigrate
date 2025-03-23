@@ -8,7 +8,7 @@ use super::CompactSize;
 
 #[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 /// A variable-size byte array.
-pub struct Data(pub Vec<u8>);
+pub struct Data(Vec<u8>);
 
 impl Data {
     pub fn new() -> Self {

@@ -3,10 +3,7 @@ use std::path::PathBuf;
 use anyhow::Result;
 use clap::Args;
 
-use crate::{
-    Data,
-    file_args::{FileArgs, FileArgsLike},
-};
+use crate::file_args::{FileArgs, FileArgsLike};
 
 use super::ZingoParser;
 
@@ -27,7 +24,7 @@ impl FileArgsLike for CommandArgs {
 impl crate::exec::Exec for CommandArgs {
     fn exec(&self) -> Result<String> {
         let file_path = self.file();
-        let file_data = Data(std::fs::read(file_path)?);
+        let file_data = std::fs::read(file_path)?.into();
         let mut parser = ZingoParser::new(&file_data);
         let wallet = parser.parse()?;
         Ok(format!("{:#?}", wallet))

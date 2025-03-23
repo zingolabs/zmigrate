@@ -68,11 +68,11 @@ impl OrchardNoteCommitmentTree {
 impl OrchardNoteCommitmentTree {
     /// Parse the raw tree data into a structured format
     pub fn parse_tree_data(&mut self) -> Result<()> {
-        if self.unparsed_data.0.is_empty() {
+        if self.unparsed_data.is_empty() {
             return Ok(());
         }
 
-        let data = &self.unparsed_data.0;
+        let data = &self.unparsed_data;
 
         // Check the tree format version - first 4 bytes
         let format_version = LittleEndian::read_u32(&data[0..4]);

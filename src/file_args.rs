@@ -10,7 +10,7 @@ pub trait FileArgsLike {
     fn read_file(&self) -> Result<Data> {
         let mut vec = Vec::new();
         std::fs::File::open(self.file())?.read_to_end(&mut vec)?;
-        Ok(Data(vec))
+        Ok(vec.into())
     }
 }
 

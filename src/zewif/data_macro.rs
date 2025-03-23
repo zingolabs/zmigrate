@@ -1,7 +1,7 @@
 #[macro_export]
 macro_rules! data {
     ($name:ident) => {
-        pub struct $name(pub $crate::Data);
+        pub struct $name($crate::Data);
 
         impl $name {
             pub fn new(data: Vec<u8>) -> Self {
