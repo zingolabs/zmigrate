@@ -3,21 +3,6 @@ use std::collections::HashMap;
 use bc_components::Digest;
 use bc_envelope::prelude::*;
 
-#[macro_export]
-macro_rules! impl_attachable {
-    ($type:ty) => {
-        impl $crate::Attachable for $type {
-            fn attachments(&self) -> &Attachments {
-                &self.attachments
-            }
-
-            fn attachments_mut(&mut self) -> &mut Attachments {
-                &mut self.attachments
-            }
-        }
-    };
-}
-
 #[derive(Debug, Clone)]
 pub struct Attachments {
     envelopes: HashMap<Digest, Envelope>,

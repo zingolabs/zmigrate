@@ -1,32 +1,32 @@
+use crate::mod_use;
+
 mod migrate;
 
-crate::mod_use!(
-    address,
-    block_locator,
-    branch_id,
-    client_version,
-    cmd,
-    key_id,
-    key_metadata,
-    key_pool,
-    key,
-    keys,
-    mnemonic_hd_chain,
-    mnemonic_seed,
-    network_info,
-    priv_key,
-    pub_key,
-    receiver_type,
-    recipient_address,
-    recipient_mapping,
-    script_id,
-    sprout_keys,
-    sprout_spending_key,
-    tx,
-    unified_account_metadata,
-    unified_accounts,
-    unified_address_metadata,
-    zcashd_dump,
-    zcashd_parser,
-    zcashd_wallet,
-);
+mod_use!(address);
+mod_use!(block_locator);
+mod_use!(branch_id);
+mod_use!(client_version);
+mod_use!(cmd);
+mod_use!(key_id);
+mod_use!(key_metadata);
+mod_use!(key_pool);
+mod_use!(key);
+mod_use!(keys);
+mod_use!(mnemonic_hd_chain);
+mod_use!(mnemonic_seed);
+mod_use!(network_info);
+mod_use!(priv_key);
+mod_use!(pub_key);
+mod_use!(receiver_type);
+mod_use!(recipient_address);
+mod_use!(recipient_mapping);
+mod_use!(script_id);
+mod_use!(sprout_keys);
+mod_use!(sprout_spending_key);
+mod_use!(tx);
+mod_use!(unified_account_metadata);
+mod_use!(unified_accounts);
+mod_use!(unified_address_metadata);
+mod_use!(zcashd_dump);
+mod_use!(zcashd_parser);
+mod_use!(zcashd_wallet);

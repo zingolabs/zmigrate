@@ -1,12 +1,12 @@
-crate::mod_use!(
-    orchard_action,
-    orchard_authorized,
-    orchard_bundle,
-    orchard_flags,
-    orchard_note_commitment_tree,
-    orchard_raw_address,
-    orchard_signature,
-    orchard_tx_meta,
-    red_pallas_signature,
-    transmitted_note_ciphertext,
-);
+use crate::mod_use;
+
+mod_use!(orchard_action);
+mod_use!(orchard_authorized);
+mod_use!(orchard_bundle);
+mod_use!(orchard_flags);
+mod_use!(orchard_note_commitment_tree);
+mod_use!(orchard_raw_address);
+mod_use!(orchard_signature);
+mod_use!(orchard_tx_meta);
+mod_use!(red_pallas_signature);
+mod_use!(transmitted_note_ciphertext);
