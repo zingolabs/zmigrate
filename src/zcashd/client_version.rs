@@ -4,11 +4,33 @@ use crate::{Parse, Parser, parse};
 
 #[derive(Clone, Copy)]
 pub struct ClientVersion {
-    pub version: u32,
-    pub major: u32,
-    pub minor: u32,
-    pub revision: u32,
-    pub build: u32,
+    version: u32,
+    major: u32,
+    minor: u32,
+    revision: u32,
+    build: u32,
+}
+
+impl ClientVersion {
+    pub fn version(&self) -> u32 {
+        self.version
+    }
+
+    pub fn major(&self) -> u32 {
+        self.major
+    }
+
+    pub fn minor(&self) -> u32 {
+        self.minor
+    }
+
+    pub fn revision(&self) -> u32 {
+        self.revision
+    }
+
+    pub fn build(&self) -> u32 {
+        self.build
+    }
 }
 
 impl PartialEq for ClientVersion {

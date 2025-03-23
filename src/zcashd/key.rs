@@ -6,9 +6,23 @@ use super::{KeyMetadata, PrivKey, PubKey};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Key {
-    pub pubkey: PubKey,
-    pub privkey: PrivKey,
-    pub metadata: KeyMetadata,
+    pubkey: PubKey,
+    privkey: PrivKey,
+    metadata: KeyMetadata,
+}
+
+impl Key {
+    pub fn pubkey(&self) -> &PubKey {
+        &self.pubkey
+    }
+
+    pub fn privkey(&self) -> &PrivKey {
+        &self.privkey
+    }
+
+    pub fn metadata(&self) -> &KeyMetadata {
+        &self.metadata
+    }
 }
 
 impl Key {

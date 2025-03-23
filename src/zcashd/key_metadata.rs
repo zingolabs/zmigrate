@@ -5,10 +5,28 @@ use crate::{Blob32, Parse, Parser, SecondsSinceEpoch, parse};
 const VERSION_WITH_HDDATA: i32 = 10;
 #[derive(Debug, Clone, PartialEq)]
 pub struct KeyMetadata {
-    pub version: i32,
-    pub create_time: Option<SecondsSinceEpoch>,
-    pub hd_keypath: Option<String>,
-    pub seed_fp: Option<Blob32>,
+    version: i32,
+    create_time: Option<SecondsSinceEpoch>,
+    hd_keypath: Option<String>,
+    seed_fp: Option<Blob32>,
+}
+
+impl KeyMetadata {
+    pub fn version(&self) -> i32 {
+        self.version
+    }
+
+    pub fn create_time(&self) -> Option<SecondsSinceEpoch> {
+        self.create_time
+    }
+
+    pub fn hd_keypath(&self) -> Option<&String> {
+        self.hd_keypath.as_ref()
+    }
+
+    pub fn seed_fp(&self) -> Option<&Blob32> {
+        self.seed_fp.as_ref()
+    }
 }
 
 impl Parse for KeyMetadata {
