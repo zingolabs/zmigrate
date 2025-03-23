@@ -133,7 +133,7 @@ impl FromStr for AddressId {
             // Parse the u256 value
             let id_bytes =
                 hex::decode(id).context("Invalid hex encoding for unified account ID")?;
-            let id_u256 = u256::from_slice(&id_bytes)
+            let id_u256 = u256::try_from(&id_bytes)
                 .context("Failed to create u256 from unified account ID bytes")?;
             Ok(Self::UnifiedAccountAddress(id_u256))
         } else {
@@ -270,7 +270,7 @@ mod tests {
         // Create a u256 value with just the first byte set to 1
         let mut bytes = [0u8; 32];
         bytes[0] = 1;
-        let account2 = u256::from_slice(&bytes).unwrap(); // Account ID 2
+        let account2 = u256::try_from(&bytes).unwrap(); // Account ID 2
 
         // Register addresses to accounts
         registry.register(addr1.clone(), account1);

@@ -104,7 +104,7 @@ impl OrchardNoteCommitmentTree {
             if has_node {
                 // Read the 32-byte node hash
                 if position + 32 <= data.len() {
-                    let node_hash = u256::from_slice(&data[position..position + 32])
+                    let node_hash = u256::try_from(&data[position..position + 32])
                         .context("Failed to parse node hash")?;
                     self.nodes.push(Some(node_hash));
                     position += 32;

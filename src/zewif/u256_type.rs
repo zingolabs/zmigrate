@@ -1,4 +1,4 @@
-use anyhow::{Context, Result};
+use anyhow::{Error, Result, bail};
 
 use crate::{Blob32, Parse, Parser, parse};
 
@@ -7,18 +7,38 @@ use crate::{Blob32, Parse, Parser, parse};
 pub struct u256([u8; 32]);
 
 impl u256 {
-    pub fn from_blob(blob: Blob32) -> Self {
-        Self(blob.0)
-    }
-
-    pub fn from_slice(bytes: &[u8]) -> Result<Self> {
-        let blob = Blob32::from_slice(bytes).context("Creating U256 from slice")?;
-        Ok(Self(blob.0))
-    }
-
     pub fn from_hex(hex: &str) -> Self {
         let blob = Blob32::from_hex(hex);
         Self(blob.0)
+    }
+}
+
+impl TryFrom<&[u8]> for u256 {
+    type Error = Error;
+
+    fn try_from(bytes: &[u8]) -> Result<Self, Self::Error> {
+        if bytes.len() != 32 {
+            bail!("Invalid data length: expected 32, got {}", bytes.len());
+        }
+        let mut a = [0u8; 32];
+        a.copy_from_slice(bytes);
+        Ok(Self(a))
+    }
+}
+
+impl TryFrom<&[u8; 32]> for u256 {
+    type Error = Error;
+
+    fn try_from(bytes: &[u8; 32]) -> Result<Self, Self::Error> {
+        Ok(Self(*bytes))
+    }
+}
+
+impl TryFrom<&Vec<u8>> for u256 {
+    type Error = Error;
+
+    fn try_from(bytes: &Vec<u8>) -> Result<Self, Self::Error> {
+        Self::try_from(bytes.as_slice())
     }
 }
 

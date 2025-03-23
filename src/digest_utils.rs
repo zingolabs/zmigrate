@@ -6,8 +6,7 @@ use crate::u256;
 pub fn sha256(data: impl AsRef<[u8]>) -> u256 {
     let mut hasher = Sha256::new();
     hasher.update(data);
-    let result = hasher.finalize();
-    u256::from_slice(&result).unwrap()
+    u256::try_from(hasher.finalize().as_slice()).unwrap()
 }
 
 /// Bitcoin double SHA256 hash.
