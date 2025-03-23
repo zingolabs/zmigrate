@@ -8,10 +8,11 @@ pub struct u252([u8; 32]);
 
 impl u252 {
     pub fn from_blob(blob: Blob32) -> Result<Self> {
-        if (blob.0[0] & 0xf0) != 0 {
+        let blob: [u8; 32] = blob.into();
+        if (blob[0] & 0xf0) != 0 {
             bail!("First four bits of u252 must be zero");
         }
-        Ok(Self(blob.0))
+        Ok(Self(blob))
     }
 }
 

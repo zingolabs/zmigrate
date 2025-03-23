@@ -24,8 +24,8 @@ impl OrchardRawAddress {
     pub fn to_string(&self, network: Network) -> String {
         // Concatenate diversifier (11 bytes) and pk_d (32 bytes) into a 43-byte array
         let mut bytes = [0u8; 43];
-        bytes[..11].copy_from_slice(&self.diversifier.0);
-        bytes[11..].copy_from_slice(&self.pk_d.0);
+        bytes[..11].copy_from_slice(self.diversifier.as_slice());
+        bytes[11..].copy_from_slice(self.pk_d.as_slice());
 
         // Create an Orchard receiver
         let orchard_receiver = zcash_address::unified::Receiver::Orchard(bytes);

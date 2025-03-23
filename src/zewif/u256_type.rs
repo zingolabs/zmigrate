@@ -9,7 +9,7 @@ pub struct u256([u8; 32]);
 impl u256 {
     pub fn from_hex(hex: &str) -> Self {
         let blob = Blob32::from_hex(hex);
-        Self(blob.0)
+        Self(blob.into())
     }
 }
 

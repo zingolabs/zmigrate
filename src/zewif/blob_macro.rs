@@ -1,7 +1,7 @@
 #[macro_export]
 macro_rules! blob {
     ($name:ident, $size:expr) => {
-        pub struct $name(pub $crate::Blob<$size>);
+        pub struct $name($crate::Blob<$size>);
 
         impl $name {
             pub fn new(data: [u8; $size]) -> Self {

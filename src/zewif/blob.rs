@@ -6,7 +6,7 @@ use crate::{Parse, Parser};
 
 /// A fixed-size byte array.
 #[derive(Clone, PartialEq, Eq, Hash)]
-pub struct Blob<const N: usize>(pub [u8; N]);
+pub struct Blob<const N: usize>([u8; N]);
 
 impl<const N: usize> Blob<N> {
     pub fn new(data: [u8; N]) -> Self {
@@ -25,6 +25,10 @@ impl<const N: usize> Blob<N> {
 
     pub fn to_vec(&self) -> Vec<u8> {
         self.0.to_vec()
+    }
+
+    pub fn as_slice(&self) -> &[u8] {
+        &self.0
     }
 
     pub fn from_slice(data: &[u8]) -> Result<Self> {
@@ -115,6 +119,12 @@ impl<const N: usize> Index<RangeToInclusive<usize>> for Blob<N> {
 
     fn index(&self, range: RangeToInclusive<usize>) -> &Self::Output {
         &self.0[range]
+    }
+}
+
+impl<const N: usize> From<Blob<N>> for [u8; N] {
+    fn from(blob: Blob<N>) -> Self {
+        blob.0
     }
 }
 

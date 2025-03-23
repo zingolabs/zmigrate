@@ -41,14 +41,14 @@ impl PHGRProof {
 
     pub fn to_bytes(&self) -> Vec<u8> {
         let mut result = Vec::with_capacity(8 * 33);
-        result.extend_from_slice(&self.g_a.0);
-        result.extend_from_slice(&self.g_a_prime.0);
-        result.extend_from_slice(&self.g_b.0);
-        result.extend_from_slice(&self.g_b_prime.0);
-        result.extend_from_slice(&self.g_c.0);
-        result.extend_from_slice(&self.g_c_prime.0);
-        result.extend_from_slice(&self.g_k.0);
-        result.extend_from_slice(&self.g_h.0);
+        result.extend_from_slice(self.g_a.as_slice());
+        result.extend_from_slice(self.g_a_prime.as_slice());
+        result.extend_from_slice(self.g_b.as_slice());
+        result.extend_from_slice(self.g_b_prime.as_slice());
+        result.extend_from_slice(self.g_c.as_slice());
+        result.extend_from_slice(self.g_c_prime.as_slice());
+        result.extend_from_slice(self.g_k.as_slice());
+        result.extend_from_slice(self.g_h.as_slice());
         result
     }
 

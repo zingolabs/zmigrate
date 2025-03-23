@@ -8,18 +8,18 @@ pub struct u160([u8; 20]);
 
 impl u160 {
     pub fn from_blob(blob: Blob20) -> Self {
-        Self(blob.0)
+        Self(blob.into())
     }
 
     pub fn from_slice(bytes: &[u8]) -> Result<Self> {
         let blob = Blob20::from_slice(bytes).context("Creating U160 from slice")?;
-        Ok(Self(blob.0))
+        Ok(Self(blob.into()))
     }
 }
 
 impl AsRef<[u8]> for u160 {
     fn as_ref(&self) -> &[u8] {
-        &self.0
+        self.0.as_ref()
     }
 }
 
@@ -47,7 +47,7 @@ impl std::fmt::Display for u160 {
 
 impl Parse for u160 {
     fn parse(p: &mut Parser) -> Result<Self> {
-        let blob = parse!(p, "u160")?;
-        Ok(Self(blob))
+        let blob = parse!(p, Blob20, "u160")?;
+        Ok(Self(blob.into())) // Update to use as_slice() here
     }
 }

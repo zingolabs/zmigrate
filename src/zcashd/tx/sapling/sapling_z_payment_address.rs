@@ -13,8 +13,8 @@ impl SaplingZPaymentAddress {
     pub fn to_string(&self, network: Network) -> String {
         // Concatenate diversifier (11 bytes) and pk (32 bytes) into a 43-byte array
         let mut bytes = [0u8; 43];
-        bytes[..11].copy_from_slice(&self.diversifier.0);
-        bytes[11..].copy_from_slice(&self.pk.0);
+        bytes[..11].copy_from_slice(self.diversifier.as_slice());
+        bytes[11..].copy_from_slice(self.pk.as_slice());
         let addr = ZcashAddress::from_sapling(network, bytes);
         addr.to_string()
     }
