@@ -15,4 +15,16 @@ impl DerivationInfo {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub struct NonHardenedChildIndex(pub u32);
+pub struct NonHardenedChildIndex(u32);
+
+impl From<u32> for NonHardenedChildIndex {
+    fn from(value: u32) -> Self {
+        Self(value)
+    }
+}
+
+impl From<NonHardenedChildIndex> for u32 {
+    fn from(value: NonHardenedChildIndex) -> Self {
+        value.0
+    }
+}
