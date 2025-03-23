@@ -1,6 +1,7 @@
 use anyhow::Result;
 
-use crate::{Parse, Parser, Script, parse};
+use crate::{parse, parser::prelude::*};
+use crate::Script;
 
 use super::OutPoint;
 

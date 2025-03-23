@@ -1,6 +1,7 @@
 use anyhow::Result;
 
-use crate::{Parse, Parser, parse, u256};
+use crate::{parse, parser::prelude::*};
+use crate::u256;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct JSOutPoint {

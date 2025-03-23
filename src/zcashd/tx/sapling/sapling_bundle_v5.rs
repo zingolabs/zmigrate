@@ -1,6 +1,7 @@
 use anyhow::Result;
 
-use crate::{Amount, Blob64, GrothProof, Parse, Parser, parse, parse_fixed_length_vec, u256};
+use crate::{parse, parser::prelude::*};
+use crate::{Amount, Blob64, GrothProof, u256};
 
 use super::{OutputDescription, OutputV5, SpendDescription, SpendV5};
 

@@ -2,9 +2,9 @@ use std::ops::{Index, IndexMut, Range, RangeFrom, RangeFull, RangeInclusive, Ran
 
 use anyhow::{Context, Result};
 
-use crate::{Parse, Parser, parse};
+use crate::{parse, parser::prelude::*};
 
-use super::CompactSize;
+use crate::CompactSize;
 
 #[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 /// A variable-size byte array.

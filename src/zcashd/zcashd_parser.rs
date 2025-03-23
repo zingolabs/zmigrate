@@ -5,9 +5,10 @@ use std::{
 
 use anyhow::{Context, Result, bail};
 
+use crate::{parse, parser::prelude::*};
+
 use crate::{
-    Bip39Mnemonic, Parser, SaplingIncomingViewingKey, TxId, parse,
-    sapling::SaplingExtendedSpendingKey, u252, u256,
+    Bip39Mnemonic, SaplingIncomingViewingKey, TxId, sapling::SaplingExtendedSpendingKey, u252, u256,
 };
 
 use super::{

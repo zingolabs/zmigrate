@@ -1,6 +1,7 @@
 use anyhow::Result;
 
-use crate::{Network, Parse, Parser, network_for_identifier, parse};
+use crate::{parse, parser::prelude::*};
+use crate::{Network, network_for_identifier};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct NetworkInfo {

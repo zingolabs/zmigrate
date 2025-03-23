@@ -1,6 +1,7 @@
 use anyhow::{Context, Result, bail};
 
-use crate::{CompactSize, Parse, Parser, parse};
+use crate::{parse, CompactSize};
+use crate::parser::prelude::*;
 
 impl Parse for String {
     fn parse(p: &mut Parser) -> Result<Self> {

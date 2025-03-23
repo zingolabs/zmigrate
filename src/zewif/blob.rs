@@ -2,7 +2,7 @@ use std::ops::{Index, IndexMut, Range, RangeFrom, RangeFull, RangeInclusive, Ran
 
 use anyhow::{Context, Result, bail};
 
-use crate::{Parse, Parser};
+use crate::parser::prelude::*;
 
 /// A fixed-size byte array.
 #[derive(Clone, PartialEq, Eq, Hash)]

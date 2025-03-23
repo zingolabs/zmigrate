@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use anyhow::{Context, Result, bail};
 
-use crate::{CompactSize, Parse, ParseWithParam, Parser, parse};
+use crate::{CompactSize, parse, parser::prelude::*};
 
 pub fn parse_pair<T: Parse, U: Parse>(p: &mut Parser) -> Result<(T, U)> {
     let first = parse!(p, "first item of pair")?;

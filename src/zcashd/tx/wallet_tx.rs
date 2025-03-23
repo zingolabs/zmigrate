@@ -2,8 +2,10 @@ use std::collections::HashMap;
 
 use anyhow::Result;
 
+use crate::{parse, parser::prelude::*};
+
 use crate::{
-    BranchId, CompactSize, Data, ExpiryHeight, Parse, Parser, parse, u256,
+    BranchId, CompactSize, Data, ExpiryHeight, u256,
     zcashd::{OrchardTxMeta, SaplingBundleV5, ZIP225_TX_VERSION},
 };
 

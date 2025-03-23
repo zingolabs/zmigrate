@@ -1,6 +1,7 @@
 use anyhow::Result;
 
-use crate::{PHGRProof, Parse, Parser, parse};
+use crate::{parse, parser::prelude::*};
+use crate::PHGRProof;
 
 impl Parse for PHGRProof {
     fn parse(p: &mut Parser) -> Result<Self> {

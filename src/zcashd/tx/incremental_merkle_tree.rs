@@ -1,6 +1,7 @@
 use anyhow::Result;
 
-use crate::{IncrementalMerkleTree, Parse, Parser, parse};
+use crate::{parse, parser::prelude::*};
+use crate::IncrementalMerkleTree;
 
 impl Parse for IncrementalMerkleTree {
     fn parse(p: &mut Parser) -> Result<Self> {

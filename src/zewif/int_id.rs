@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use crate::{Parse, Parser, parse};
+use crate::{parse, parser::prelude::*};
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub struct IntID(u32);

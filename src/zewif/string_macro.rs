@@ -41,8 +41,8 @@ macro_rules! string {
             }
         }
 
-        impl $crate::Parse for $name {
-            fn parse(p: &mut $crate::Parser) -> ::anyhow::Result<Self> {
+        impl $crate::parser::Parse for $name {
+            fn parse(p: &mut $crate::parser::Parser) -> ::anyhow::Result<Self> {
                 Ok(Self($crate::parse!(p, "string")?))
             }
         }

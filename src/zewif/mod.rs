@@ -29,7 +29,6 @@ mod_use!(mnemonic_language);
 mod_use!(network);
 mod_use!(orchard_action_description);
 mod_use!(orchard_sent_output);
-mod_use!(parseable_types);
 mod_use!(phgr_proof);
 mod_use!(position);
 mod_use!(sapling_incoming_viewing_key);

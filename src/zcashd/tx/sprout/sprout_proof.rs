@@ -1,6 +1,7 @@
 use anyhow::Result;
 
-use crate::{ParseWithParam, Parser, SproutProof, parse};
+use crate::{parse, parser::prelude::*};
+use crate::SproutProof;
 
 impl ParseWithParam<bool> for SproutProof {
     fn parse(p: &mut Parser, use_groth: bool) -> Result<Self> {

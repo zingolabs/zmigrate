@@ -1,6 +1,7 @@
 use anyhow::Result;
 
-use crate::{Data, Parse, Parser, parse};
+use crate::{parse, parser::prelude::*};
+use crate::Data;
 
 use super::RedPallasSignature;
 
@@ -17,7 +18,7 @@ impl OrchardAuthorized {
             binding_signature,
         }
     }
-    
+
     pub fn proof(&self) -> &Data {
         &self.proof
     }

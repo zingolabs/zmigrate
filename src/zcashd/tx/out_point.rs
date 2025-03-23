@@ -1,6 +1,7 @@
 use anyhow::Result;
 
-use crate::{Parse, Parser, TxId, parse};
+use crate::{parse, parser::prelude::*};
+use crate::TxId;
 
 pub type SaplingOutPoint = OutPoint;
 

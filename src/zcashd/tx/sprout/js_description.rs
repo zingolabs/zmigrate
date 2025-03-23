@@ -1,6 +1,7 @@
 use anyhow::Result;
 
-use crate::{Amount, Anchor, ParseWithParam, Parser, SproutProof, parse, u256};
+use crate::{parse, parser::prelude::*};
+use crate::{Amount, Anchor, SproutProof, u256};
 
 use super::NoteEncryptionCiphertext;
 

@@ -1,6 +1,7 @@
 use anyhow::Result;
 
-use crate::{Amount, Parse, Parser, Script, parse};
+use crate::{parse, parser::prelude::*};
+use crate::{Amount, Script};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct TxOut {

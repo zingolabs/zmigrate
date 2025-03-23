@@ -1,7 +1,8 @@
 use anyhow::Result;
 use zcash_address::{ToAddress, ZcashAddress};
 
-use crate::{Blob, Network, Parse, Parser, parse};
+use crate::{parse, parser::prelude::*};
+use crate::{Blob, Network};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SaplingZPaymentAddress {

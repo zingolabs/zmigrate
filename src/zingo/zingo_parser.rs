@@ -15,7 +15,8 @@ use zingolib::{
     },
 };
 
-use crate::{Data, Parser, parse, parse_string};
+use crate::{parse, parser::prelude::*};
+use crate::Data;
 
 use super::{WalletCapability, ZingoWallet};
 

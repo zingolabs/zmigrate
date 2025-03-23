@@ -1,6 +1,7 @@
 use anyhow::{Context, Result, bail};
 
-use crate::{CompactSize, Data, Parse, Parser, parse};
+use crate::{parse, parser::prelude::*};
+use crate::{CompactSize, Data};
 
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct PubKey(Data);

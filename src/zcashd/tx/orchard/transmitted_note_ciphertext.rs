@@ -1,8 +1,7 @@
 use anyhow::Result;
 
 use crate::{Blob, u256};
-
-use crate::{Parse, Parser, parse};
+use crate::{parse, parser::prelude::*};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct TransmittedNoteCiphertext {

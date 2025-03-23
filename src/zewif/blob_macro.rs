@@ -99,8 +99,8 @@ macro_rules! blob {
             }
         }
 
-        impl $crate::Parse for $name {
-            fn parse(parser: &mut $crate::Parser) -> ::anyhow::Result<Self>
+        impl $crate::parser::Parse for $name {
+            fn parse(parser: &mut $crate::parser::Parser) -> ::anyhow::Result<Self>
             where
                 Self: Sized,
             {

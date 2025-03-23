@@ -1,4 +1,5 @@
 mod mod_use_macro;
+pub mod parser;
 
 mod bdb_dump;
 pub use bdb_dump::*;
@@ -8,11 +9,6 @@ mod exec;
 pub use exec::*;
 mod file_args;
 pub use file_args::*;
-mod parse_macro;
-mod parser;
-pub use parser::*;
-mod parsing;
-pub use parsing::*;
 mod sapling;
 mod string_utils;
 pub use string_utils::*;

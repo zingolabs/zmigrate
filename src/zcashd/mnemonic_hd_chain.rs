@@ -1,6 +1,7 @@
 use anyhow::Result;
 
-use crate::{Blob32, Parse, Parser, SecondsSinceEpoch, parse};
+use crate::{parse, parser::prelude::*};
+use crate::{Blob32, SecondsSinceEpoch};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct MnemonicHDChain {
