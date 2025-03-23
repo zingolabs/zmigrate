@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use zcash_address::{ToAddress, TryFromAddress, ZcashAddress, unified::Encoding};
+use zcash_address::{ToAddress, ZcashAddress, unified::Encoding};
 
 use crate::{Blob, Blob32, Network, Parse, Parser, parse};
 

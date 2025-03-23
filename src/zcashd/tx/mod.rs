@@ -11,5 +11,5 @@ crate::mod_use!(
     tx_in,
     tx_out,
     tx_version,
-    wallet_tx
+    wallet_tx,
 );

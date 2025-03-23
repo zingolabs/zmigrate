@@ -9,5 +9,5 @@ crate::mod_use!(
     sapling_note_data,
     sapling_z_payment_address,
     spend_v4,
-    spend_v5
+    spend_v5,
 );
