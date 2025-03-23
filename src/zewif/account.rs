@@ -38,8 +38,8 @@ impl Account {
         }
     }
 
-    pub fn id(&self) -> &ARID {
-        &self.id
+    pub fn id(&self) -> ARID {
+        self.id
     }
 
     pub fn name(&self) -> &str {

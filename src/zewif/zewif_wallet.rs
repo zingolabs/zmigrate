@@ -22,8 +22,8 @@ pub struct ZewifWallet {
 }
 
 impl Identifiable for ZewifWallet {
-    fn id(&self) -> &ARID {
-        &self.id
+    fn id(&self) -> ARID {
+        self.id
     }
 }
 
@@ -38,6 +38,10 @@ impl ZewifWallet {
             accounts: HashMap::new(),
             attachments: Attachments::new(),
         }
+    }
+
+    pub fn id(&self) -> ARID {
+        self.id
     }
 
     pub fn network(&self) -> Network {
@@ -57,6 +61,6 @@ impl ZewifWallet {
     }
 
     pub fn add_account(&mut self, account: Account) {
-        self.accounts.insert(account.id().clone(), account);
+        self.accounts.insert(account.id(), account);
     }
 }
