@@ -3,8 +3,8 @@ use std::collections::HashMap;
 use anyhow::Result;
 
 use crate::{
-    CompactSize, Data, Parse, Parser, parse, u256,
-    zcashd::{BranchId, OrchardTxMeta, SaplingBundleV5, ZIP225_TX_VERSION},
+    BranchId, CompactSize, Data, Parse, Parser, parse, u256,
+    zcashd::{OrchardTxMeta, SaplingBundleV5, ZIP225_TX_VERSION},
 };
 
 use super::{
@@ -88,8 +88,8 @@ impl Parse for WalletTx {
             .transpose()?
             .unwrap_or_default();
 
-            if version.number >= 2 {
-                let use_groth = version.is_overwinter() && version.number >= SAPLING_TX_VERSION;
+            if version.number() >= 2 {
+                let use_groth = version.is_overwinter() && version.number() >= SAPLING_TX_VERSION;
                 join_splits = Some(parse!(p, param = use_groth, "join_splits")?);
             }
 
@@ -122,12 +122,12 @@ impl Parse for WalletTx {
         let is_spent = parse!(p, "is_spent")?;
 
         let mut sapling_note_data = None;
-        if version.is_overwinter() && version.number >= SAPLING_TX_VERSION {
+        if version.is_overwinter() && version.number() >= SAPLING_TX_VERSION {
             sapling_note_data = parse!(p, "sapling_note_data")?;
         }
 
         let mut orchard_tx_meta: Option<OrchardTxMeta> = None;
-        if version.is_overwinter() && version.number >= ZIP225_TX_VERSION {
+        if version.is_overwinter() && version.number() >= ZIP225_TX_VERSION {
             let meta = parse!(p, "orchard_tx_meta")?;
             orchard_tx_meta = Some(meta);
         }

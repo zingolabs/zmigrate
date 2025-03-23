@@ -7,8 +7,18 @@ use super::ClientVersion;
 /// Vector of block hashes
 #[derive(Debug, Clone, PartialEq)]
 pub struct BlockLocator {
-    pub version: ClientVersion,
-    pub blocks: Vec<u256>,
+    version: ClientVersion,
+    blocks: Vec<u256>,
+}
+
+impl BlockLocator {
+    pub fn version(&self) -> ClientVersion {
+        self.version
+    }
+
+    pub fn blocks(&self) -> &[u256] {
+        &self.blocks
+    }
 }
 
 impl Parse for BlockLocator {

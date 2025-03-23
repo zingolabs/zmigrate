@@ -5,7 +5,6 @@ mod bip_39_mnemonic;
 
 mod_use!(address);
 mod_use!(block_locator);
-mod_use!(branch_id);
 mod_use!(client_version);
 mod_use!(cmd);
 mod_use!(key_id);

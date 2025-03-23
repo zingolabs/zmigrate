@@ -309,12 +309,12 @@ fn extract_transaction_addresses(
     // For transparent inputs, extract addresses from the script signatures
     for tx_in in &tx.vin {
         // We'll derive a unique identifier from the previous outpoint to ensure we capture this transaction
-        let txid_str = format!("{}", tx_in.prevout.txid);
-        let input_addr = format!("input:{}:{}", txid_str, tx_in.prevout.vout);
+        let txid_str = format!("{}", tx_in.prevout().txid());
+        let input_addr = format!("input:{}:{}", txid_str, tx_in.prevout().vout());
         addresses.insert(input_addr);
 
         // Extract potential P2PKH or P2SH addresses from script signatures
-        let script_data = &tx_in.script_sig;
+        let script_data = tx_in.script_sig();
 
         // We're looking for common script signature patterns that might contain addresses
         // P2PKH scriptSigs typically have format: <sig> <pubkey>
@@ -351,7 +351,7 @@ fn extract_transaction_addresses(
 
     // For transparent outputs, extract addresses from the scriptPubKey
     for (vout_idx, tx_out) in tx.vout.iter().enumerate() {
-        let script_data = &tx_out.script_pub_key;
+        let script_data = tx_out.script_pub_key();
 
         // P2PKH detection - match the pattern: OP_DUP OP_HASH160 <pubKeyHash> OP_EQUALVERIFY OP_CHECKSIG
         if script_data.len() >= 25 && script_data[0] == 0x76 && script_data[1] == 0xA9 {
@@ -552,17 +552,17 @@ fn convert_transaction(tx_id: TxId, tx: &zcashd::WalletTx) -> Result<zewif::Tran
     // Convert transparent inputs
     for tx_in in &tx.vin {
         let zewif_tx_in = zewif::TxIn::new(
-            zewif::TxOutPoint::new(tx_in.prevout.txid, tx_in.prevout.vout),
-            tx_in.script_sig.clone(),
-            tx_in.sequence,
+            zewif::TxOutPoint::new(tx_in.prevout().txid(), tx_in.prevout().vout()),
+            tx_in.script_sig().clone(),
+            tx_in.sequence(),
         );
         zewif_tx.add_input(zewif_tx_in);
     }
 
     // Convert transparent outputs
-    for tx_out in &tx.vout {
-        let amount = tx_out.value;
-        let script_pubkey = tx_out.script_pub_key.clone();
+    for tx_out in tx.vout.iter() {
+        let amount = tx_out.value();
+        let script_pubkey = tx_out.script_pub_key().clone();
 
         let zewif_tx_out = zewif::TxOut::new(amount, script_pubkey);
         zewif_tx.add_output(zewif_tx_out);
@@ -940,7 +940,7 @@ fn update_transaction_positions(
                     if let Some(sapling_note_data) = &zcashd_tx.sapling_note_data {
                         for (outpoint, note_data) in sapling_note_data.iter() {
                             // Check if this output matches our index
-                            if outpoint.vout == idx as u32 {
+                            if outpoint.vout() == idx as u32 {
                                 // Get position information from the witnesses if available
                                 if !note_data.witnesses().is_empty() {
                                     // Use the most recent witness, which is typically the first one

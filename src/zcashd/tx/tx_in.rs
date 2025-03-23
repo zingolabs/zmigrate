@@ -6,9 +6,23 @@ use super::OutPoint;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TxIn {
-    pub prevout: OutPoint,
-    pub script_sig: Script,
-    pub sequence: u32,
+    prevout: OutPoint,
+    script_sig: Script,
+    sequence: u32,
+}
+
+impl TxIn {
+    pub fn prevout(&self) -> &OutPoint {
+        &self.prevout
+    }
+
+    pub fn script_sig(&self) -> &Script {
+        &self.script_sig
+    }
+
+    pub fn sequence(&self) -> u32 {
+        self.sequence
+    }
 }
 
 impl Parse for TxIn {

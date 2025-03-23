@@ -6,8 +6,18 @@ pub type SaplingOutPoint = OutPoint;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct OutPoint {
-    pub txid: TxId,
-    pub vout: u32,
+    txid: TxId,
+    vout: u32,
+}
+
+impl OutPoint {
+    pub fn txid(&self) -> TxId {
+        self.txid
+    }
+
+    pub fn vout(&self) -> u32 {
+        self.vout
+    }
 }
 
 impl Parse for OutPoint {
