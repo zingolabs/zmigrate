@@ -13,12 +13,10 @@ impl<const N: usize> Blob<N> {
         Self(data)
     }
 
-    #[must_use]
     pub fn len(&self) -> usize {
         N
     }
 
-    #[must_use]
     pub fn is_empty(&self) -> bool {
         N == 0
     }

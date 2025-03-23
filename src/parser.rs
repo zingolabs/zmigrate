@@ -57,12 +57,10 @@ impl<'a> Parser<'a> {
         Self { buffer: buffer.as_ref(), offset: 0, trace: false }
     }
 
-    #[must_use]
     pub fn len(&self) -> usize {
         self.buffer.len()
     }
 
-    #[must_use]
     pub fn is_empty(&self) -> bool {
         self.buffer.is_empty()
     }

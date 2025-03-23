@@ -7,12 +7,10 @@ use std::ops::{Index, IndexMut, Range, RangeFrom, RangeFull, RangeInclusive, Ran
 pub struct Script(pub Data);
 
 impl Script {
-    #[must_use]
     pub fn len(&self) -> usize {
         self.0.len()
     }
 
-    #[must_use]
     pub fn is_empty(&self) -> bool {
         self.len() == 0
     }
