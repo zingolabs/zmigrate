@@ -31,7 +31,11 @@ pub fn migrate_to_zewif(wallet: &ZcashdWallet) -> Result<ZewifTop> {
     let mut transactions = convert_transactions(wallet)?;
 
     // Convert orchard note commitment tree if available
-    if !wallet.orchard_note_commitment_tree.unparsed_data().is_empty() {
+    if !wallet
+        .orchard_note_commitment_tree
+        .unparsed_data()
+        .is_empty()
+    {
         // Update transaction outputs with note positions from the note commitment tree
         update_transaction_positions(wallet, &mut transactions)?;
     }
@@ -307,7 +311,7 @@ fn extract_transaction_addresses(
     }
 
     // For transparent inputs, extract addresses from the script signatures
-    for tx_in in &tx.vin {
+    for tx_in in tx.vin() {
         // We'll derive a unique identifier from the previous outpoint to ensure we capture this transaction
         let txid_str = format!("{}", tx_in.prevout().txid());
         let input_addr = format!("input:{}:{}", txid_str, tx_in.prevout().vout());
@@ -350,7 +354,7 @@ fn extract_transaction_addresses(
     }
 
     // For transparent outputs, extract addresses from the scriptPubKey
-    for (vout_idx, tx_out) in tx.vout.iter().enumerate() {
+    for (vout_idx, tx_out) in tx.vout().iter().enumerate() {
         let script_data = tx_out.script_pub_key();
 
         // P2PKH detection - match the pattern: OP_DUP OP_HASH160 <pubKeyHash> OP_EQUALVERIFY OP_CHECKSIG
@@ -388,7 +392,7 @@ fn extract_transaction_addresses(
     }
 
     // For Sapling spends and outputs
-    match &tx.sapling_bundle {
+    match tx.sapling_bundle() {
         zcashd::SaplingBundle::V4(bundle_v4) => {
             for spend in bundle_v4.spends() {
                 // The nullifier uniquely identifies the spend
@@ -397,7 +401,7 @@ fn extract_transaction_addresses(
                 addresses.insert(format!("sapling_spend:{}", nullifier_hex));
 
                 // If we have note data for this nullifier, we might find the address
-                if let Some(sapling_note_data) = &tx.sapling_note_data {
+                if let Some(sapling_note_data) = tx.sapling_note_data() {
                     for note_data in sapling_note_data.values() {
                         if let Some(nullifier) = note_data.nullifer() {
                             if nullifier == spend.nullifier() {
@@ -422,7 +426,7 @@ fn extract_transaction_addresses(
                 addresses.insert(format!("sapling_output:{}", cm_hex));
 
                 // If we have note data for this output, we might find the address
-                if let Some(sapling_note_data) = &tx.sapling_note_data {
+                if let Some(sapling_note_data) = tx.sapling_note_data() {
                     for note_data in sapling_note_data.values() {
                         // We'd need to link the outpoint to this specific output
                         // Since we don't have enough information, we'll use the IVK
@@ -455,7 +459,7 @@ fn extract_transaction_addresses(
     }
 
     // Process sapling note data directly
-    if let Some(sapling_note_data) = &tx.sapling_note_data {
+    if let Some(sapling_note_data) = tx.sapling_note_data() {
         for note_data in sapling_note_data.values() {
             // If we have the incoming viewing key, we can find the corresponding address
             for (addr, ivk) in &wallet.sapling_z_addresses {
@@ -469,7 +473,7 @@ fn extract_transaction_addresses(
     }
 
     // Handle Orchard actions if present
-    if let zcashd::OrchardBundle(Some(orchard_bundle)) = &tx.orchard_bundle {
+    if let zcashd::OrchardBundle(Some(orchard_bundle)) = tx.orchard_bundle() {
         // Extract data from Orchard actions
         for (idx, action) in orchard_bundle.actions.iter().enumerate() {
             // Add standard identifiers like nullifier and commitment
@@ -477,7 +481,7 @@ fn extract_transaction_addresses(
             addresses.insert(format!("orchard_nullifier:{}", nullifier_hex));
 
             // Extract potential address information if available
-            if let Some(orchard_meta) = &tx.orchard_tx_meta {
+            if let Some(orchard_meta) = tx.orchard_tx_meta() {
                 if let Some(_action_data) = orchard_meta.action_data(idx as u32) {
                     // Try to recover the Orchard address components if we have enough data
                     // We don't have direct access to the receiver's complete address data here,
@@ -505,7 +509,7 @@ fn extract_transaction_addresses(
 
     // If the transaction is marked as "from me", and we don't have other identifying information,
     // use all our addresses as potential sources
-    if tx.from_me && addresses.is_empty() {
+    if tx.is_from_me() && addresses.is_empty() {
         for addr in wallet.sapling_z_addresses.keys() {
             let addr_str = addr.to_string(wallet.network());
             addresses.insert(addr_str);
@@ -541,8 +545,8 @@ fn convert_transaction(tx_id: TxId, tx: &zcashd::WalletTx) -> Result<zewif::Tran
     let mut zewif_tx = zewif::Transaction::new(tx_id);
 
     // Set raw transaction data
-    if !tx.unparsed_data.is_empty() {
-        zewif_tx.set_raw(tx.unparsed_data.clone());
+    if !tx.unparsed_data().is_empty() {
+        zewif_tx.set_raw(tx.unparsed_data().clone());
     }
 
     // Add basic transaction metadata
@@ -550,7 +554,7 @@ fn convert_transaction(tx_id: TxId, tx: &zcashd::WalletTx) -> Result<zewif::Tran
     // For this prototype, we'll just leave it as None
 
     // Convert transparent inputs
-    for tx_in in &tx.vin {
+    for tx_in in tx.vin() {
         let zewif_tx_in = zewif::TxIn::new(
             zewif::TxOutPoint::new(tx_in.prevout().txid(), tx_in.prevout().vout()),
             tx_in.script_sig().clone(),
@@ -560,7 +564,7 @@ fn convert_transaction(tx_id: TxId, tx: &zcashd::WalletTx) -> Result<zewif::Tran
     }
 
     // Convert transparent outputs
-    for tx_out in tx.vout.iter() {
+    for tx_out in tx.vout() {
         let amount = tx_out.value();
         let script_pubkey = tx_out.script_pub_key().clone();
 
@@ -569,7 +573,7 @@ fn convert_transaction(tx_id: TxId, tx: &zcashd::WalletTx) -> Result<zewif::Tran
     }
 
     // Convert Sapling spends and outputs
-    match &tx.sapling_bundle {
+    match tx.sapling_bundle() {
         zcashd::SaplingBundle::V4(bundle_v4) => {
             // Convert Sapling spends
             for (idx, spend) in bundle_v4.spends().iter().enumerate() {
@@ -613,7 +617,7 @@ fn convert_transaction(tx_id: TxId, tx: &zcashd::WalletTx) -> Result<zewif::Tran
     }
 
     // Convert Orchard actions
-    if let zcashd::OrchardBundle(Some(orchard_bundle)) = &tx.orchard_bundle {
+    if let zcashd::OrchardBundle(Some(orchard_bundle)) = tx.orchard_bundle() {
         for (idx, action) in orchard_bundle.actions.iter().enumerate() {
             let mut orchard_action = zewif::OrchardActionDescription::new();
             orchard_action.set_action_index(idx as u32);
@@ -625,7 +629,7 @@ fn convert_transaction(tx_id: TxId, tx: &zcashd::WalletTx) -> Result<zewif::Tran
     }
 
     // Convert Sprout JoinSplits if present
-    if let Some(join_splits) = &tx.join_splits {
+    if let Some(join_splits) = tx.join_splits() {
         for js in join_splits.descriptions() {
             // Create arrays using from_fn to avoid needing Copy
             let nullifiers = js.nullifiers();
@@ -904,15 +908,14 @@ fn update_transaction_positions(
         // Find the corresponding zcashd transaction to get metadata
         if let Some(zcashd_tx) = wallet.transactions.get(tx_id) {
             // Check for Orchard bundle
-            if let zcashd::OrchardBundle(Some(_orchard_bundle)) = &zcashd_tx.orchard_bundle {
+            if let zcashd::OrchardBundle(Some(_orchard_bundle)) = zcashd_tx.orchard_bundle() {
                 // Check for Orchard transaction metadata
-                if let Some(orchard_meta) = &zcashd_tx.orchard_tx_meta {
+                if let Some(orchard_meta) = zcashd_tx.orchard_tx_meta() {
                     // Process each Orchard action if we have any
                     if let Some(orchard_actions) = zewif_tx.orchard_actions() {
                         for (idx, action) in orchard_actions.iter().enumerate() {
                             // Use idx as action_index because it's the only identifier we have for now
-                            if let Some(_action_data) = orchard_meta.action_data(idx as u32)
-                            {
+                            if let Some(_action_data) = orchard_meta.action_data(idx as u32) {
                                 // Generate a placeholder position based on the action index
                                 // In a real implementation, we'd extract this from the tree structure
                                 let position = Position((idx as u32) + 1); // Placeholder, starting from 1
@@ -937,7 +940,7 @@ fn update_transaction_positions(
             if let Some(sapling_outputs) = zewif_tx.sapling_outputs() {
                 for (idx, output) in sapling_outputs.iter().enumerate() {
                     // If we have sapling note data, use that to set positions
-                    if let Some(sapling_note_data) = &zcashd_tx.sapling_note_data {
+                    if let Some(sapling_note_data) = zcashd_tx.sapling_note_data() {
                         for (outpoint, note_data) in sapling_note_data.iter() {
                             // Check if this output matches our index
                             if outpoint.vout() == idx as u32 {

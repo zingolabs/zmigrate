@@ -20,7 +20,7 @@ pub enum TxVersionGroup {
     Future,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct TxVersion {
     group: TxVersionGroup,
     number: u32,

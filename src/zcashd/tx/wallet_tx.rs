@@ -16,37 +16,127 @@ use super::{
 #[derive(Debug, Clone, PartialEq)]
 pub struct WalletTx {
     // CTransaction
-    pub version: TxVersion,
+    version: TxVersion,
 
-    pub consensus_branch_id: Option<BranchId>,
+    consensus_branch_id: Option<BranchId>,
 
-    pub vin: Vec<TxIn>,
-    pub vout: Vec<TxOut>,
-    pub lock_time: Option<LockTime>,
-    pub expiry_height: Option<ExpiryHeight>,
-    pub sapling_bundle: SaplingBundle,
+    vin: Vec<TxIn>,
+    vout: Vec<TxOut>,
+    lock_time: Option<LockTime>,
+    expiry_height: Option<ExpiryHeight>,
+    sapling_bundle: SaplingBundle,
 
-    pub orchard_bundle: OrchardBundle,
+    orchard_bundle: OrchardBundle,
 
-    pub join_splits: Option<JoinSplits>,
+    join_splits: Option<JoinSplits>,
 
     // CMerkleTx
-    pub hash_block: u256,
-    pub merkle_branch: Vec<u256>,
-    pub index: i32,
+    hash_block: u256,
+    merkle_branch: Vec<u256>,
+    index: i32,
 
     // CWalletTx
-    pub map_value: HashMap<String, String>,
-    pub map_sprout_note_data: HashMap<JSOutPoint, SproutNoteData>,
-    pub order_form: Vec<(String, String)>,
-    pub time_received_is_tx_time: i32,
-    pub time_received: i32,
-    pub from_me: bool,
-    pub is_spent: bool,
-    pub sapling_note_data: Option<HashMap<SaplingOutPoint, SaplingNoteData>>,
-    pub orchard_tx_meta: Option<OrchardTxMeta>,
+    map_value: HashMap<String, String>,
+    map_sprout_note_data: HashMap<JSOutPoint, SproutNoteData>,
+    order_form: Vec<(String, String)>,
+    time_received_is_tx_time: i32,
+    time_received: i32,
+    is_from_me: bool,
+    is_spent: bool,
+    sapling_note_data: Option<HashMap<SaplingOutPoint, SaplingNoteData>>,
+    orchard_tx_meta: Option<OrchardTxMeta>,
 
-    pub unparsed_data: Data,
+    unparsed_data: Data,
+}
+
+impl WalletTx {
+    pub fn version(&self) -> TxVersion {
+        self.version
+    }
+
+    pub fn consensus_branch_id(&self) -> Option<BranchId> {
+        self.consensus_branch_id
+    }
+
+    pub fn vin(&self) -> &[TxIn] {
+        &self.vin
+    }
+
+    pub fn vout(&self) -> &[TxOut] {
+        &self.vout
+    }
+
+    pub fn lock_time(&self) -> Option<LockTime> {
+        self.lock_time
+    }
+
+    pub fn expiry_height(&self) -> Option<ExpiryHeight> {
+        self.expiry_height
+    }
+
+    pub fn sapling_bundle(&self) -> &SaplingBundle {
+        &self.sapling_bundle
+    }
+
+    pub fn orchard_bundle(&self) -> &OrchardBundle {
+        &self.orchard_bundle
+    }
+
+    pub fn join_splits(&self) -> Option<&JoinSplits> {
+        self.join_splits.as_ref()
+    }
+
+    pub fn hash_block(&self) -> u256 {
+        self.hash_block
+    }
+
+    pub fn merkle_branch(&self) -> &[u256] {
+        &self.merkle_branch
+    }
+
+    pub fn index(&self) -> i32 {
+        self.index
+    }
+
+    pub fn map_value(&self) -> &HashMap<String, String> {
+        &self.map_value
+    }
+
+    pub fn map_sprout_note_data(&self) -> &HashMap<JSOutPoint, SproutNoteData> {
+        &self.map_sprout_note_data
+    }
+
+    pub fn order_form(&self) -> &[(String, String)] {
+        &self.order_form
+    }
+
+    pub fn time_received_is_tx_time(&self) -> i32 {
+        self.time_received_is_tx_time
+    }
+
+    pub fn time_received(&self) -> i32 {
+        self.time_received
+    }
+
+    pub fn is_from_me(&self) -> bool {
+        self.is_from_me
+    }
+
+    pub fn is_spent(&self) -> bool {
+        self.is_spent
+    }
+
+    pub fn sapling_note_data(&self) -> Option<&HashMap<SaplingOutPoint, SaplingNoteData>> {
+        self.sapling_note_data.as_ref()
+    }
+
+    pub fn orchard_tx_meta(&self) -> Option<&OrchardTxMeta> {
+        self.orchard_tx_meta.as_ref()
+    }
+
+    pub fn unparsed_data(&self) -> &Data {
+        &self.unparsed_data
+    }
 }
 
 impl Parse for WalletTx {
@@ -164,7 +254,7 @@ impl Parse for WalletTx {
             order_form,
             time_received_is_tx_time,
             time_received,
-            from_me,
+            is_from_me: from_me,
             is_spent,
             sapling_note_data,
             orchard_tx_meta,
