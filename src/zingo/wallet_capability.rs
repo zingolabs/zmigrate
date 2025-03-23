@@ -11,7 +11,7 @@ use zingolib::{
     wallet::{keys::unified::UnifiedKeyStore, traits::ReadableWriteable},
 };
 
-pub struct WalletCapability(pub zingolib::wallet::keys::unified::WalletCapability);
+pub struct WalletCapability(zingolib::wallet::keys::unified::WalletCapability);
 
 impl WalletCapability {
     pub fn unified_key_store(&self) -> &UnifiedKeyStore {
@@ -52,5 +52,11 @@ impl std::fmt::Debug for WalletCapability {
             .field("rejection_addresses", self.rejection_addresses())
             .field("addresses", self.addresses())
             .finish()
+    }
+}
+
+impl AsRef<zingolib::wallet::keys::unified::WalletCapability> for WalletCapability {
+    fn as_ref(&self) -> &zingolib::wallet::keys::unified::WalletCapability {
+        &self.0
     }
 }

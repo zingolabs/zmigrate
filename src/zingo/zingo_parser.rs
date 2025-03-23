@@ -66,9 +66,9 @@ impl<'a> ZingoParser<'a> {
         }
 
         let transactions = if external_version <= 14 {
-            TxMap::read_old(&mut *p, &wallet_capability.0).with_context(|| "TxMap old")
+            TxMap::read_old(&mut *p, wallet_capability.as_ref()).with_context(|| "TxMap old")
         } else {
-            TxMap::read(&mut *p, &wallet_capability.0).with_context(|| "TxMap")
+            TxMap::read(&mut *p, wallet_capability.as_ref()).with_context(|| "TxMap")
         }?;
 
         let chain_name = parse_string::<u64>(&mut *p)?;
