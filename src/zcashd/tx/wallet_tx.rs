@@ -95,7 +95,7 @@ impl Parse for WalletTx {
 
             if (version.is_sapling() || version.is_future()) && sapling_bundle_v4.have_actions() {
                 let binding_sig = parse!(p, "binding_sig")?;
-                sapling_bundle_v4.binding_sig = binding_sig;
+                sapling_bundle_v4.set_binding_sig(binding_sig);
             }
 
             sapling_bundle = SaplingBundle::V4(sapling_bundle_v4);

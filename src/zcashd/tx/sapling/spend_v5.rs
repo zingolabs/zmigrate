@@ -1,12 +1,14 @@
+#![allow(dead_code)]
+
 use anyhow::Result;
 
 use crate::{Blob64, GrothProof, Parse, Parser, parse, u256};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct SpendV5 {
-    pub cv: u256,
-    pub nullifier: u256,
-    pub rk: u256,
+    cv: u256,
+    nullifier: u256,
+    rk: u256,
 }
 
 impl SpendV5 {
@@ -24,6 +26,18 @@ impl SpendV5 {
             zkproof,
             spend_auth_sig,
         }
+    }
+
+    pub fn cv(&self) -> u256 {
+        self.cv
+    }
+
+    pub fn nullifier(&self) -> u256 {
+        self.nullifier
+    }
+
+    pub fn rk(&self) -> u256 {
+        self.rk
     }
 }
 

@@ -6,9 +6,9 @@ use super::super::super::KeyMetadata;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct SaplingKey {
-    pub ivk: SaplingIncomingViewingKey,
-    pub key: SaplingExtendedSpendingKey,
-    pub metadata: KeyMetadata,
+    ivk: SaplingIncomingViewingKey,
+    key: SaplingExtendedSpendingKey,
+    metadata: KeyMetadata,
 }
 
 impl SaplingKey {
@@ -18,5 +18,17 @@ impl SaplingKey {
         metadata: KeyMetadata,
     ) -> Result<Self> {
         Ok(Self { ivk, key, metadata })
+    }
+
+    pub fn ivk(&self) -> &SaplingIncomingViewingKey {
+        &self.ivk
+    }
+
+    pub fn key(&self) -> &SaplingExtendedSpendingKey {
+        &self.key
+    }
+
+    pub fn metadata(&self) -> &KeyMetadata {
+        &self.metadata
     }
 }

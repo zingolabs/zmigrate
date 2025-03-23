@@ -5,8 +5,8 @@ use crate::{Blob, Network, Parse, Parser, parse};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SaplingZPaymentAddress {
-    pub diversifier: Blob<11>,
-    pub pk: Blob<32>,
+    diversifier: Blob<11>,
+    pk: Blob<32>,
 }
 
 impl SaplingZPaymentAddress {
@@ -17,6 +17,14 @@ impl SaplingZPaymentAddress {
         bytes[11..].copy_from_slice(&self.pk.0);
         let addr = ZcashAddress::from_sapling(network, bytes);
         addr.to_string()
+    }
+
+    pub fn diversifier(&self) -> &Blob<11> {
+        &self.diversifier
+    }
+
+    pub fn pk(&self) -> &Blob<32> {
+        &self.pk
     }
 }
 

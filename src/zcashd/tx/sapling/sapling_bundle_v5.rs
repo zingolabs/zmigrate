@@ -6,10 +6,28 @@ use super::{OutputDescription, OutputV5, SpendDescription, SpendV5};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct SaplingBundleV5 {
-    pub shielded_spends: Vec<SpendDescription>,
-    pub shielded_outputs: Vec<OutputDescription>,
-    pub value_balance: Amount,
-    pub authorization: Option<Blob64>,
+    shielded_spends: Vec<SpendDescription>,
+    shielded_outputs: Vec<OutputDescription>,
+    value_balance: Amount,
+    authorization: Option<Blob64>,
+}
+
+impl SaplingBundleV5 {
+    pub fn shielded_spends(&self) -> &Vec<SpendDescription> {
+        &self.shielded_spends
+    }
+
+    pub fn shielded_outputs(&self) -> &Vec<OutputDescription> {
+        &self.shielded_outputs
+    }
+
+    pub fn value_balance(&self) -> Amount {
+        self.value_balance
+    }
+
+    pub fn authorization(&self) -> Option<&Blob64> {
+        self.authorization.as_ref()
+    }
 }
 
 impl Parse for SaplingBundleV5 {

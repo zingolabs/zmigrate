@@ -198,7 +198,7 @@ fn convert_sapling_addresses(
         // Add spending key if available in sapling_keys
         if let Some(sapling_key) = find_sapling_key_for_ivk(wallet, viewing_key) {
             // Convert to Zewif spending key format
-            let spending_key = convert_sapling_spending_key(&sapling_key.key)
+            let spending_key = convert_sapling_spending_key(sapling_key.key())
                 .context("Failed to convert sapling spending key")?;
             shielded_address.set_spending_key(spending_key);
         }
@@ -391,20 +391,20 @@ fn extract_transaction_addresses(
     // For Sapling spends and outputs
     match &tx.sapling_bundle {
         zcashd::SaplingBundle::V4(bundle_v4) => {
-            for spend in &bundle_v4.spends {
+            for spend in bundle_v4.spends() {
                 // The nullifier uniquely identifies the spend
                 // Use AsRef to get a reference to the underlying bytes
-                let nullifier_hex = hex::encode(spend.nullifier.as_ref() as &[u8]);
+                let nullifier_hex = format!("{}", spend.nullifier());
                 addresses.insert(format!("sapling_spend:{}", nullifier_hex));
 
                 // If we have note data for this nullifier, we might find the address
                 if let Some(sapling_note_data) = &tx.sapling_note_data {
                     for note_data in sapling_note_data.values() {
-                        if let Some(nullifier) = &note_data.nullifer {
-                            if *nullifier == spend.nullifier {
+                        if let Some(nullifier) = note_data.nullifer() {
+                            if nullifier == spend.nullifier() {
                                 // Find the address for this viewing key
                                 for (addr, ivk) in &wallet.sapling_z_addresses {
-                                    if &note_data.incoming_viewing_key == ivk {
+                                    if note_data.incoming_viewing_key() == ivk {
                                         let addr_str = addr.to_string(wallet.network());
                                         addresses.insert(addr_str);
                                         break;
@@ -416,10 +416,10 @@ fn extract_transaction_addresses(
                 }
             }
 
-            for output in &bundle_v4.outputs {
+            for output in bundle_v4.outputs() {
                 // The commitment uniquely identifies the output
                 // Use AsRef to get a reference to the underlying bytes
-                let cm_hex = hex::encode(output.cmu.as_ref() as &[u8]);
+                let cm_hex = hex::encode(output.cmu().as_ref() as &[u8]);
                 addresses.insert(format!("sapling_output:{}", cm_hex));
 
                 // If we have note data for this output, we might find the address
@@ -428,7 +428,7 @@ fn extract_transaction_addresses(
                         // We'd need to link the outpoint to this specific output
                         // Since we don't have enough information, we'll use the IVK
                         for (addr, ivk) in &wallet.sapling_z_addresses {
-                            if &note_data.incoming_viewing_key == ivk {
+                            if note_data.incoming_viewing_key() == ivk {
                                 let addr_str = addr.to_string(wallet.network());
                                 addresses.insert(addr_str);
                                 break;
@@ -441,13 +441,13 @@ fn extract_transaction_addresses(
         zcashd::SaplingBundle::V5(bundle_v5) => {
             // Similar processing for V5 bundles
             // V5 has the same structure for spends and outputs
-            for spend in &bundle_v5.shielded_spends {
+            for spend in bundle_v5.shielded_spends() {
                 // Use AsRef to get a reference to the underlying bytes
                 let nullifier_hex = hex::encode(spend.nullifier().as_ref() as &[u8]);
                 addresses.insert(format!("sapling_spend_v5:{}", nullifier_hex));
             }
 
-            for output in &bundle_v5.shielded_outputs {
+            for output in bundle_v5.shielded_outputs() {
                 // Use AsRef to get a reference to the underlying bytes
                 let cm_hex = hex::encode(output.cmu().as_ref() as &[u8]);
                 addresses.insert(format!("sapling_output_v5:{}", cm_hex));
@@ -460,7 +460,7 @@ fn extract_transaction_addresses(
         for note_data in sapling_note_data.values() {
             // If we have the incoming viewing key, we can find the corresponding address
             for (addr, ivk) in &wallet.sapling_z_addresses {
-                if &note_data.incoming_viewing_key == ivk {
+                if note_data.incoming_viewing_key() == ivk {
                     let addr_str = addr.to_string(wallet.network());
                     addresses.insert(addr_str);
                     break;
@@ -573,28 +573,28 @@ fn convert_transaction(tx_id: TxId, tx: &zcashd::WalletTx) -> Result<zewif::Tran
     match &tx.sapling_bundle {
         zcashd::SaplingBundle::V4(bundle_v4) => {
             // Convert Sapling spends
-            for (idx, spend) in bundle_v4.spends.iter().enumerate() {
+            for (idx, spend) in bundle_v4.spends().iter().enumerate() {
                 let mut sapling_spend = zewif::SaplingSpendDescription::new();
                 sapling_spend.set_spend_index(idx as u32);
-                sapling_spend.set_value(Some(bundle_v4.amount));
-                sapling_spend.set_nullifier(spend.nullifier);
-                sapling_spend.set_zkproof(spend.zkproof.clone());
+                sapling_spend.set_value(Some(bundle_v4.amount()));
+                sapling_spend.set_nullifier(spend.nullifier());
+                sapling_spend.set_zkproof(spend.zkproof().clone());
                 zewif_tx.add_sapling_spend(sapling_spend);
             }
 
             // Convert Sapling outputs
-            for (idx, output) in bundle_v4.outputs.iter().enumerate() {
+            for (idx, output) in bundle_v4.outputs().iter().enumerate() {
                 let mut sapling_output = zewif::SaplingOutputDescription::new();
                 sapling_output.set_output_index(idx as u32);
-                sapling_output.set_commitment(output.cmu);
-                sapling_output.set_ephemeral_key(output.ephemeral_key);
-                sapling_output.set_enc_ciphertext(output.enc_ciphertext.clone());
+                sapling_output.set_commitment(output.cmu());
+                sapling_output.set_ephemeral_key(output.ephemeral_key());
+                sapling_output.set_enc_ciphertext(output.enc_ciphertext().clone());
                 zewif_tx.add_sapling_output(sapling_output);
             }
         }
         zcashd::SaplingBundle::V5(bundle_v5) => {
             // Processing for V5 bundles
-            for (idx, spend) in bundle_v5.shielded_spends.iter().enumerate() {
+            for (idx, spend) in bundle_v5.shielded_spends().iter().enumerate() {
                 let mut sapling_spend = zewif::SaplingSpendDescription::new();
                 sapling_spend.set_spend_index(idx as u32);
                 sapling_spend.set_nullifier(spend.nullifier());
@@ -602,7 +602,7 @@ fn convert_transaction(tx_id: TxId, tx: &zcashd::WalletTx) -> Result<zewif::Tran
                 zewif_tx.add_sapling_spend(sapling_spend);
             }
 
-            for (idx, output) in bundle_v5.shielded_outputs.iter().enumerate() {
+            for (idx, output) in bundle_v5.shielded_outputs().iter().enumerate() {
                 let mut sapling_output = zewif::SaplingOutputDescription::new();
                 sapling_output.set_output_index(idx as u32);
                 sapling_output.set_commitment(output.cmu());
@@ -788,7 +788,7 @@ fn convert_unified_accounts(
             // Add spending key if available in sapling_keys
             if let Some(sapling_key) = find_sapling_key_for_ivk(wallet, viewing_key) {
                 // Convert to Zewif spending key format
-                let spending_key = convert_sapling_spending_key(&sapling_key.key)
+                let spending_key = convert_sapling_spending_key(sapling_key.key())
                     .context("Failed to convert sapling spending key")?;
                 shielded_address.set_spending_key(spending_key);
             }
@@ -945,11 +945,11 @@ fn update_transaction_positions(
                             // Check if this output matches our index
                             if outpoint.vout == idx as u32 {
                                 // Get position information from the witnesses if available
-                                if !note_data.witnesses.is_empty() {
+                                if !note_data.witnesses().is_empty() {
                                     // Use the most recent witness, which is typically the first one
                                     // In a real implementation, we'd select the appropriate witness
                                     // based on anchor height or other criteria
-                                    let _witness = &note_data.witnesses[0];
+                                    let _witness = &note_data.witnesses()[0];
 
                                     // Create a position using the witness information
                                     // For now, just use a placeholder based on the index
