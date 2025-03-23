@@ -4,10 +4,9 @@ use crate::{IncrementalMerkleTree, Parse, Parser, parse};
 
 impl Parse for IncrementalMerkleTree {
     fn parse(p: &mut Parser) -> Result<Self> {
-        Ok(Self {
-            left: parse!(p, "left")?,
-            right: parse!(p, "right")?,
-            parents: parse!(p, "parents")?,
-        })
+        let left = parse!(p, "left")?;
+        let right = parse!(p, "right")?;
+        let parents = parse!(p, "parents")?;
+        Ok(Self::with_fields(left, right, parents))
     }
 }

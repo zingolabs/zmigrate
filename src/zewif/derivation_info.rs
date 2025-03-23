@@ -1,8 +1,18 @@
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct DerivationInfo {
-    pub change: NonHardenedChildIndex,
-    pub address_index: NonHardenedChildIndex,
+    change: NonHardenedChildIndex,
+    address_index: NonHardenedChildIndex,
 }
 
-#[derive(Debug, Clone)]
+impl DerivationInfo {
+    pub fn change(&self) -> NonHardenedChildIndex {
+        self.change
+    }
+
+    pub fn address_index(&self) -> NonHardenedChildIndex {
+        self.address_index
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
 pub struct NonHardenedChildIndex(pub u32);

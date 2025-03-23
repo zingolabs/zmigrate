@@ -156,18 +156,17 @@ impl OrchardNoteCommitmentTree {
 
     /// Convert to Zewif IncrementalMerkleTree format
     pub fn to_zewif_tree(&self) -> crate::zewif::IncrementalMerkleTree {
-        let mut tree =
-            crate::zewif::IncrementalMerkleTree { left: None, right: None, parents: Vec::new() };
+        let mut tree = crate::zewif::IncrementalMerkleTree::new();
 
         // Convert the root node
         if let Some(root_node) = &self.root {
             // The root node's left and right children are the first level
             if let Some(left) = &root_node.left {
-                tree.left = Some(left.hash);
+                tree.set_left(left.hash);
             }
 
             if let Some(right) = &root_node.right {
-                tree.right = Some(right.hash);
+                tree.set_right(right.hash);
             }
 
             // Add parents (ancestors) from the tree
@@ -175,9 +174,9 @@ impl OrchardNoteCommitmentTree {
             for idx in 0..self.depth.saturating_sub(1) {
                 let parent_idx = (1 << idx) - 1; // Formula for perfect binary tree indices
                 if parent_idx < self.nodes.len() {
-                    tree.parents.push(self.nodes[parent_idx]);
+                    tree.push_parent(self.nodes[parent_idx]);
                 } else {
-                    tree.parents.push(None);
+                    tree.push_parent(None);
                 }
             }
         }
