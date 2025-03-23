@@ -4,25 +4,35 @@ use crate::{CompactSize, Data, Parse, Parser, parse, u256};
 
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct PrivKey {
-    pub data: Data,
-    pub hash: u256,
+    data: Data,
+    hash: u256,
+}
+
+impl PrivKey {
+    pub fn data(&self) -> &Data {
+        &self.data
+    }
+
+    pub fn hash(&self) -> u256 {
+        self.hash
+    }
 }
 
 impl std::fmt::Debug for PrivKey {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "PrivKey({:?})", &self.data)
+        write!(f, "PrivKey({:?})", self.data())
     }
 }
 
 impl AsRef<Data> for PrivKey {
     fn as_ref(&self) -> &Data {
-        &self.data
+        self.data()
     }
 }
 
 impl AsRef<[u8]> for PrivKey {
     fn as_ref(&self) -> &[u8] {
-        self.data.as_ref()
+        self.data().as_ref()
     }
 }
 

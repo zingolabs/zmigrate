@@ -32,7 +32,7 @@ pub fn migrate_to_zewif(wallet: &ZcashdWallet) -> Result<ZewifTop> {
 
     // Convert orchard note commitment tree if available
     if !wallet
-        .orchard_note_commitment_tree
+        .orchard_note_commitment_tree()
         .unparsed_data()
         .is_empty()
     {
@@ -41,7 +41,7 @@ pub fn migrate_to_zewif(wallet: &ZcashdWallet) -> Result<ZewifTop> {
     }
 
     // If there are unified accounts, process them
-    if let Some(unified_accounts) = &wallet.unified_accounts {
+    if let Some(unified_accounts) = wallet.unified_accounts() {
         // Create accounts based on unified_accounts structure
         let mut accounts_map = convert_unified_accounts(wallet, unified_accounts, &transactions)?;
 
@@ -113,9 +113,9 @@ pub fn migrate_to_zewif(wallet: &ZcashdWallet) -> Result<ZewifTop> {
 /// Convert ZCashd mnemonic seed to Zewif SeedMaterial
 fn convert_seed_material(wallet: &ZcashdWallet) -> Result<Option<zewif::SeedMaterial>> {
     // Check if we have a mnemonic phrase
-    if !wallet.bip39_mnemonic.mnemonic().is_empty() {
+    if !wallet.bip39_mnemonic().mnemonic().is_empty() {
         return Ok(Some(zewif::SeedMaterial::Bip39Mnemonic(
-            wallet.bip39_mnemonic.mnemonic().clone(),
+            wallet.bip39_mnemonic().mnemonic().clone(),
         )));
     }
     // If no mnemonic, return None
@@ -137,7 +137,7 @@ fn convert_transparent_addresses(
     let multi_account_mode = address_registry.is_some() && accounts_map.is_some();
 
     // Process address_names which contain transparent addresses
-    for (zcashd_address, name) in &wallet.address_names {
+    for (zcashd_address, name) in wallet.address_names() {
         // Create address components
         let transparent_address = zewif::TransparentAddress::new(zcashd_address.clone());
         let protocol_address = ProtocolAddress::Transparent(transparent_address);
@@ -145,7 +145,7 @@ fn convert_transparent_addresses(
         zewif_address.set_name(name.clone());
 
         // Set purpose if available
-        if let Some(purpose) = wallet.address_purposes.get(zcashd_address) {
+        if let Some(purpose) = wallet.address_purposes().get(zcashd_address) {
             zewif_address.set_purpose(purpose.clone());
         }
 
@@ -191,7 +191,7 @@ fn convert_sapling_addresses(
     let multi_account_mode = address_registry.is_some() && accounts_map.is_some();
 
     // Process sapling_z_addresses
-    for (sapling_address, viewing_key) in &wallet.sapling_z_addresses {
+    for (sapling_address, viewing_key) in wallet.sapling_z_addresses() {
         let address_str = sapling_address.to_string(wallet.network());
 
         // Create a new ShieldedAddress
@@ -211,7 +211,7 @@ fn convert_sapling_addresses(
 
         // Set purpose if available - convert to Address type for lookup
         let zcashd_address = zcashd::Address(address_str.clone());
-        if let Some(purpose) = wallet.address_purposes.get(&zcashd_address) {
+        if let Some(purpose) = wallet.address_purposes().get(&zcashd_address) {
             zewif_address.set_purpose(purpose.clone());
         }
 
@@ -247,7 +247,7 @@ fn find_sapling_key_for_ivk<'a>(
     wallet: &'a ZcashdWallet,
     ivk: &SaplingIncomingViewingKey,
 ) -> Option<&'a zcashd::SaplingKey> {
-    wallet.sapling_keys.get(ivk)
+    wallet.sapling_keys().get(ivk)
 }
 
 /// Convert ZCashd SaplingExtendedSpendingKey to Zewif SpendingKey
@@ -279,7 +279,7 @@ fn extract_transaction_addresses(
     let mut addresses = HashSet::new();
 
     // Check if we have recipient mappings for this transaction
-    if let Some(recipients) = wallet.send_recipients.get(&tx_id) {
+    if let Some(recipients) = wallet.send_recipients().get(&tx_id) {
         for recipient in recipients {
             // Add the unified address if it exists
             if !recipient.unified_address.is_empty() {
@@ -406,7 +406,7 @@ fn extract_transaction_addresses(
                         if let Some(nullifier) = note_data.nullifer() {
                             if nullifier == spend.nullifier() {
                                 // Find the address for this viewing key
-                                for (addr, ivk) in &wallet.sapling_z_addresses {
+                                for (addr, ivk) in wallet.sapling_z_addresses() {
                                     if note_data.incoming_viewing_key() == ivk {
                                         let addr_str = addr.to_string(wallet.network());
                                         addresses.insert(addr_str);
@@ -430,7 +430,7 @@ fn extract_transaction_addresses(
                     for note_data in sapling_note_data.values() {
                         // We'd need to link the outpoint to this specific output
                         // Since we don't have enough information, we'll use the IVK
-                        for (addr, ivk) in &wallet.sapling_z_addresses {
+                        for (addr, ivk) in wallet.sapling_z_addresses() {
                             if note_data.incoming_viewing_key() == ivk {
                                 let addr_str = addr.to_string(wallet.network());
                                 addresses.insert(addr_str);
@@ -462,7 +462,7 @@ fn extract_transaction_addresses(
     if let Some(sapling_note_data) = tx.sapling_note_data() {
         for note_data in sapling_note_data.values() {
             // If we have the incoming viewing key, we can find the corresponding address
-            for (addr, ivk) in &wallet.sapling_z_addresses {
+            for (addr, ivk) in wallet.sapling_z_addresses() {
                 if note_data.incoming_viewing_key() == ivk {
                     let addr_str = addr.to_string(wallet.network());
                     addresses.insert(addr_str);
@@ -510,13 +510,13 @@ fn extract_transaction_addresses(
     // If the transaction is marked as "from me", and we don't have other identifying information,
     // use all our addresses as potential sources
     if tx.is_from_me() && addresses.is_empty() {
-        for addr in wallet.sapling_z_addresses.keys() {
+        for addr in wallet.sapling_z_addresses().keys() {
             let addr_str = addr.to_string(wallet.network());
             addresses.insert(addr_str);
         }
 
         // Also add transparent addresses if any are associated with this wallet
-        for addr in wallet.address_names.keys() {
+        for addr in wallet.address_names().keys() {
             addresses.insert(addr.clone().into());
         }
     }
@@ -531,7 +531,7 @@ fn extract_transaction_addresses(
 fn convert_transactions(wallet: &ZcashdWallet) -> Result<HashMap<TxId, zewif::Transaction>> {
     let mut transactions = HashMap::new();
 
-    for (tx_id, wallet_tx) in &wallet.transactions {
+    for (tx_id, wallet_tx) in wallet.transactions() {
         let zewif_tx = convert_transaction(*tx_id, wallet_tx)
             .with_context(|| format!("Failed to convert transaction {}", tx_id))?;
         transactions.insert(*tx_id, zewif_tx);
@@ -669,7 +669,7 @@ fn initialize_address_registry(
     }
 
     // Step 2: For each known transparent address, try to find its account
-    for zcashd_address in wallet.address_names.keys() {
+    for zcashd_address in wallet.address_names().keys() {
         // Create an AddressId for this transparent address
         let _addr_id = AddressId::Transparent(zcashd_address.0.clone());
 
@@ -679,7 +679,7 @@ fn initialize_address_registry(
     }
 
     // Step 3: For each known sapling address, try to find its account
-    for sapling_address in wallet.sapling_z_addresses.keys() {
+    for sapling_address in wallet.sapling_z_addresses().keys() {
         // Create an AddressId for this sapling address
         let addr_str = sapling_address.to_string(wallet.network());
         let _addr_id = AddressId::Sapling(addr_str);
@@ -705,9 +705,9 @@ fn convert_unified_accounts(
         let mut account = Account::new();
 
         // Set the account name and ZIP-32 account ID
-        let account_name = format!("Account #{}", account_metadata.account_id);
+        let account_name = format!("Account #{}", account_metadata.account_id());
         account.set_name(account_name);
-        account.set_zip32_account_id(account_metadata.account_id);
+        account.set_zip32_account_id(account_metadata.account_id());
 
         // Store the account in our map using the key_id as the key
         accounts_map.insert(*key_id, account);
@@ -726,7 +726,7 @@ fn convert_unified_accounts(
     // Step 3: Process all addresses and assign them to the appropriate accounts
 
     // Process transparent addresses
-    for (zcashd_address, name) in &wallet.address_names {
+    for (zcashd_address, name) in wallet.address_names() {
         // Create an AddressId for this transparent address
         let addr_id = AddressId::Transparent(zcashd_address.0.clone());
 
@@ -751,7 +751,7 @@ fn convert_unified_accounts(
             zewif_address.set_name(name.clone());
 
             // Set purpose if available
-            if let Some(purpose) = wallet.address_purposes.get(zcashd_address) {
+            if let Some(purpose) = wallet.address_purposes().get(zcashd_address) {
                 zewif_address.set_purpose(purpose.clone());
             }
 
@@ -761,7 +761,7 @@ fn convert_unified_accounts(
     }
 
     // Process sapling addresses
-    for (sapling_address, viewing_key) in &wallet.sapling_z_addresses {
+    for (sapling_address, viewing_key) in wallet.sapling_z_addresses() {
         let address_str = sapling_address.to_string(wallet.network());
 
         // Create an AddressId for this sapling address
@@ -799,7 +799,7 @@ fn convert_unified_accounts(
 
             // Set purpose if available - convert to Address type for lookup
             let zcashd_address = zcashd::Address(address_str.clone());
-            if let Some(purpose) = wallet.address_purposes.get(&zcashd_address) {
+            if let Some(purpose) = wallet.address_purposes().get(&zcashd_address) {
                 zewif_address.set_purpose(purpose.clone());
             }
 
@@ -835,7 +835,7 @@ fn convert_unified_accounts(
     // We'll use our AddressRegistry to find account associations
 
     // Analyze each transaction to find which addresses are involved
-    for (txid, wallet_tx) in &wallet.transactions {
+    for (txid, wallet_tx) in wallet.transactions() {
         // Extract all addresses involved in this transaction
         match extract_transaction_addresses(wallet, *txid, wallet_tx) {
             Ok(tx_addresses) => {
@@ -891,7 +891,7 @@ fn update_transaction_positions(
 ) -> Result<()> {
     // Check if we have a valid tree to process
     if wallet
-        .orchard_note_commitment_tree
+        .orchard_note_commitment_tree()
         .unparsed_data()
         .0
         .is_empty()
@@ -906,7 +906,7 @@ fn update_transaction_positions(
     // For each transaction with Orchard actions
     for (tx_id, zewif_tx) in transactions.iter_mut() {
         // Find the corresponding zcashd transaction to get metadata
-        if let Some(zcashd_tx) = wallet.transactions.get(tx_id) {
+        if let Some(zcashd_tx) = wallet.transactions().get(tx_id) {
             // Check for Orchard bundle
             if let zcashd::OrchardBundle(Some(_orchard_bundle)) = zcashd_tx.orchard_bundle() {
                 // Check for Orchard transaction metadata

@@ -159,7 +159,7 @@ impl<'a> ZcashdParser<'a> {
         // **bestblock_nomerkle**
         let bestblock_nomerkle = self.parse_opt_block_locator("bestblock_nomerkle")?;
 
-        let wallet = ZcashdWallet {
+        let wallet = ZcashdWallet::new(
             address_names,
             address_purposes,
             bestblock_nomerkle,
@@ -170,7 +170,7 @@ impl<'a> ZcashdParser<'a> {
             keys,
             min_version,
             mnemonic_hd_chain,
-            bip39_mnemonic: mnemonic_phrase,
+            mnemonic_phrase,
             network_info,
             orchard_note_commitment_tree,
             orderposnext,
@@ -181,7 +181,7 @@ impl<'a> ZcashdParser<'a> {
             transactions,
             unified_accounts,
             witnesscachesize,
-        };
+        );
 
         Ok((wallet, self.unparsed_keys.borrow().clone()))
     }
@@ -394,7 +394,7 @@ impl<'a> ZcashdParser<'a> {
                 UnifiedAccountMetadata,
                 "UnifiedAccountMetadata key"
             )?;
-            account_metadata.insert(metadata.key_id, metadata);
+            account_metadata.insert(metadata.key_id(), metadata);
             let v: u32 = parse!(buf = value.as_data(), u32, "UnifiedAccountMetadata value")?;
             if v != 0 {
                 bail!("Unexpected value for UnifiedAccountMetadata: 0x{:08x}", v);

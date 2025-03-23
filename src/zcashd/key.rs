@@ -28,7 +28,7 @@ impl Key {
 impl Key {
     pub fn new(pubkey: PubKey, privkey: PrivKey, metadata: KeyMetadata) -> Result<Self> {
         let hash = hash256(Data::concat(&[&pubkey, &privkey]));
-        if hash != privkey.hash {
+        if hash != privkey.hash() {
             bail!("Invalid keypair: pubkey and privkey do not match");
         }
         Ok(Self { pubkey, privkey, metadata })
