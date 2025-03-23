@@ -627,18 +627,18 @@ fn convert_transaction(tx_id: TxId, tx: &zcashd::WalletTx) -> Result<zewif::Tran
 
     // Convert Sprout JoinSplits if present
     if let Some(join_splits) = &tx.join_splits {
-        for js in &join_splits.descriptions {
+        for js in join_splits.descriptions() {
             // Create arrays using from_fn to avoid needing Copy
-            let nullifiers = js.nullifiers;
-            let commitments = js.commitments;
+            let nullifiers = js.nullifiers();
+            let commitments = js.commitments();
 
             let join_split = zewif::JoinSplitDescription {
                 anchor: zewif::Anchor(
-                    Blob32::from_slice(js.anchor.as_ref()).expect("Converting anchor"),
+                    Blob32::from_slice(js.anchor().0).expect("Converting anchor"),
                 ),
                 nullifiers,
                 commitments,
-                zkproof: Data(match &js.zkproof {
+                zkproof: Data(match js.zkproof() {
                     zcashd::SproutProof::PHGRProof(proof) => proof.to_bytes(),
                     zcashd::SproutProof::GrothProof(proof) => proof.0.to_vec(),
                 }),

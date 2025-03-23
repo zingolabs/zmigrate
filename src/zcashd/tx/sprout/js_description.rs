@@ -9,16 +9,58 @@ const ZC_NUM_JS_OUTPUTS: usize = 2;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct JSDescription {
-    pub vpub_old: Amount,
-    pub vpub_new: Amount,
-    pub anchor: u256,
-    pub nullifiers: [u256; ZC_NUM_JS_INPUTS],
-    pub commitments: [u256; ZC_NUM_JS_OUTPUTS],
-    pub ephemeral_key: u256,
-    pub random_seed: u256,
-    pub macs: [u256; ZC_NUM_JS_INPUTS],
-    pub zkproof: SproutProof,
-    pub ciphertexts: [NoteEncryptionCiphertext; ZC_NUM_JS_OUTPUTS],
+    vpub_old: Amount,
+    vpub_new: Amount,
+    anchor: u256,
+    nullifiers: [u256; ZC_NUM_JS_INPUTS],
+    commitments: [u256; ZC_NUM_JS_OUTPUTS],
+    ephemeral_key: u256,
+    random_seed: u256,
+    macs: [u256; ZC_NUM_JS_INPUTS],
+    zkproof: SproutProof,
+    ciphertexts: [NoteEncryptionCiphertext; ZC_NUM_JS_OUTPUTS],
+}
+
+impl JSDescription {
+    pub fn vpub_old(&self) -> Amount {
+        self.vpub_old
+    }
+
+    pub fn vpub_new(&self) -> Amount {
+        self.vpub_new
+    }
+
+    pub fn anchor(&self) -> u256 {
+        self.anchor
+    }
+
+    pub fn nullifiers(&self) -> [u256; ZC_NUM_JS_INPUTS] {
+        self.nullifiers
+    }
+
+    pub fn commitments(&self) -> [u256; ZC_NUM_JS_OUTPUTS] {
+        self.commitments
+    }
+
+    pub fn ephemeral_key(&self) -> u256 {
+        self.ephemeral_key
+    }
+
+    pub fn random_seed(&self) -> u256 {
+        self.random_seed
+    }
+
+    pub fn macs(&self) -> [u256; ZC_NUM_JS_INPUTS] {
+        self.macs
+    }
+
+    pub fn zkproof(&self) -> &SproutProof {
+        &self.zkproof
+    }
+
+    pub fn ciphertexts(&self) -> &[NoteEncryptionCiphertext; ZC_NUM_JS_OUTPUTS] {
+        &self.ciphertexts
+    }
 }
 
 impl ParseWithParam<bool> for JSDescription {
