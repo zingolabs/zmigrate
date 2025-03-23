@@ -4,7 +4,7 @@ use zcash_address::{ToAddress, ZcashAddress};
 use crate::{Network, Parse, Parser, parse, u160};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct KeyId(pub u160);
+pub struct KeyId(u160);
 
 impl KeyId {
     pub fn to_string(&self, network: Network) -> String {
@@ -22,5 +22,17 @@ impl Parse for KeyId {
     fn parse(p: &mut Parser) -> Result<Self> {
         let key_id = parse!(p, "key_id")?;
         Ok(KeyId(key_id))
+    }
+}
+
+impl From<u160> for KeyId {
+    fn from(key_id: u160) -> Self {
+        KeyId(key_id)
+    }
+}
+
+impl From<KeyId> for u160 {
+    fn from(key_id: KeyId) -> Self {
+        key_id.0
     }
 }

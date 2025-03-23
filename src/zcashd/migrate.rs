@@ -342,7 +342,7 @@ fn extract_transaction_addresses(
 
                 // Create a transparent P2PKH address from this pubkey hash
                 // Create a KeyId for consistent address encoding
-                let key_id = zcashd::KeyId(
+                let key_id = zcashd::KeyId::from(
                     crate::u160::from_slice(&pubkey_hash[..])
                         .expect("Creating u160 from RIPEMD160 hash"),
                 );
@@ -362,7 +362,7 @@ fn extract_transaction_addresses(
                 let pubkey_hash = &script_data[3..23];
 
                 // Convert to a proper P2PKH Zcash address using KeyId
-                let key_id = zcashd::KeyId(
+                let key_id = zcashd::KeyId::from(
                     crate::u160::from_slice(pubkey_hash).expect("Creating u160 from pubkey hash"),
                 );
                 addresses.insert(key_id.to_string(wallet.network()));
@@ -378,7 +378,7 @@ fn extract_transaction_addresses(
             let script_hash = &script_data[2..22];
 
             // Convert to a proper P2SH Zcash address using ScriptId
-            let script_id = zcashd::ScriptId(
+            let script_id = zcashd::ScriptId::from(
                 crate::u160::from_slice(script_hash).expect("Creating u160 from script hash"),
             );
             addresses.insert(script_id.to_string(wallet.network()));
@@ -471,7 +471,7 @@ fn extract_transaction_addresses(
     }
 
     // Handle Orchard actions if present
-    if let zcashd::OrchardBundle(Some(orchard_bundle)) = tx.orchard_bundle() {
+    if let Some(orchard_bundle) = tx.orchard_bundle().inner() {
         // Extract data from Orchard actions
         for (idx, action) in orchard_bundle.actions.iter().enumerate() {
             // Add standard identifiers like nullifier and commitment
@@ -615,7 +615,7 @@ fn convert_transaction(tx_id: TxId, tx: &zcashd::WalletTx) -> Result<zewif::Tran
     }
 
     // Convert Orchard actions
-    if let zcashd::OrchardBundle(Some(orchard_bundle)) = tx.orchard_bundle() {
+    if let Some(orchard_bundle) = tx.orchard_bundle().inner() {
         for (idx, action) in orchard_bundle.actions.iter().enumerate() {
             let mut orchard_action = zewif::OrchardActionDescription::new();
             orchard_action.set_action_index(idx as u32);
@@ -898,7 +898,7 @@ fn update_transaction_positions(
         // Find the corresponding zcashd transaction to get metadata
         if let Some(zcashd_tx) = wallet.transactions().get(tx_id) {
             // Check for Orchard bundle
-            if let zcashd::OrchardBundle(Some(_orchard_bundle)) = zcashd_tx.orchard_bundle() {
+            if let Some(_orchard_bundle) = zcashd_tx.orchard_bundle().inner() {
                 // Check for Orchard transaction metadata
                 if let Some(orchard_meta) = zcashd_tx.orchard_tx_meta() {
                     // Process each Orchard action if we have any

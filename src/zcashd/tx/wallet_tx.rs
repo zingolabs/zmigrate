@@ -151,7 +151,7 @@ impl Parse for WalletTx {
         let sapling_bundle: SaplingBundle;
         let mut join_splits = None;
         let mut consensus_branch_id = None;
-        let mut orchard_bundle = OrchardBundle(None);
+        let mut orchard_bundle = OrchardBundle::default();
 
         if version.is_zip225() {
             consensus_branch_id = Some(parse!(p, BranchId, "consensus_branch_id")?);

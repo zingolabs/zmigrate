@@ -5,7 +5,29 @@ use crate::{Amount, Blob32, Data, Parse, Parser, parse};
 use super::{OrchardAction, OrchardAuthorized, OrchardFlags};
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct OrchardBundle(pub Option<OrchardBundleInner>);
+pub struct OrchardBundle(Option<OrchardBundleInner>);
+
+impl OrchardBundle {
+    pub fn new() -> Self {
+        Self(None)
+    }
+
+    pub fn inner(&self) -> Option<&OrchardBundleInner> {
+        self.0.as_ref()
+    }
+}
+
+impl Default for OrchardBundle {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl From<OrchardBundleInner> for OrchardBundle {
+    fn from(inner: OrchardBundleInner) -> Self {
+        Self(Some(inner))
+    }
+}
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct OrchardBundleInner {

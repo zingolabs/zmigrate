@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use super::{SproutPaymentAddress, SproutSpendingKey};
 
 #[derive(Clone, PartialEq)]
-pub struct SproutKeys(pub HashMap<SproutPaymentAddress, SproutSpendingKey>);
+pub struct SproutKeys(HashMap<SproutPaymentAddress, SproutSpendingKey>);
 
 impl SproutKeys {
     pub fn new(map: HashMap<SproutPaymentAddress, SproutSpendingKey>) -> Self {

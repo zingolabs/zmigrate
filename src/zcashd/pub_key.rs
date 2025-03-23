@@ -3,7 +3,7 @@ use anyhow::{Context, Result, bail};
 use crate::{CompactSize, Data, Parse, Parser, parse};
 
 #[derive(Clone, PartialEq, Eq, Hash)]
-pub struct PubKey(pub Data);
+pub struct PubKey(Data);
 
 impl std::fmt::Debug for PubKey {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
