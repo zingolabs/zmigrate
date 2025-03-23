@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use crate::{Amount, ParseWithParam, Parser, parse, u256};
+use crate::{Amount, Anchor, ParseWithParam, Parser, parse, u256};
 
 use super::{NoteEncryptionCiphertext, SproutProof};
 
@@ -11,7 +11,7 @@ const ZC_NUM_JS_OUTPUTS: usize = 2;
 pub struct JSDescription {
     vpub_old: Amount,
     vpub_new: Amount,
-    anchor: u256,
+    anchor: Anchor,
     nullifiers: [u256; ZC_NUM_JS_INPUTS],
     commitments: [u256; ZC_NUM_JS_OUTPUTS],
     ephemeral_key: u256,

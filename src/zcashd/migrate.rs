@@ -633,9 +633,7 @@ fn convert_transaction(tx_id: TxId, tx: &zcashd::WalletTx) -> Result<zewif::Tran
             let commitments = js.commitments();
 
             let join_split = zewif::JoinSplitDescription {
-                anchor: zewif::Anchor(
-                    Blob32::from_slice(js.anchor().0).expect("Converting anchor"),
-                ),
+                anchor: js.anchor(),
                 nullifiers,
                 commitments,
                 zkproof: Data(match js.zkproof() {
