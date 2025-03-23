@@ -17,10 +17,10 @@ impl SpendV5 {
         spend_auth_sig: Blob64,
     ) -> SpendDescription {
         SpendDescription {
-            cv: self.cv,
+            cv: self.cv(),
             anchor,
-            nullifier: self.nullifier,
-            rk: self.rk,
+            nullifier: self.nullifier(),
+            rk: self.rk(),
             zkproof,
             spend_auth_sig,
         }

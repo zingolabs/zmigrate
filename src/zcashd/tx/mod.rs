@@ -1,8 +1,9 @@
 use crate::mod_use;
 
+mod incremental_merkle_tree;
+mod incremental_witness;
+
 mod_use!(expiry_height);
-mod_use!(incremental_merkle_tree);
-mod_use!(incremental_witness);
 mod_use!(int_id);
 mod_use!(lock_time);
 mod_use!(orchard);

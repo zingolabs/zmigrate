@@ -1,6 +1,7 @@
 use crate::mod_use;
 
 mod migrate;
+mod bip_39_mnemonic;
 
 mod_use!(address);
 mod_use!(block_locator);
@@ -13,7 +14,6 @@ mod_use!(key_pool);
 mod_use!(key);
 mod_use!(keys);
 mod_use!(mnemonic_hd_chain);
-mod_use!(mnemonic_seed);
 mod_use!(network_info);
 mod_use!(priv_key);
 mod_use!(pub_key);
