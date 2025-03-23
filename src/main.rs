@@ -1,3 +1,5 @@
+mod mod_use_macro;
+
 mod bdb_dump;
 pub use bdb_dump::*;
 mod digest_utils;

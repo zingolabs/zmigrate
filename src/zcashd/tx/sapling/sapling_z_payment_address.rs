@@ -1,5 +1,5 @@
-use anyhow::{Error, Result, anyhow};
-use zcash_address::{ToAddress, TryFromAddress, ZcashAddress};
+use anyhow::Result;
+use zcash_address::{ToAddress, ZcashAddress};
 
 use crate::{Blob, Network, Parse, Parser, parse};
 
