@@ -18,6 +18,7 @@ mod_use!(branch_id);
 mod_use!(compact_size);
 mod_use!(data);
 mod_use!(derivation_info);
+mod_use!(expiry_height);
 mod_use!(groth_proof);
 mod_use!(identifiable);
 mod_use!(incremental_merkle_tree);

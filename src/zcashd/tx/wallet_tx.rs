@@ -3,14 +3,13 @@ use std::collections::HashMap;
 use anyhow::Result;
 
 use crate::{
-    BranchId, CompactSize, Data, Parse, Parser, parse, u256,
+    BranchId, CompactSize, Data, ExpiryHeight, Parse, Parser, parse, u256,
     zcashd::{OrchardTxMeta, SaplingBundleV5, ZIP225_TX_VERSION},
 };
 
 use super::{
-    ExpiryHeight, JSOutPoint, JoinSplits, LockTime, OrchardBundle, SAPLING_TX_VERSION,
-    SaplingBundle, SaplingBundleV4, SaplingNoteData, SaplingOutPoint, SproutNoteData, TxIn, TxOut,
-    TxVersion,
+    JSOutPoint, JoinSplits, LockTime, OrchardBundle, SAPLING_TX_VERSION, SaplingBundle,
+    SaplingBundleV4, SaplingNoteData, SaplingOutPoint, SproutNoteData, TxIn, TxOut, TxVersion,
 };
 
 #[derive(Debug, Clone, PartialEq)]
