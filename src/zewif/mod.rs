@@ -6,8 +6,8 @@ mod string_macro;
 mod impl_attachable_macro;
 
 mod_use!(account);
-mod_use!(address);
 mod_use!(address_id);
+mod_use!(address);
 mod_use!(amount);
 mod_use!(anchor);
 mod_use!(attachments);
@@ -17,6 +17,7 @@ mod_use!(block_height);
 mod_use!(compact_size);
 mod_use!(data);
 mod_use!(derivation_info);
+mod_use!(groth_proof);
 mod_use!(identifiable);
 mod_use!(incremental_merkle_tree);
 mod_use!(incremental_witness);
@@ -32,6 +33,7 @@ mod_use!(sapling_output_description);
 mod_use!(sapling_sent_output);
 mod_use!(sapling_spend_description);
 mod_use!(sapling_witness);
+mod_use!(script);
 mod_use!(seconds_since_epoch);
 mod_use!(seed_material);
 mod_use!(shielded_address);
@@ -48,8 +50,6 @@ mod_use!(u160_type);
 mod_use!(u252_type);
 mod_use!(u256_type);
 mod_use!(zewif_wallet);
-mod_use!(script);
-mod_use!(groth_proof);
 
 use std::collections::HashMap;
 

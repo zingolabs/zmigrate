@@ -7,14 +7,14 @@ pub type CompressedG1 = Blob<33>;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct PHGRProof {
-    pub g_a: CompressedG1,
-    pub g_a_prime: CompressedG1,
-    pub g_b: CompressedG1,
-    pub g_b_prime: CompressedG1,
-    pub g_c: CompressedG1,
-    pub g_c_prime: CompressedG1,
-    pub g_k: CompressedG1,
-    pub g_h: CompressedG1,
+    g_a: CompressedG1,
+    g_a_prime: CompressedG1,
+    g_b: CompressedG1,
+    g_b_prime: CompressedG1,
+    g_c: CompressedG1,
+    g_c_prime: CompressedG1,
+    g_k: CompressedG1,
+    g_h: CompressedG1,
 }
 
 impl PHGRProof {
@@ -29,6 +29,38 @@ impl PHGRProof {
         result.extend_from_slice(&self.g_k.0);
         result.extend_from_slice(&self.g_h.0);
         result
+    }
+
+    pub fn g_a(&self) -> &CompressedG1 {
+        &self.g_a
+    }
+
+    pub fn g_a_prime(&self) -> &CompressedG1 {
+        &self.g_a_prime
+    }
+
+    pub fn g_b(&self) -> &CompressedG1 {
+        &self.g_b
+    }
+
+    pub fn g_b_prime(&self) -> &CompressedG1 {
+        &self.g_b_prime
+    }
+
+    pub fn g_c(&self) -> &CompressedG1 {
+        &self.g_c
+    }
+
+    pub fn g_c_prime(&self) -> &CompressedG1 {
+        &self.g_c_prime
+    }
+
+    pub fn g_k(&self) -> &CompressedG1 {
+        &self.g_k
+    }
+
+    pub fn g_h(&self) -> &CompressedG1 {
+        &self.g_h
     }
 }
 

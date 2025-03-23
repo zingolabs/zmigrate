@@ -6,10 +6,28 @@ use super::SproutPaymentAddress;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SproutNoteData {
-    pub address: SproutPaymentAddress,
-    pub nullifer: Option<u256>,
-    pub witnesses: Vec<SproutWitness>,
-    pub witness_height: i32,
+    address: SproutPaymentAddress,
+    nullifer: Option<u256>,
+    witnesses: Vec<SproutWitness>,
+    witness_height: i32,
+}
+
+impl SproutNoteData {
+    pub fn address(&self) -> SproutPaymentAddress {
+        self.address.clone()
+    }
+
+    pub fn nullifer(&self) -> Option<u256> {
+        self.nullifer
+    }
+
+    pub fn witnesses(&self) -> &Vec<SproutWitness> {
+        &self.witnesses
+    }
+
+    pub fn witness_height(&self) -> i32 {
+        self.witness_height
+    }
 }
 
 impl Parse for SproutNoteData {
