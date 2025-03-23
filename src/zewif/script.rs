@@ -4,7 +4,7 @@ use crate::{Data, Parse, Parser, parse};
 use std::ops::{Index, IndexMut, Range, RangeFrom, RangeFull, RangeInclusive, RangeTo, RangeToInclusive};
 
 #[derive(Clone, PartialEq, Eq, Hash)]
-pub struct Script(pub Data);
+pub struct Script(Data);
 
 impl Script {
     pub fn len(&self) -> usize {

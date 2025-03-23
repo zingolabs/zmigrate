@@ -1,7 +1,7 @@
 #[macro_export]
 macro_rules! string {
     ($name:ident) => {
-        pub struct $name(pub String);
+        pub struct $name(String);
 
         impl Clone for $name {
             fn clone(&self) -> Self {

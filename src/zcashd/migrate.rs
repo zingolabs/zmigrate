@@ -208,7 +208,7 @@ fn convert_sapling_addresses(
         let mut zewif_address = zewif::Address::new(protocol_address);
 
         // Set purpose if available - convert to Address type for lookup
-        let zcashd_address = zcashd::Address(address_str.clone());
+        let zcashd_address = zcashd::Address::from(address_str.clone());
         if let Some(purpose) = wallet.address_purposes().get(&zcashd_address) {
             zewif_address.set_purpose(purpose.clone());
         }
@@ -661,7 +661,7 @@ fn initialize_address_registry(
     // Step 2: For each known transparent address, try to find its account
     for zcashd_address in wallet.address_names().keys() {
         // Create an AddressId for this transparent address
-        let _addr_id = AddressId::Transparent(zcashd_address.0.clone());
+        let _addr_id = AddressId::Transparent(zcashd_address.into());
 
         // TODO: When we have explicit mappings, use those here
         // For now, this will be done in the convert_transparent_addresses function
@@ -718,7 +718,7 @@ fn convert_unified_accounts(
     // Process transparent addresses
     for (zcashd_address, name) in wallet.address_names() {
         // Create an AddressId for this transparent address
-        let addr_id = AddressId::Transparent(zcashd_address.0.clone());
+        let addr_id = AddressId::Transparent(zcashd_address.into());
 
         // Try to find which account this address belongs to using our registry
         let account_key_id = if let Some(key_id) = address_registry.find_account(&addr_id) {
@@ -733,7 +733,7 @@ fn convert_unified_accounts(
         };
 
         if let Some(account) = accounts_map.get_mut(&account_key_id) {
-            let transparent_address = zewif::TransparentAddress::new(zcashd_address.0.clone());
+            let transparent_address = zewif::TransparentAddress::new(zcashd_address);
 
             // Create a ZewifAddress from the TransparentAddress
             let protocol_address = ProtocolAddress::Transparent(transparent_address);
@@ -788,7 +788,7 @@ fn convert_unified_accounts(
             let mut zewif_address = zewif::Address::new(protocol_address);
 
             // Set purpose if available - convert to Address type for lookup
-            let zcashd_address = zcashd::Address(address_str.clone());
+            let zcashd_address = zcashd::Address::from(address_str);
             if let Some(purpose) = wallet.address_purposes().get(&zcashd_address) {
                 zewif_address.set_purpose(purpose.clone());
             }
