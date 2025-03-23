@@ -1,14 +1,6 @@
 use anyhow::Result;
 
-use crate::{GrothProof, ParseWithParam, Parser, parse};
-
-use super::PHGRProof;
-
-#[derive(Debug, Clone, PartialEq)]
-pub enum SproutProof {
-    PHGRProof(PHGRProof),
-    GrothProof(GrothProof),
-}
+use crate::{ParseWithParam, Parser, SproutProof, parse};
 
 impl ParseWithParam<bool> for SproutProof {
     fn parse(p: &mut Parser, use_groth: bool) -> Result<Self> {

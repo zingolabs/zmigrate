@@ -5,11 +5,9 @@ use ripemd::{Digest, Ripemd160};
 use sha2::Sha256;
 
 use crate::{
-    Data, ProtocolAddress, SaplingIncomingViewingKey, TxId, u256,
+    ProtocolAddress, SaplingIncomingViewingKey, TxId, u256,
     zcashd::{self, ZcashdWallet},
-    zewif::{
-        self, Account, AddressId, AddressRegistry, Attachments, Position, ZewifTop, ZewifWallet,
-    },
+    zewif::{self, Account, AddressId, AddressRegistry, Position, ZewifTop, ZewifWallet},
 };
 
 /// Migrate a ZCashd wallet to the Zewif wallet format
@@ -631,20 +629,12 @@ fn convert_transaction(tx_id: TxId, tx: &zcashd::WalletTx) -> Result<zewif::Tran
     // Convert Sprout JoinSplits if present
     if let Some(join_splits) = tx.join_splits() {
         for js in join_splits.descriptions() {
-            // Create arrays using from_fn to avoid needing Copy
-            let nullifiers = js.nullifiers();
-            let commitments = js.commitments();
-
-            let join_split = zewif::JoinSplitDescription {
-                anchor: js.anchor(),
-                nullifiers,
-                commitments,
-                zkproof: Data(match js.zkproof() {
-                    zcashd::SproutProof::PHGRProof(proof) => proof.to_bytes(),
-                    zcashd::SproutProof::GrothProof(proof) => proof.0.to_vec(),
-                }),
-                attachments: Attachments::new(),
-            };
+            let join_split = zewif::JoinSplitDescription::new(
+                js.anchor(),
+                js.nullifiers(),
+                js.commitments(),
+                js.zkproof().clone(),
+            );
             zewif_tx.add_sprout_joinsplit(join_split);
         }
     }

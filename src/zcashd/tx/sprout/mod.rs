@@ -1,10 +1,11 @@
+mod phgr_proof;
+mod sprout_proof;
+
 use crate::mod_use;
 
 mod_use!(join_splits);
 mod_use!(js_description);
 mod_use!(js_out_point);
 mod_use!(note_encryption_ciphertext);
-mod_use!(phgr_proof);
 mod_use!(sprout_note_data);
 mod_use!(sprout_payment_address);
-mod_use!(sprout_proof);

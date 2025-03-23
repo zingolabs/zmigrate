@@ -2,8 +2,8 @@ use crate::mod_use;
 
 mod blob_macro;
 mod data_macro;
-mod string_macro;
 mod impl_attachable_macro;
+mod string_macro;
 
 mod_use!(account);
 mod_use!(address_id);
@@ -29,6 +29,7 @@ mod_use!(network);
 mod_use!(orchard_action_description);
 mod_use!(orchard_sent_output);
 mod_use!(parseable_types);
+mod_use!(phgr_proof);
 mod_use!(position);
 mod_use!(sapling_incoming_viewing_key);
 mod_use!(sapling_output_description);
@@ -40,6 +41,7 @@ mod_use!(seconds_since_epoch);
 mod_use!(seed_material);
 mod_use!(shielded_address);
 mod_use!(spending_key);
+mod_use!(sprout_proof);
 mod_use!(sprout_witness);
 mod_use!(transaction);
 mod_use!(transparent_address);

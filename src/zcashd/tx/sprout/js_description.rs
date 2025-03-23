@@ -1,8 +1,8 @@
 use anyhow::Result;
 
-use crate::{Amount, Anchor, ParseWithParam, Parser, parse, u256};
+use crate::{Amount, Anchor, ParseWithParam, Parser, SproutProof, parse, u256};
 
-use super::{NoteEncryptionCiphertext, SproutProof};
+use super::NoteEncryptionCiphertext;
 
 const ZC_NUM_JS_INPUTS: usize = 2;
 const ZC_NUM_JS_OUTPUTS: usize = 2;
@@ -30,7 +30,7 @@ impl JSDescription {
         self.vpub_new
     }
 
-    pub fn anchor(&self) -> u256 {
+    pub fn anchor(&self) -> Anchor {
         self.anchor
     }
 
