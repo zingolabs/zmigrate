@@ -6,7 +6,7 @@ use std::fmt::Write;
 
 use crate::file_args::{FileArgs, FileArgsLike};
 
-use crate::zcashd::{BDBDump, ZcashdDump, ZcashdParser};
+use zewif_zcashd::{BDBDump, ZcashdDump, ZcashdParser};
 
 /// Doc comment here
 #[derive(Debug, Args)]

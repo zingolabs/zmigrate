@@ -4,7 +4,6 @@ pub use exec::*;
 mod file_args;
 pub use file_args::*;
 mod styles;
-pub mod zcashd;
 pub mod zingo;
 pub mod zcashd_cmd;
 pub mod zingo_cmd;

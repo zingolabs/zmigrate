@@ -5,6 +5,8 @@ edition = "2024"
 
 [dependencies]
 zewif = { path = "../zewif" }
+zewif-zcashd = { path = "../zewif-zcashd" }
+
 anyhow = "1.0.95"
 chrono = "0.4.39"
 hex = "0.4.3"
