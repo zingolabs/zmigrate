@@ -1,7 +1,7 @@
 use anyhow::Result;
 
-use crate::{parse, parser::prelude::*};
-use crate::{Blob64, GrothProof, u256};
+use crate::{parse, zewif::parser::prelude::*};
+use crate::zewif::{Blob64, GrothProof, u256};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct SpendV5 {

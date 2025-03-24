@@ -1,7 +1,7 @@
 use anyhow::Result;
 
 use crate::parse;
-use crate::parser::prelude::*;
+use super::parser::prelude::*;
 
 pub type Amount = zcash_protocol::value::ZatBalance;
 

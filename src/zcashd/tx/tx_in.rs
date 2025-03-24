@@ -1,7 +1,7 @@
 use anyhow::Result;
 
-use crate::{parse, parser::prelude::*};
-use crate::Script;
+use crate::{parse, zewif::parser::prelude::*};
+use crate::zewif::Script;
 
 use super::OutPoint;
 

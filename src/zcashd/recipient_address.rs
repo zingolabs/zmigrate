@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use crate::{parse, parser::prelude::*};
+use crate::{parse, zewif::parser::prelude::*};
 
 use super::{KeyId, OrchardRawAddress, ReceiverType, SaplingZPaymentAddress, ScriptId};
 

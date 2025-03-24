@@ -1,4 +1,5 @@
-use crate::{Anchor, Attachments, SproutProof, impl_attachable, u256};
+use crate::impl_attachable;
+use super::{Anchor, Attachments, SproutProof, u256};
 
 /// For legacy Sprout transactions: JoinSplit descriptions that mix transparent and shielded values.
 #[derive(Debug, Clone)]

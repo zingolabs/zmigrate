@@ -1,7 +1,7 @@
 use anyhow::Result;
 
-use crate::{parse, parser::prelude::*};
-use crate::IncrementalMerkleTree;
+use crate::{parse, zewif::parser::prelude::*};
+use crate::zewif::IncrementalMerkleTree;
 
 impl Parse for IncrementalMerkleTree {
     fn parse(p: &mut Parser) -> Result<Self> {

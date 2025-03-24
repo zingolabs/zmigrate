@@ -1,4 +1,4 @@
-use crate::parser::prelude::*;
+use super::parser::prelude::*;
 use anyhow::Result;
 
 pub type TxId = zcash_primitives::transaction::TxId;

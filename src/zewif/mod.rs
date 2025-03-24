@@ -1,9 +1,13 @@
-use crate::mod_use;
-
+mod mod_use_macro;
 mod blob_macro;
 mod data_macro;
 mod impl_attachable_macro;
 mod string_macro;
+
+pub mod parser;
+pub mod sapling;
+
+use crate::mod_use;
 
 mod_use!(account);
 mod_use!(address_id);
@@ -18,6 +22,7 @@ mod_use!(branch_id);
 mod_use!(compact_size);
 mod_use!(data);
 mod_use!(derivation_info);
+mod_use!(digest_utils);
 mod_use!(expiry_height);
 mod_use!(groth_proof);
 mod_use!(identifiable);

@@ -1,7 +1,7 @@
 use anyhow::Result;
 
-use crate::{parse, parser::prelude::*};
-use crate::IncrementalWitness;
+use crate::{parse, zewif::parser::prelude::*};
+use crate::zewif::IncrementalWitness;
 
 impl<const DEPTH: usize, Hash: Parse> Parse for IncrementalWitness<DEPTH, Hash> {
     fn parse(p: &mut Parser) -> Result<Self> {

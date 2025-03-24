@@ -1,10 +1,12 @@
+#![allow(dead_code)]
+
 use std::fmt::{self, Display, Formatter};
 use std::str::FromStr;
 
 use anyhow::{Context, Result};
 
-use crate::u256;
-use crate::zewif::{Network, ProtocolAddress};
+use super::u256;
+use super::{Network, ProtocolAddress};
 
 /// Represents a universal identifier for addresses across different ZCash protocols
 /// (transparent, sapling, orchard, etc.)

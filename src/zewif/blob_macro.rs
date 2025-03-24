@@ -1,11 +1,11 @@
 #[macro_export]
 macro_rules! blob {
     ($name:ident, $size:expr) => {
-        pub struct $name($crate::Blob<$size>);
+        pub struct $name($crate::zewif::Blob<$size>);
 
         impl $name {
             pub fn new(data: [u8; $size]) -> Self {
-                Self($crate::Blob::new(data))
+                Self($crate::zewif::Blob::new(data))
             }
 
             pub fn len(&self) -> usize {
@@ -21,15 +21,15 @@ macro_rules! blob {
             }
 
             pub fn from_slice(data: &[u8]) -> ::anyhow::Result<Self> {
-                Ok(Self($crate::Blob::from_slice(data)?))
+                Ok(Self($crate::zewif::Blob::from_slice(data)?))
             }
 
             pub fn from_vec(data: Vec<u8>) -> ::anyhow::Result<Self> {
-                Ok(Self($crate::Blob::from_vec(data)?))
+                Ok(Self($crate::zewif::Blob::from_vec(data)?))
             }
 
             pub fn from_hex(hex: &str) -> Self {
-                Self($crate::Blob::from_hex(hex))
+                Self($crate::zewif::Blob::from_hex(hex))
             }
 
             pub fn reverse(&mut self) {
@@ -65,7 +65,7 @@ macro_rules! blob {
 
         impl Default for $name {
             fn default() -> Self {
-                Self($crate::Blob::default())
+                Self($crate::zewif::Blob::default())
             }
         }
 
@@ -99,15 +99,15 @@ macro_rules! blob {
             }
         }
 
-        impl $crate::parser::Parse for $name {
-            fn parse(parser: &mut $crate::parser::Parser) -> ::anyhow::Result<Self>
+        impl $crate::zewif::parser::Parse for $name {
+            fn parse(parser: &mut $crate::zewif::parser::Parser) -> ::anyhow::Result<Self>
             where
                 Self: Sized,
             {
                 let bytes = ::anyhow::Context::with_context(parser.next($size), || {
                     format!("Parsing {}", stringify!($name))
                 })?;
-                Ok(Self($crate::Blob::from(bytes)))
+                Ok(Self($crate::zewif::Blob::from(bytes)))
             }
         }
     };

@@ -1,7 +1,7 @@
 use anyhow::Result;
 
-use crate::{parse, parser::prelude::*};
-use crate::{Blob, GrothProof, u256};
+use crate::{parse, zewif::parser::prelude::*};
+use crate::zewif::{Blob, GrothProof, u256};
 
 const COMPACT_NOTE_SIZE: usize = 1 + // version
     11 + // diversifier

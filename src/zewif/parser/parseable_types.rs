@@ -2,8 +2,8 @@ use std::collections::HashMap;
 
 use anyhow::{Context, Result, bail};
 
-use crate::{parse, parser::prelude::*};
-use crate::CompactSize;
+use crate::{parse, zewif::parser::prelude::*};
+use super::super::CompactSize;
 
 impl Parse for String {
     fn parse(p: &mut Parser) -> Result<Self> {

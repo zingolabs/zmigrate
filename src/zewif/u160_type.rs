@@ -1,7 +1,8 @@
 use anyhow::{Context, Result};
 
-use crate::{parse, parser::prelude::*};
-use crate::Blob20;
+use crate::parse;
+use super::parser::prelude::*;
+use super::Blob20;
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Default)]
 #[allow(non_camel_case_types)]

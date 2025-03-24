@@ -1,4 +1,5 @@
-use crate::{BlockHeight, Data, TxId, impl_attachable};
+use crate::impl_attachable;
+use super::{BlockHeight, Data, TxId};
 
 use super::{
     Attachments, JoinSplitDescription, OrchardActionDescription, SaplingOutputDescription,

@@ -1,7 +1,7 @@
 use anyhow::Result;
 
-use crate::{parse, parser::prelude::*};
-use crate::u256;
+use crate::{parse, zewif::parser::prelude::*};
+use crate::zewif::u256;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct RedPallasSignature {

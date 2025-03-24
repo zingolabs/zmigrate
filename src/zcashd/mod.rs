@@ -4,9 +4,9 @@ mod migrate;
 mod bip_39_mnemonic;
 
 mod_use!(address);
+mod_use!(bdb_dump);
 mod_use!(block_locator);
 mod_use!(client_version);
-mod_use!(cmd);
 mod_use!(key_id);
 mod_use!(key_metadata);
 mod_use!(key_pool);

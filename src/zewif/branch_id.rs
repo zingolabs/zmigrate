@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use crate::{parse, parser::prelude::*};
+use crate::{parse, zewif::parser::prelude::*};
 
 pub type BranchId = zcash_protocol::consensus::BranchId;
 

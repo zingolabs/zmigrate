@@ -1,4 +1,4 @@
-use crate::{Amount, Blob, u256};
+use super::{Amount, Blob, u256};
 
 /// Represents a sent output in an Orchard shielded transaction within a Zcash wallet.
 ///

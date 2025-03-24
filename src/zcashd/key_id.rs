@@ -1,8 +1,8 @@
 use anyhow::Result;
 use zcash_address::{ToAddress, ZcashAddress};
 
-use crate::{parse, parser::prelude::*};
-use crate::{Network, u160};
+use crate::{parse, zewif::parser::prelude::*};
+use crate::zewif::{Network, u160};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct KeyId(u160);

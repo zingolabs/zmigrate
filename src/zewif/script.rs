@@ -1,7 +1,7 @@
 use anyhow::Result;
 
-use crate::{parse, parser::prelude::*};
-use crate::Data;
+use crate::{parse, zewif::parser::prelude::*};
+use super::Data;
 use std::ops::{Index, IndexMut, Range, RangeFrom, RangeFull, RangeInclusive, RangeTo, RangeToInclusive};
 
 #[derive(Clone, PartialEq, Eq, Hash)]

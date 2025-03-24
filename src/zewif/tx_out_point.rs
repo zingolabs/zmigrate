@@ -1,4 +1,4 @@
-use crate::TxId;
+use super::TxId;
 
 /// A reference to a previous transaction output.
 #[derive(Debug, Clone)]

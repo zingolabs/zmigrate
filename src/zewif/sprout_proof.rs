@@ -1,4 +1,4 @@
-use crate::{GrothProof, PHGRProof};
+use super::{GrothProof, PHGRProof};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum SproutProof {

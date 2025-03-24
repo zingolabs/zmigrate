@@ -1,6 +1,6 @@
 use anyhow::{Result, bail};
 
-use crate::{parse, parser::prelude::*};
+use crate::{parse, zewif::parser::prelude::*};
 
 #[derive(Clone, Copy, PartialEq)]
 pub enum MnemonicLanguage {

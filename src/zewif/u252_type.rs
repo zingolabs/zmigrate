@@ -1,7 +1,8 @@
 use anyhow::{Result, bail};
 
-use crate::{parse, parser::prelude::*};
-use crate::Blob32;
+use crate::parse;
+use super::parser::prelude::*;
+use super::Blob32;
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Default)]
 #[allow(non_camel_case_types)]

@@ -1,6 +1,5 @@
 use crate::mod_use;
 
-mod_use!(cmd);
 mod_use!(wallet_capability);
 mod_use!(zingo_parser);
 mod_use!(zingo_wallet);

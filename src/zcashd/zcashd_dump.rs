@@ -3,8 +3,9 @@ use std::fmt::Write;
 
 use anyhow::{Context, Result, bail};
 
-use crate::{parse, parser::prelude::*};
-use crate::{BDBDump, Data};
+use super::BDBDump;
+use crate::{parse, zewif::parser::prelude::*};
+use crate::zewif::Data;
 
 #[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct DBKey {
@@ -59,6 +60,10 @@ impl DBValue {
 
     pub fn len(&self) -> usize {
         self.0.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.0.is_empty()
     }
 }
 

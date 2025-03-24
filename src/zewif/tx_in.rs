@@ -1,4 +1,4 @@
-use crate::Script;
+use super::Script;
 
 use super::TxOutPoint;
 

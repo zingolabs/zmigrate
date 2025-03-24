@@ -1,8 +1,8 @@
 use anyhow::Result;
 use zcash_address::{ToAddress, ZcashAddress};
 
-use crate::{parse, parser::prelude::*};
-use crate::{Network, u160};
+use crate::zewif::{Network, u160};
+use crate::{parse, zewif::parser::prelude::*};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ScriptId(u160);

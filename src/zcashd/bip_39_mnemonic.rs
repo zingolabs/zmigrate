@@ -1,7 +1,8 @@
 use anyhow::Result;
 
-use crate::{parse, parser::prelude::*};
-use crate::Bip39Mnemonic;
+use crate::parse;
+use crate::zewif::parser::prelude::*;
+use crate::zewif::Bip39Mnemonic;
 
 impl Parse for Bip39Mnemonic {
     fn parse(p: &mut Parser) -> Result<Self> {

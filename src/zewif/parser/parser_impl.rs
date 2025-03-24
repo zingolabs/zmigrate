@@ -1,6 +1,6 @@
 use anyhow::{Result, bail};
 
-use crate::Data;
+use super::super::Data;
 
 pub trait Parse {
     fn parse(p: &mut Parser) -> Result<Self>
@@ -24,6 +24,7 @@ pub trait ParseWithParam<P> {
     where
         Self: Sized;
 
+    #[allow(dead_code)]
     fn parse_buf(buf: &dyn AsRef<[u8]>, param: P, trace: bool) -> Result<Self>
     where
         Self: Sized,

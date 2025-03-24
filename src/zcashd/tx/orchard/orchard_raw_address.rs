@@ -2,8 +2,8 @@ use anyhow::Result;
 
 use zcash_address::{ToAddress, ZcashAddress, unified::Encoding};
 
-use crate::{parse, parser::prelude::*};
-use crate::{Blob, Blob32, Network};
+use crate::{parse, zewif::parser::prelude::*};
+use crate::zewif::{Blob, Blob32, Network};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct OrchardRawAddress {

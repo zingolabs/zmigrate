@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::{Bip39Mnemonic, Network, SaplingIncomingViewingKey, TxId};
+use crate::zewif::{Bip39Mnemonic, Network, SaplingIncomingViewingKey, TxId};
 
 use super::{
     Address, BlockLocator, ClientVersion, KeyPoolEntry, Keys, MnemonicHDChain, NetworkInfo,

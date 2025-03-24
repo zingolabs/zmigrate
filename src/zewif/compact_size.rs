@@ -1,6 +1,6 @@
 use anyhow::{Result, bail};
 
-use crate::{parse, parser::prelude::*};
+use crate::{parse, zewif::parser::prelude::*};
 
 pub fn parse_compact_size(p: &mut Parser) -> Result<usize> {
     match parse!(p, u8, "compact size")? {

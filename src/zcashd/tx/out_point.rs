@@ -1,7 +1,7 @@
 use anyhow::Result;
 
-use crate::{parse, parser::prelude::*};
-use crate::TxId;
+use crate::{parse, zewif::parser::prelude::*};
+use crate::zewif::TxId;
 
 pub type SaplingOutPoint = OutPoint;
 

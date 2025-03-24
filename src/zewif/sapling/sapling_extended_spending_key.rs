@@ -1,7 +1,8 @@
 use anyhow::Result;
 
-use crate::{parse, parser::prelude::*};
-use crate::u256;
+use crate::parse;
+use super::super::parser::prelude::*;
+use super::super::u256;
 
 use super::SaplingExpandedSpendingKey;
 

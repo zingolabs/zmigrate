@@ -1,4 +1,4 @@
-use crate::{parse, parser::prelude::*};
+use crate::{parse, zewif::parser::prelude::*};
 
 pub type BlockHeight = zcash_primitives::consensus::BlockHeight;
 

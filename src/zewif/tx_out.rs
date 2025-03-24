@@ -1,4 +1,4 @@
-use crate::{Amount, Script};
+use super::{Amount, Script};
 
 /// A transparent transaction output.
 #[derive(Debug, Clone)]

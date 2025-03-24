@@ -2,7 +2,8 @@ use std::collections::HashMap;
 
 use bc_components::ARID;
 
-use crate::{Attachments, Transaction, TxId, ZewifWallet, impl_attachable};
+use crate::impl_attachable;
+use super::{Attachments, Transaction, TxId, ZewifWallet};
 
 /// Represents a Zewif wallet database, the top level of the interchange format
 /// hierarchy, which can contain multiple wallets and a global transaction

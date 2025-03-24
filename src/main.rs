@@ -1,22 +1,14 @@
-mod mod_use_macro;
-pub mod parser;
 
-mod bdb_dump;
-pub use bdb_dump::*;
-mod digest_utils;
-pub use digest_utils::*;
 mod exec;
 pub use exec::*;
 mod file_args;
 pub use file_args::*;
-mod sapling;
-mod string_utils;
-pub use string_utils::*;
 mod styles;
-mod zcashd;
+pub mod zcashd;
 mod zewif;
-mod zingo;
-pub use zewif::*;
+pub mod zingo;
+pub mod zcashd_cmd;
+pub mod zingo_cmd;
 
 use clap::{Parser as ClapParser, Subcommand};
 
@@ -34,8 +26,8 @@ struct Cli {
 #[derive(Debug, Subcommand)]
 #[doc(hidden)]
 enum MainCommands {
-    Zcashd(zcashd::CommandArgs),
-    Zingo(zingo::CommandArgs),
+    Zcashd(zcashd_cmd::CommandArgs),
+    Zingo(zingo_cmd::CommandArgs),
 }
 
 #[doc(hidden)]

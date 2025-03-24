@@ -4,12 +4,9 @@ use anyhow::{Context, Result};
 use clap::Args;
 use std::fmt::Write;
 
-use crate::{
-    BDBDump,
-    file_args::{FileArgs, FileArgsLike},
-};
+use crate::file_args::{FileArgs, FileArgsLike};
 
-use super::{ZcashdDump, ZcashdParser};
+use crate::zcashd::{BDBDump, ZcashdDump, ZcashdParser};
 
 /// Doc comment here
 #[derive(Debug, Args)]

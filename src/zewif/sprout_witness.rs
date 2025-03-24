@@ -1,4 +1,4 @@
-use crate::u256;
+use super::u256;
 
 use super::IncrementalWitness;
 

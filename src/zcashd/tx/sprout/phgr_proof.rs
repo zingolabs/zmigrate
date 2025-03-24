@@ -1,7 +1,7 @@
 use anyhow::Result;
 
-use crate::{parse, parser::prelude::*};
-use crate::PHGRProof;
+use crate::{parse, zewif::parser::prelude::*};
+use crate::zewif::PHGRProof;
 
 impl Parse for PHGRProof {
     fn parse(p: &mut Parser) -> Result<Self> {

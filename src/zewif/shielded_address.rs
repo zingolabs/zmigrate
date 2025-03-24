@@ -1,4 +1,4 @@
-use crate::Data;
+use super::Data;
 
 use super::{SaplingIncomingViewingKey, SpendingKey};
 

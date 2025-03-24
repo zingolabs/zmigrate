@@ -6,7 +6,7 @@ use std::{
 
 use anyhow::{Result, anyhow, bail};
 
-use crate::Data;
+use crate::zewif::Data;
 
 pub struct BDBDump {
     pub header_records: HashMap<String, String>,

@@ -1,6 +1,6 @@
 use sha2::{Digest, Sha256};
 
-use crate::u256;
+use super::u256;
 
 /// SHA256 hash.
 pub fn sha256(data: impl AsRef<[u8]>) -> u256 {

@@ -5,7 +5,7 @@ use clap::Args;
 
 use crate::file_args::{FileArgs, FileArgsLike};
 
-use super::ZingoParser;
+use crate::zingo::ZingoParser;
 
 /// Doc comment here
 #[derive(Debug, Args)]

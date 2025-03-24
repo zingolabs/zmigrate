@@ -1,7 +1,7 @@
 use anyhow::Result;
 
-use crate::{parse, parser::prelude::*};
-use crate::{Amount, Blob32, Data};
+use crate::{parse, zewif::parser::prelude::*};
+use crate::zewif::{Amount, Blob32, Data};
 
 use super::{OrchardAction, OrchardAuthorized, OrchardFlags};
 

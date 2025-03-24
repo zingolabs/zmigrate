@@ -2,9 +2,9 @@ use std::collections::{HashMap, HashSet};
 
 use bc_components::ARID;
 
-use crate::{TxId, impl_attachable};
+use crate::impl_attachable;
 
-use super::{Address, Attachments, OrchardSentOutput, SaplingSentOutput};
+use super::{Address, Attachments, OrchardSentOutput, SaplingSentOutput, TxId};
 
 /// Logical grouping within a wallet. Each account can have its own set of
 /// addresses, transactions, and other metadata.

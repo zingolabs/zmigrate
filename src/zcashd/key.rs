@@ -1,6 +1,6 @@
 use anyhow::{Result, bail};
 
-use crate::{Data, hash256};
+use crate::zewif::{Data, hash256};
 
 use super::{KeyMetadata, PrivKey, PubKey};
 

@@ -4,10 +4,11 @@ use anyhow::{Context, Result};
 use ripemd::{Digest, Ripemd160};
 use sha2::Sha256;
 
-use crate::{
-    ProtocolAddress, SaplingIncomingViewingKey, TxId, u256,
-    zcashd::{self, ZcashdWallet},
-    zewif::{self, Account, AddressId, AddressRegistry, Position, ZewifTop, ZewifWallet},
+use super::ZcashdWallet;
+
+use crate::zewif::{
+    self, Account, AddressId, AddressRegistry, Position, ProtocolAddress,
+    SaplingIncomingViewingKey, TxId, ZewifTop, ZewifWallet, u256, u160,
 };
 
 /// Migrate a ZCashd wallet to the Zewif wallet format
@@ -208,7 +209,7 @@ fn convert_sapling_addresses(
         let mut zewif_address = zewif::Address::new(protocol_address);
 
         // Set purpose if available - convert to Address type for lookup
-        let zcashd_address = zcashd::Address::from(address_str.clone());
+        let zcashd_address = super::Address::from(address_str.clone());
         if let Some(purpose) = wallet.address_purposes().get(&zcashd_address) {
             zewif_address.set_purpose(purpose.clone());
         }
@@ -244,13 +245,13 @@ fn convert_sapling_addresses(
 fn find_sapling_key_for_ivk<'a>(
     wallet: &'a ZcashdWallet,
     ivk: &SaplingIncomingViewingKey,
-) -> Option<&'a zcashd::SaplingKey> {
+) -> Option<&'a super::SaplingKey> {
     wallet.sapling_keys().get(ivk)
 }
 
 /// Convert ZCashd SaplingExtendedSpendingKey to Zewif SpendingKey
 fn convert_sapling_spending_key(
-    key: &crate::sapling::SaplingExtendedSpendingKey,
+    key: &crate::zewif::sapling::SaplingExtendedSpendingKey,
 ) -> Result<zewif::SpendingKey> {
     // Create the Sapling spending key with all components including HD parameters
     // Since both structures use u256, we can directly use them without cloning
@@ -272,7 +273,7 @@ fn convert_sapling_spending_key(
 fn extract_transaction_addresses(
     wallet: &ZcashdWallet,
     tx_id: TxId,
-    tx: &zcashd::WalletTx,
+    tx: &super::WalletTx,
 ) -> Result<HashSet<String>> {
     let mut addresses = HashSet::new();
 
@@ -286,20 +287,20 @@ fn extract_transaction_addresses(
 
             // Add the recipient address based on the type
             match &recipient.recipient_address {
-                zcashd::RecipientAddress::Sapling(addr) => {
+                super::RecipientAddress::Sapling(addr) => {
                     let addr_str = addr.to_string(wallet.network());
                     addresses.insert(addr_str);
                 }
-                zcashd::RecipientAddress::Orchard(addr) => {
+                super::RecipientAddress::Orchard(addr) => {
                     let addr_str = addr.to_string(wallet.network());
                     addresses.insert(addr_str);
                 }
-                zcashd::RecipientAddress::KeyId(key_id) => {
+                super::RecipientAddress::KeyId(key_id) => {
                     // Convert P2PKH key hash to a Zcash address
                     let addr_str = key_id.to_string(wallet.network());
                     addresses.insert(addr_str);
                 }
-                zcashd::RecipientAddress::ScriptId(script_id) => {
+                super::RecipientAddress::ScriptId(script_id) => {
                     // Convert P2SH script hash to a Zcash address
                     let addr_str = script_id.to_string(wallet.network());
                     addresses.insert(addr_str);
@@ -342,8 +343,8 @@ fn extract_transaction_addresses(
 
                 // Create a transparent P2PKH address from this pubkey hash
                 // Create a KeyId for consistent address encoding
-                let key_id = zcashd::KeyId::from(
-                    crate::u160::from_slice(&pubkey_hash[..])
+                let key_id = super::KeyId::from(
+                    u160::from_slice(&pubkey_hash[..])
                         .expect("Creating u160 from RIPEMD160 hash"),
                 );
                 addresses.insert(key_id.to_string(wallet.network()));
@@ -362,8 +363,8 @@ fn extract_transaction_addresses(
                 let pubkey_hash = &script_data[3..23];
 
                 // Convert to a proper P2PKH Zcash address using KeyId
-                let key_id = zcashd::KeyId::from(
-                    crate::u160::from_slice(pubkey_hash).expect("Creating u160 from pubkey hash"),
+                let key_id = super::KeyId::from(
+                    u160::from_slice(pubkey_hash).expect("Creating u160 from pubkey hash"),
                 );
                 addresses.insert(key_id.to_string(wallet.network()));
             }
@@ -378,8 +379,8 @@ fn extract_transaction_addresses(
             let script_hash = &script_data[2..22];
 
             // Convert to a proper P2SH Zcash address using ScriptId
-            let script_id = zcashd::ScriptId::from(
-                crate::u160::from_slice(script_hash).expect("Creating u160 from script hash"),
+            let script_id = super::ScriptId::from(
+                u160::from_slice(script_hash).expect("Creating u160 from script hash"),
             );
             addresses.insert(script_id.to_string(wallet.network()));
         }
@@ -391,7 +392,7 @@ fn extract_transaction_addresses(
 
     // For Sapling spends and outputs
     match tx.sapling_bundle() {
-        zcashd::SaplingBundle::V4(bundle_v4) => {
+        super::SaplingBundle::V4(bundle_v4) => {
             for spend in bundle_v4.spends() {
                 // The nullifier uniquely identifies the spend
                 // Use AsRef to get a reference to the underlying bytes
@@ -439,7 +440,7 @@ fn extract_transaction_addresses(
                 }
             }
         }
-        zcashd::SaplingBundle::V5(bundle_v5) => {
+        super::SaplingBundle::V5(bundle_v5) => {
             // Similar processing for V5 bundles
             // V5 has the same structure for spends and outputs
             for spend in bundle_v5.shielded_spends() {
@@ -539,7 +540,7 @@ fn convert_transactions(wallet: &ZcashdWallet) -> Result<HashMap<TxId, zewif::Tr
 }
 
 /// Convert a single ZCashd transaction to Zewif format
-fn convert_transaction(tx_id: TxId, tx: &zcashd::WalletTx) -> Result<zewif::Transaction> {
+fn convert_transaction(tx_id: TxId, tx: &super::WalletTx) -> Result<zewif::Transaction> {
     let mut zewif_tx = zewif::Transaction::new(tx_id);
 
     // Set raw transaction data
@@ -572,7 +573,7 @@ fn convert_transaction(tx_id: TxId, tx: &zcashd::WalletTx) -> Result<zewif::Tran
 
     // Convert Sapling spends and outputs
     match tx.sapling_bundle() {
-        zcashd::SaplingBundle::V4(bundle_v4) => {
+        super::SaplingBundle::V4(bundle_v4) => {
             // Convert Sapling spends
             for (idx, spend) in bundle_v4.spends().iter().enumerate() {
                 let mut sapling_spend = zewif::SaplingSpendDescription::new();
@@ -593,7 +594,7 @@ fn convert_transaction(tx_id: TxId, tx: &zcashd::WalletTx) -> Result<zewif::Tran
                 zewif_tx.add_sapling_output(sapling_output);
             }
         }
-        zcashd::SaplingBundle::V5(bundle_v5) => {
+        super::SaplingBundle::V5(bundle_v5) => {
             // Processing for V5 bundles
             for (idx, spend) in bundle_v5.shielded_spends().iter().enumerate() {
                 let mut sapling_spend = zewif::SaplingSpendDescription::new();
@@ -645,7 +646,7 @@ fn convert_transaction(tx_id: TxId, tx: &zcashd::WalletTx) -> Result<zewif::Tran
 /// Initialize an AddressRegistry based on the unified accounts data
 fn initialize_address_registry(
     wallet: &ZcashdWallet,
-    unified_accounts: &zcashd::UnifiedAccounts,
+    unified_accounts: &super::UnifiedAccounts,
 ) -> Result<AddressRegistry> {
     let mut registry = AddressRegistry::new();
 
@@ -684,7 +685,7 @@ fn initialize_address_registry(
 /// Convert ZCashd UnifiedAccounts to Zewif accounts
 fn convert_unified_accounts(
     wallet: &ZcashdWallet,
-    unified_accounts: &zcashd::UnifiedAccounts,
+    unified_accounts: &super::UnifiedAccounts,
     _transactions: &HashMap<TxId, zewif::Transaction>,
 ) -> Result<HashMap<u256, Account>> {
     let mut accounts_map = HashMap::new();
@@ -788,7 +789,7 @@ fn convert_unified_accounts(
             let mut zewif_address = zewif::Address::new(protocol_address);
 
             // Set purpose if available - convert to Address type for lookup
-            let zcashd_address = zcashd::Address::from(address_str);
+            let zcashd_address = super::Address::from(address_str);
             if let Some(purpose) = wallet.address_purposes().get(&zcashd_address) {
                 zewif_address.set_purpose(purpose.clone());
             }

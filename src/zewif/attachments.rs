@@ -47,6 +47,7 @@ impl Attachments {
     }
 }
 
+#[allow(dead_code)]
 pub trait Attachable {
     fn attachments(&self) -> &Attachments;
     fn attachments_mut(&mut self) -> &mut Attachments;

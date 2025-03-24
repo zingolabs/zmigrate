@@ -5,9 +5,9 @@ use std::{
 
 use anyhow::{Context, Result, bail};
 
-use crate::{parse, parser::prelude::*};
+use crate::{parse, zewif::parser::prelude::*};
 
-use crate::{
+use crate::zewif::{
     Bip39Mnemonic, SaplingIncomingViewingKey, TxId, sapling::SaplingExtendedSpendingKey, u252, u256,
 };
 

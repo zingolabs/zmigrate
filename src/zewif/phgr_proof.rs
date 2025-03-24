@@ -1,4 +1,4 @@
-use crate::Blob;
+use super::Blob;
 
 // Initial bool || Fq
 pub type CompressedG1 = Blob<33>;

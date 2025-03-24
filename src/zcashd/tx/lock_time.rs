@@ -1,7 +1,7 @@
 use anyhow::Result;
 
-use crate::{parse, parser::prelude::*};
-use crate::SecondsSinceEpoch;
+use crate::{parse, zewif::parser::prelude::*};
+use crate::zewif::SecondsSinceEpoch;
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub enum LockTime {

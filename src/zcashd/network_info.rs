@@ -1,7 +1,7 @@
 use anyhow::Result;
 
-use crate::{parse, parser::prelude::*};
-use crate::{Network, network_for_identifier};
+use crate::{parse, zewif::parser::prelude::*};
+use crate::zewif::{Network, network_for_identifier};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct NetworkInfo {

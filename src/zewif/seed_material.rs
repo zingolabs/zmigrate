@@ -1,4 +1,4 @@
-use crate::Blob;
+use super::Blob;
 
 /// Seed material used to generate the keys in the wallet.
 /// Proposal as minimal set of sources of truth

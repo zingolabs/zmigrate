@@ -1,4 +1,4 @@
-use crate::{Blob, u256};
+use super::{Blob, u256};
 
 /// Represents a spending key which contains cryptographic material
 /// necessary to spend funds and view transaction details

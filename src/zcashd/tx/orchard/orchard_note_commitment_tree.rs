@@ -1,5 +1,5 @@
-use crate::parser::prelude::*;
-use crate::{Data, u256};
+use crate::zewif::parser::prelude::*;
+use crate::zewif::{Data, u256};
 use anyhow::{Context, Result, bail};
 use byteorder::{ByteOrder, LittleEndian};
 

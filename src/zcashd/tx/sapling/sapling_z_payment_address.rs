@@ -1,8 +1,8 @@
 use anyhow::Result;
 use zcash_address::{ToAddress, ZcashAddress};
 
-use crate::{parse, parser::prelude::*};
-use crate::{Blob, Network};
+use crate::{parse, zewif::parser::prelude::*};
+use crate::zewif::{Blob, Network};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SaplingZPaymentAddress {

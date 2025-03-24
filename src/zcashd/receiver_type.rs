@@ -1,7 +1,7 @@
 use anyhow::Result;
 
-use crate::{parse, parser::prelude::*};
-use crate::CompactSize;
+use crate::{parse, zewif::parser::prelude::*};
+use crate::zewif::CompactSize;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[repr(u8)]

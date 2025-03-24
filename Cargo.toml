@@ -3,6 +3,14 @@ name = "zmigrate"
 version = "0.1.0"
 edition = "2024"
 
+[lib]
+name = "zmigrate"
+path = "src/lib.rs"
+
+[[bin]]
+name = "zmigrate"
+path = "src/main.rs"
+
 [dependencies]
 anyhow = "1.0.95"
 chrono = "0.4.39"

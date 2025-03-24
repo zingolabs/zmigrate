@@ -1,7 +1,7 @@
 #[macro_export]
 macro_rules! impl_attachable {
     ($type:ty) => {
-        impl $crate::Attachable for $type {
+        impl $crate::zewif::Attachable for $type {
             fn attachments(&self) -> &Attachments {
                 &self.attachments
             }

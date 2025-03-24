@@ -1,7 +1,7 @@
 use anyhow::Result;
 
-use crate::{parse, parser::prelude::*};
-use crate::{Amount, Blob64, GrothProof, u256};
+use crate::{parse, zewif::parser::prelude::*};
+use crate::zewif::{Amount, Blob64, GrothProof, u256};
 
 use super::{OutputDescription, OutputV5, SpendDescription, SpendV5};
 

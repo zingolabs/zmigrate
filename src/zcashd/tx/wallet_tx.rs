@@ -2,11 +2,12 @@ use std::collections::HashMap;
 
 use anyhow::Result;
 
-use crate::{parse, parser::prelude::*};
+use crate::{parse, zewif::parser::prelude::*};
 
-use crate::{
+use super::{OrchardTxMeta, SaplingBundleV5, ZIP225_TX_VERSION};
+
+use crate::zewif::{
     BranchId, CompactSize, Data, ExpiryHeight, u256,
-    zcashd::{OrchardTxMeta, SaplingBundleV5, ZIP225_TX_VERSION},
 };
 
 use super::{
