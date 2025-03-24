@@ -1,37 +1,53 @@
-# CLAUDE.md - ZMigrate Guidelines
+# CLAUDE.md - ZCash Wallet Export/Import Format Guidelines
 
-- You are working in the `zmigrate` crate.
-- Above `zmigrate` is the containing `bc-rust` workspace.
-- DO NOT MAKE CHANGES ABOVE THE `zmigrate` MODULE.
-- You may examine the dependencies in the `bc-rust/target` directory there that we reference in this crate's `Cargo.toml` file.
+- You are working on several related crates in the `bc-rust` workspace:
+  - `zmigrate` is a command line tool to migrate wallets between different ZCash wallet formats.
+  - `zewif` defines the ZeWIF interchange format for ZCash wallets, a common in-memory and serialized representation for wallet data based on Gordian Envelope.
+  - `zewif-zcashd` provides ZCashd-specific structures and migration code for the `zmigrate` tool.
+  - `zewif-zingo` provides Zingo-specific structures and migration code for the `zmigrate` tool.
+  - DO NOT MAKE CHANGES OUTSIDE THESE FOUR CRATES.
+
+- You will *not* find a `target` directory in `bc-rust` because it lives outside the workspace. If you need to examine dependencies, let me know and I will provide you with the necessary information, or you can do a web search for the crate documentation.
 
 ## Introduction
 
-- The `zmigrate` crate provides tooling to migrate wallets from various ZCash implementations (zcashd, zingo, etc.) to the common ZeWIF interchange format.
-- NOTE: The zmigrate crate and the ZeWIF interchange format are *not* intended to provide a full wallet implementation. They are a tool to migrate wallets between different wallet implementations. The functionality provided by the `zmigrate` crate is strictly limited to wallet migration and data interchange.
-- Eventually the wallet-specific parts will be moved to separate crates, which will provide front-end and back-end implementations for each wallet type.
-- The ZeWIF file format itself, which will be directly supported by the `zmigrate` crate will be based on Gordian Envelope, with wallet-specific and esoteric data stored in attachments. NOTE: We are *not* writing code using attachments yet.
-- The `zmigrate` command line tool will convert wallets to and from ZeWIF files, and will be able to convert between wallet formats.
+- The `zmigrate` tool and `zewif` framework enable migration between different ZCash wallet implementations.
+- The ZeWIF interchange format is *not* intended to provide a full wallet implementation. It is a framework for the migration of wallets between different wallet implementations.
+- The ZeWIF file format will be based on Gordian Envelope, with wallet-specific data stored in attachments. NOTE: We are *not* writing code using attachments yet.
+- The `zmigrate` command line tool converts wallets to and from ZeWIF files, enabling conversion between wallet formats.
 
-### Purpose of ZMigrate
+### Purpose of ZeWIF and ZMigrate
 
-The `zmigrate` library serves several key purposes:
+The `zmigrate` tool and `zewif` framework serve several key purposes:
 
 1. **Wallet Migration** - Enables users to convert their existing wallets from specific implementations to a universal format
 2. **Wallet Interoperability** - Allows wallet data to be moved between different ZCash wallet implementations
 3. **Data Preservation** - Ensures no critical wallet data is lost during transfers between implementations
 4. **Key Recovery** - Facilitates recovery of keys and addresses from various wallet formats
 
-### ZeWIF Interchange Format
+### Crate Structure
 
-ZeWIF (ZCash Wallet Interchange Format) is a specification designed to:
+1. **zewif** - Core library defining the common interchange format:
+   - Defines data structures for addresses, transactions, keys, and accounts
+   - Provides common interfaces for wallet operations
+   - Implements parsing capabilities with a custom parser framework
+   - Contains utilities for cryptographic operations
 
-1. **Standardize Wallet Data** - Create a common representation of ZCash wallet data regardless of implementation
-2. **Enable Cross-Wallet Compatibility** - Allow users to migrate between wallet implementations without losing data
-3. **Future Proofing** - Provide a format that can accommodate future ZCash protocol developments
-4. **Preserve All Critical Data** - Maintain spending keys, viewing keys, addresses, transactions, and metadata
+2. **zewif-zcashd** - Adapter for ZCashd wallet format:
+   - Implements parsers for zcashd wallet dump format
+   - Handles zcashd-specific key formats and management
+   - Provides migration paths from zcashd wallet format
+   - Contains the critical `migrate_to_zewif` function
 
-The format is structured to capture the hierarchical nature of wallet data, from individual keys and addresses to accounts and complete wallets, while preserving the relationships between these elements.
+3. **zewif-zingo** - Adapter for Zingo wallet format:
+   - Implements parsers for Zingo wallet format
+   - Supports migration from Zingo wallet format
+   - Handles Zingo-specific wallet capabilities
+
+4. **zmigrate** - Command-line tool:
+   - Provides user interface for wallet migration
+   - Coordinates migration process between different wallet formats
+   - Handles file I/O operations
 
 ## Build/Test Commands
 
@@ -54,210 +70,111 @@ The format is structured to capture the hierarchical nature of wallet data, from
 - **File Structure**: Group related functionality in modules
 - **Traits**: Prefer trait implementations for extensible functionality
 
-## Important Basic Types
+## Important Basic Types Provided by the `zewif` Crate
 
 - `Blob<N>`: A fixed-size byte array (wrapper around `[u8; N]`)
 - `Blob32`: Type alias for `Blob<32>`
 - `Data`: A variable-size byte array (wrapper around `Vec<u8>`)
-- `u256`: A 256-bit unsigned integer (wrapper around `[u8; 32]`), assumes little-endian byte order so reverses on display, usually used for cryptographic values. Implements `Copy`.
-- `u252`: A 252-bit unsigned integer (wrapper around `[u8; 32]`), used for Orchard note commitments. Implements `Copy`.
-- `u160`: A 160-bit unsigned integer (wrapper around `[u8; 20]`), used for transparent addresses. Implements `Copy`.
+- `u256`: A 256-bit unsigned integer (wrapper around `[u8; 32]`), assumes little-endian byte order, implements `Copy`
+- `u252`: A 252-bit unsigned integer (wrapper around `[u8; 32]`), used for Orchard note commitments, implements `Copy`
+- `u160`: A 160-bit unsigned integer (wrapper around `[u8; 20]`), used for transparent addresses, implements `Copy`
+- `TxId`: A transaction ID, which is 32 bytes representing a transaction hash
+- `ZewifTop`: The top-level container for wallet data
+- `ZewifWallet`: Represents a complete wallet
+- `Account`: Represents an account within a wallet
+- `Address`: Represents a ZCash address (transparent, shielded, or unified)
+- `Transaction`: Represents a ZCash transaction
 
 ### Coding Notes
 
-- Do *not* use the Gordian Envelope attachments feature yet. It will be used for wallet-specific data that is not part of the core ZeWIF interchange format, but which will be preserved by it.
+- Do *not* use the Gordian Envelope attachments feature yet. It will be used later to preserve wallet-specific data.
 - Don't generate tests yet.
 - If you think, "In a *real* implementation we'd do it this way," then do it that way. We're not doing coding exercises, this is production code.
-- Do not use and placeholder implementations when writing new code; implement the full functionality. If a particular code path is out of scope, mark it with a `todo!()` macro.
-- Use `Result<T>` and proper error handling with context (using `anyhow::Context`) for all functions that can fail. We are using `anyhow` for error handling throughout.
+- Do not use placeholder implementations when writing new code; implement the full functionality. If a particular code path is out of scope, mark it with a `todo!()` macro.
+- Use `Result<T>` and proper error handling with context (`anyhow::Context`) for all functions that can fail.
 - Always prefer "fail fast" error handling. If a function cannot proceed due to an error, return early.
 - Don't mark items complete below until they are fully implemented.
 - Make sure all errors and lints are fixed in files you modify.
 
-## Migration Plan: ZCashd to ZeWIF
+## Migration Status and Next Tasks
 
-### Migration Status and Next Tasks
+- The current goal is to migrate a `ZcashdWallet` (structures in `zewif-zcashd`) to a `ZewifTop` (structures in `zewif`).
+- The main migration function is `zewif-zcashd::migrate::migrate_to_zewif`.
+- We are primarily working in the `zewif-zcashd::migrate` and `zewif` modules.
+- We are focused on converting in-memory wallet data to ZeWIF abstractions, not on serialization or file I/O yet.
 
-1. The overall goal is to migrate a `ZcashdWallet` (already read into the structures in `src/zcashd/`) to a `ZewifTop` (using the structures in `src/zewif/`).
-2. The main migration function is `src/zcashd/migrate.rs::migrate_to_zewif`.
-3. We are focusing on the wallet and account data, with transaction data as a later priority.
-4. We are primarily working in the `src/zcashd/migrate.rs` and `src/zewif/` modules.
-5. We are focused on moving in-memory representations of the wallet data to the ZeWIF abstractions, we are *not* focused on serialization or file I/O at this time.
-6. The next high-priority tasks are:
-   - **Unified Accounts Migration**: Convert the `wallet.unified_accounts` structure to ZeWIF format
-   - **Note Commitment Trees Migration**: Parse and convert the Orchard note commitment tree
+### Current Tasks (HIGH PRIORITY)
 
-#### Current Tasks
-- 🔄 **Note Commitment Trees Migration** (HIGH PRIORITY)
-  - Initial implementation for parsing and converting Orchard note commitment tree completed
-  - Required improvements:
-    - Complete binary tree format parser with proper error handling
-    - Add detailed mapping between commitments and their positions in the tree
-    - Create proper witness data structures for each output
-    - Implement mutable access methods to update transaction outputs with correct positions
-    - Test with real-world tree structures from various wallet implementations
+1. **Note Commitment Trees Migration**
+   - Status: Initial implementation completed, improvements needed
+   - Required improvements:
+     - Complete binary tree format parser with proper error handling
+     - Add detailed mapping between commitments and their positions in the tree
+     - Create proper witness data structures for each output
+     - Implement mutable access methods to update transaction outputs with correct positions
+     - Test with real-world tree structures
 
-#### Future Tasks
-- ⏳ **Enhanced Transaction Conversion** (MEDIUM PRIORITY)
-  - Improve note position tracking for Sapling and Orchard outputs
-  - Add full witness data support for verification
-  - Add proper memo field decryption when appropriate keys are available
-  - Extract block height information from transaction metadata
+2. **Transaction Assignment Logic**
+   - Status: Partially completed in `extract_transaction_addresses`
+   - Required improvements:
+     - Refine how transactions are assigned to accounts based on address involvement
+     - Replace existing placeholder code with robust assignment logic
+     - Add validation to ensure all transactions are properly associated with relevant accounts
 
-- ⏳ **Unified Address Support** (MEDIUM PRIORITY)
-  - Add support for unified addresses with multiple receiver types
-  - Properly handle diversifier indices
+### Future Tasks (MEDIUM PRIORITY)
 
-- ⏳ **Key Mapping Improvements** (LOW PRIORITY)
-  - Implement robust transparent address derivation from keys and scripts
-  - Add proper viewing key support
-  - Create a key registry for faster lookups
+1. **Enhanced Transaction Conversion**
+   - Improve note position tracking for Sapling and Orchard outputs
+   - Add full witness data support for verification
+   - Add proper memo field decryption when appropriate keys are available
+   - Extract block height information from transaction metadata
 
-### High-Priority Zcashd -> ZeWIF Mappings
+2. **Viewing Key Migration**
+   - Complete missing viewing key conversion code 
+   - Preserve viewing key relationships with addresses in ZeWIF format
 
-1. **Unified Accounts Migration**
-   - **Analysis**:
-     - The `wallet.unified_accounts` structure contains critical information about HD account hierarchy
-     - It consists of three HashMaps:
-       - `address_metadata`: Maps `u256` identifiers to `UnifiedAddressMetadata` objects containing diversifier indices and receiver types
-       - `full_viewing_keys`: Maps `u256` identifiers to viewing key strings
-       - `account_metadata`: Maps `u256` identifiers to `UnifiedAccountMetadata` objects containing seed fingerprint, BIP-44 coin type, ZIP-32 account ID, and key ID
-     - The key ID in `UnifiedAddressMetadata` links addresses to their accounts in `UnifiedAccountMetadata`
+3. **Unified Address Support**
+   - Add support for unified addresses with multiple receiver types
+   - Properly handle diversifier indices
+   - Ensure proper handling of receiver types
 
-   - **Implementation Plan**:
-     - For each entry in `wallet.unified_accounts.account_metadata`:
-       1. Create a new `zewif::Account` with a unique ARID
-       2. Set the account's `zip32_account_id` to the `UnifiedAccountMetadata.account_id`
-       3. Set the account's name to a generated string including account ID (e.g., "Account #0")
-     - For each entry in `wallet.unified_accounts.address_metadata`:
-       1. Find the account metadata using the address's `key_id`
-       2. Link the address to the correct account in the ZeWIF hierarchy
-       3. Include diversifier information in the address structure
-     - Migrate all relevant viewing keys from `full_viewing_keys` to their corresponding addresses
+### Low-Priority Tasks
 
-   - **Required Changes**:
-     1. Modify `migrate_to_zewif` function to conditionally process unified accounts
-     2. Create a new function `convert_unified_accounts` that:
-        - Creates multiple accounts based on `account_metadata`
-        - Maps each address to its appropriate account using `key_id` relationships
-        - Preserves necessary derivation and diversifier information
-     3. Update address conversion functions to check for unified address relationships
-     4. Modify existing code that creates a single default account to handle multiple accounts
+1. **Key Mapping Improvements**
+   - Implement robust transparent address derivation from keys and scripts
+   - Add proper viewing key support
+   - Create a key registry for faster lookups
 
-2. **Note Commitment Trees**
-   - **Analysis**:
-     - Note commitment trees are critical for transaction validation in ZCash
-     - The `ZcashdWallet` contains an `orchard_note_commitment_tree` field of type `OrchardNoteCommitmentTree`
-     - `OrchardNoteCommitmentTree` currently just stores unparsed data as a `Data` object
-     - ZeWIF provides corresponding structures in:
-       - `zewif::IncrementalMerkleTree` with fields for left, right, and parent nodes
-       - `zewif::IncrementalWitness<DEPTH, Hash>` for witness data
-       - Specialized witness types like `SaplingWitness` and `SproutWitness`
-       - Note commitment tree position info in output descriptions
+2. **Witness Data Migration**
+   - Complete witness data conversion between in-memory formats
+   - Properly map witness structures to ZeWIF memory representation
 
-   - **Implementation Plan**:
-     1. Parse the raw `orchard_note_commitment_tree.unparsed_data` into a structured format
-     2. Convert to appropriate ZeWIF structures:
-        - Create `IncrementalMerkleTree` instances
-        - Populate witness data
-        - Link notes to their positions in the tree
-     3. Add the tree data to related transaction outputs in the ZeWIF format
+3. **Note Position Preservation**
+   - Fix placeholder position values (currently Position(0))
+   - Implement proper position value extraction and conversion
+   - Preserve correct positional relationships in the ZeWIF format
 
-   - **Required Changes**:
-     1. Implement a parser for the raw Orchard note commitment tree data
-     2. Create a conversion function from ZCashd tree format to ZeWIF format
-     3. Update the transaction migration code to include tree and witness data
-     4. Ensure that note positions and authentication paths are preserved
+## Implementation Progress
 
-### Low-Priority or Zcashd-specific Mappings
+### Completed Tasks
 
-1. **KeyPool Information**
-   - The `wallet.key_pool` is Zcashd-specific and likely not needed in a generic interchange format.
+1. **Address-to-Account Mapping**
+   - ✅ Designed a consistent way to identify addresses across different protocols
+   - ✅ Created `AddressId` enum and `AddressRegistry` in `src/zewif/address_id.rs`
+   - ✅ Implemented conversion functions with comprehensive unit tests
+   - ✅ Created `initialize_address_registry` function to map addresses to accounts
+   - ✅ Improved `convert_unified_accounts` function to use the AddressRegistry
+   - ✅ Updated transaction assignment logic to use the registry for account mapping
+   - ✅ Updated address conversion functions to use the registry for proper account assignment
 
-2. **Client Version Information**
-   - The `wallet.client_version` and `wallet.min_version` are Zcashd implementation details.
+### In Progress
 
-3. **Block Locator**
-   - The `wallet.bestblock` and `wallet.bestblock_nomerkle` are chain-specific sync data.
+1. **Transaction Data Structure Conversion**
+   - Adding proper transaction data conversion to in-memory ZeWIF structures
+   - Improving in-memory representation of transaction components
+   - Fixing note position placeholder values during migration
 
-4. **OrderPosNext**
-   - The `wallet.orderposnext` is an internal Zcashd ordering mechanism.
-
-5. **WitnessCacheSize**
-   - The `wallet.witnesscachesize` is an implementation detail of Zcashd.
-
-## Unfinished Migration Components in zcashd::migrate
-
-The following items represent unfinished components specifically related to in-memory data migration between wallet representation formats:
-
-### High-Priority Migration Fixes
-
-1. **Address-to-Account Mapping** (HIGH PRIORITY)
-   - Current placeholders at several locations using default account
-   - Implementation plan (breakdown into subtasks):
-     1. **Create a Universal Address Identifier System** (COMPLETED)
-        - ✅ Designed a consistent way to identify addresses across different protocols (transparent, sapling, orchard)
-        - ✅ Created `AddressId` enum and `AddressRegistry` in `src/zewif/address_id.rs`
-        - ✅ Implemented conversion functions and comprehensive unit tests
-
-     2. **Enhance the Unified Accounts Parser** (COMPLETED)
-        - ✅ Created `initialize_address_registry` function to map addresses to accounts
-        - ✅ Improved `convert_unified_accounts` function to use the AddressRegistry
-        - ✅ Updated transaction assignment logic to use the registry for account mapping
-
-     3. **Fix Transparent Address Assignment** (COMPLETED)
-        - ✅ Updated the code in `convert_transparent_addresses` to use the AddressRegistry for account mapping
-        - ✅ Added support for both unified and non-unified account scenarios with a flexible API
-
-     4. **Fix Shielded Address Assignment** (COMPLETED)
-        - ✅ Updated the `convert_sapling_addresses` function to use proper account mapping via AddressRegistry
-        - ✅ Implemented consistent logic to ensure addresses are assigned to correct accounts
-
-     5. **Update Transaction Assignment Logic**
-        - Refine how transactions are assigned to accounts based on address involvement
-        - Replace the existing placeholder in `extract_transaction_addresses`
-
-     6. **Add Validation and Testing**
-        - Add checks to ensure all addresses are mapped to valid accounts
-        - Verify correct account-address relationships are maintained during migration
-
-2. **Transaction Data Structure Conversion** (HIGH PRIORITY)
-   - Current limitations with representing transaction outputs and actions
-   - Implementation plan:
-     - Complete proper transaction data conversion to in-memory ZeWIF structures
-     - Improve in-memory representation of transaction components
-     - Fix note position placeholder values during migration
-
-### Medium-Priority Migration Components
-
-1. **Viewing Key Migration** (MEDIUM PRIORITY)
-   - Current TODO for processing viewing keys during migration
-   - Implementation plan:
-     - Complete missing viewing key conversion code
-     - Preserve viewing key relationships with addresses in ZeWIF format
-
-2. **Memo Data Handling** (MEDIUM PRIORITY)
-   - Currently not preserving memo data in transaction outputs
-   - Implementation plan:
-     - Add proper memo field preservation during in-memory migration
-     - Map memo fields to appropriate ZeWIF data structures
-
-3. **Orchard Data Migration** (MEDIUM PRIORITY)
-   - Incomplete conversion of Orchard wallet components
-   - Implementation plan:
-     - Complete conversion of Orchard-specific data structures
-     - Fix placeholder code in Orchard address handling
-
-### Low-Priority Migration Improvements
-
-1. **Witness Data Migration** (LOW PRIORITY)
-   - Current limitations with witness data conversion
-   - Implementation plan:
-     - Complete witness data conversion between in-memory formats
-     - Properly map witness structures to ZeWIF memory representation
-
-2. **Note Position Preservation** (LOW PRIORITY)
-   - Current placeholder position values (Position(0))
-   - Implementation plan:
-     - Implement proper position value extraction and conversion
-     - Preserve correct positional relationships in the ZeWIF format
+2. **Orchard Note Commitment Tree Processing**
+   - Parsing the raw orchard note commitment tree data
+   - Implementing conversion to ZeWIF tree format
+   - Adding position information to transaction outputs

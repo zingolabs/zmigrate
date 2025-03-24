@@ -2,10 +2,9 @@ use std::path::PathBuf;
 
 use anyhow::Result;
 use clap::Args;
+use zewif_zingo::ZingoParser;
 
 use crate::file_args::{FileArgs, FileArgsLike};
-
-use crate::zingo::ZingoParser;
 
 /// Doc comment here
 #[derive(Debug, Args)]
