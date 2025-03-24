@@ -5,19 +5,19 @@ use std::{
 
 use anyhow::{Context, Result, bail};
 
-use crate::{parse, zewif::parser::prelude::*};
+use zewif::{parse, parser::prelude::*};
 
-use crate::zewif::{
-    Bip39Mnemonic, TxId,
+use zewif::{
+    TxId,
     sapling::{SaplingExtendedSpendingKey, SaplingIncomingViewingKey},
     u252, u256,
 };
 
 use super::{
-    Address, BlockLocator, ClientVersion, DBValue, Key, KeyMetadata, KeyPoolEntry, Keys,
-    MnemonicHDChain, NetworkInfo, OrchardNoteCommitmentTree, PrivKey, PubKey, RecipientAddress,
-    RecipientMapping, SaplingKey, SaplingKeys, SaplingZPaymentAddress, SproutKeys,
-    SproutPaymentAddress, SproutSpendingKey, UnifiedAccountMetadata, UnifiedAccounts,
+    Address, Bip39Mnemonic, BlockLocator, ClientVersion, DBValue, Key, KeyMetadata, KeyPoolEntry,
+    Keys, MnemonicHDChain, NetworkInfo, OrchardNoteCommitmentTree, PrivKey, PubKey,
+    RecipientAddress, RecipientMapping, SaplingKey, SaplingKeys, SaplingZPaymentAddress,
+    SproutKeys, SproutPaymentAddress, SproutSpendingKey, UnifiedAccountMetadata, UnifiedAccounts,
     UnifiedAddressMetadata, WalletTx, ZcashdDump, ZcashdWallet, zcashd_dump::DBKey,
 };
 

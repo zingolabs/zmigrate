@@ -1,4 +1,4 @@
-use crate::zewif::parser::prelude::*;
+use zewif::parser::prelude::*;
 use anyhow::Result;
 use std::sync::Arc;
 

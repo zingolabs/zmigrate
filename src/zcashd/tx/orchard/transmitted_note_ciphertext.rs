@@ -1,7 +1,7 @@
 use anyhow::Result;
 
-use crate::zewif::{Blob, u256};
-use crate::{parse, zewif::parser::prelude::*};
+use zewif::{Blob, u256};
+use zewif::{parse, parser::prelude::*};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct TransmittedNoteCiphertext {

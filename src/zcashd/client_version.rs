@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use crate::{parse, zewif::parser::prelude::*};
+use zewif::{parse, parser::prelude::*};
 
 #[derive(Clone, Copy)]
 pub struct ClientVersion {

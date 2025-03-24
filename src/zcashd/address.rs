@@ -1,3 +1,3 @@
-use crate::string;
+use zewif::string;
 
 string!(Address);

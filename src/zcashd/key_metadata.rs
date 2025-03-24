@@ -1,7 +1,7 @@
 use anyhow::Result;
 
-use crate::{parse, zewif::parser::prelude::*};
-use crate::zewif::{Blob32, SecondsSinceEpoch};
+use zewif::{Blob32, SecondsSinceEpoch};
+use zewif::{parse, parser::prelude::*};
 
 const VERSION_WITH_HDDATA: i32 = 10;
 #[derive(Debug, Clone, PartialEq)]

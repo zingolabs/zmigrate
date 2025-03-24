@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::zewif::sapling::SaplingIncomingViewingKey;
+use zewif::sapling::SaplingIncomingViewingKey;
 
 use super::SaplingKey;
 

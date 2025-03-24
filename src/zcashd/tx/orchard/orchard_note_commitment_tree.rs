@@ -1,5 +1,5 @@
-use crate::zewif::parser::prelude::*;
-use crate::zewif::{Data, u256};
+use zewif::parser::prelude::*;
+use zewif::{Data, u256};
 use anyhow::{Context, Result, bail};
 use byteorder::{ByteOrder, LittleEndian};
 
@@ -155,8 +155,8 @@ impl OrchardNoteCommitmentTree {
     }
 
     /// Convert to Zewif IncrementalMerkleTree format
-    pub fn to_zewif_tree(&self) -> crate::zewif::IncrementalMerkleTree {
-        let mut tree = crate::zewif::IncrementalMerkleTree::new();
+    pub fn to_zewif_tree(&self) -> zewif::IncrementalMerkleTree {
+        let mut tree = zewif::IncrementalMerkleTree::new();
 
         // Convert the root node
         if let Some(root_node) = &self.root {

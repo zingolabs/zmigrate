@@ -1,7 +1,7 @@
 use anyhow::Result;
 
-use crate::{parse, zewif::parser::prelude::*};
-use crate::blob;
+use zewif::blob;
+use zewif::{parse, parser::prelude::*};
 
 use super::JSDescription;
 

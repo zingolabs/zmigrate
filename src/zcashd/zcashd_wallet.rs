@@ -1,11 +1,11 @@
 use std::collections::HashMap;
 
-use crate::zewif::{Bip39Mnemonic, Network, TxId, sapling::SaplingIncomingViewingKey};
+use zewif::{Network, TxId, sapling::SaplingIncomingViewingKey};
 
 use super::{
-    Address, BlockLocator, ClientVersion, KeyPoolEntry, Keys, MnemonicHDChain, NetworkInfo,
-    OrchardNoteCommitmentTree, PubKey, RecipientMapping, SaplingKeys, SaplingZPaymentAddress,
-    SproutKeys, UnifiedAccounts, WalletTx,
+    Address, Bip39Mnemonic, BlockLocator, ClientVersion, KeyPoolEntry, Keys, MnemonicHDChain,
+    NetworkInfo, OrchardNoteCommitmentTree, PubKey, RecipientMapping, SaplingKeys,
+    SaplingZPaymentAddress, SproutKeys, UnifiedAccounts, WalletTx,
 };
 
 #[derive(Debug)]

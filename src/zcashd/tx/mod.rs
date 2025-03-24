@@ -1,7 +1,4 @@
-use crate::mod_use;
-
-mod incremental_merkle_tree;
-mod incremental_witness;
+use zewif::mod_use;
 
 mod_use!(lock_time);
 mod_use!(orchard);

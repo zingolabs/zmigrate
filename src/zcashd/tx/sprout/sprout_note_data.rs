@@ -1,7 +1,7 @@
 use anyhow::Result;
 
-use crate::{parse, zewif::parser::prelude::*};
-use crate::zewif::{SproutWitness, u256};
+use zewif::{parse, parser::prelude::*};
+use zewif::{SproutWitness, u256};
 
 use super::SproutPaymentAddress;
 

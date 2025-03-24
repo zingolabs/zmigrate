@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::zewif::u256;
+use zewif::u256;
 
 use super::{UnifiedAccountMetadata, UnifiedAddressMetadata};
 

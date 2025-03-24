@@ -1,4 +1,4 @@
-use crate::mod_use;
+use zewif::mod_use;
 
 mod_use!(orchard_action);
 mod_use!(orchard_authorized);

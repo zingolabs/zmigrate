@@ -1,7 +1,7 @@
 use anyhow::Result;
 
-use crate::{parse, zewif::parser::prelude::*};
-use crate::zewif::u256;
+use zewif::{parse, parser::prelude::*};
+use zewif::u256;
 
 use super::{OrchardSignature, TransmittedNoteCiphertext};
 

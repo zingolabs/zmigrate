@@ -1,7 +1,7 @@
 use anyhow::Result;
 
-use crate::{parse, zewif::parser::prelude::*};
-use crate::zewif::{sapling::{SaplingIncomingViewingKey, SaplingWitness}, u256};
+use zewif::{parse, parser::prelude::*};
+use zewif::{sapling::{SaplingIncomingViewingKey, SaplingWitness}, u256};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SaplingNoteData {

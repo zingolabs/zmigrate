@@ -1,10 +1,10 @@
-use crate::mod_use;
+use zewif::mod_use;
 
 mod migrate;
-mod bip_39_mnemonic;
 
 mod_use!(address);
 mod_use!(bdb_dump);
+mod_use!(bip_39_mnemonic);
 mod_use!(block_locator);
 mod_use!(client_version);
 mod_use!(key_id);

@@ -4,8 +4,8 @@ use std::fmt::Write;
 use anyhow::{Context, Result, bail};
 
 use super::BDBDump;
-use crate::{parse, zewif::parser::prelude::*};
-use crate::zewif::Data;
+use zewif::{parse, parser::prelude::*};
+use zewif::Data;
 
 #[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct DBKey {

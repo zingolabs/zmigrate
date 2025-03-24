@@ -1,7 +1,4 @@
-mod phgr_proof;
-mod sprout_proof;
-
-use crate::mod_use;
+use zewif::mod_use;
 
 mod_use!(join_splits);
 mod_use!(js_description);

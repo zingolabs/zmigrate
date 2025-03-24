@@ -2,8 +2,8 @@ use std::collections::HashMap;
 
 use anyhow::Result;
 
-use crate::{parse, zewif::parser::prelude::*};
-use crate::zewif::Blob64;
+use zewif::{parse, parser::prelude::*};
+use zewif::Blob64;
 
 use super::super::super::ClientVersion;
 

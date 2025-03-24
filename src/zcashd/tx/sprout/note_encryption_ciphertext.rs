@@ -1,4 +1,4 @@
-use crate::blob;
+use zewif::blob;
 
 pub const NOTEPLAINTEXT_LEADING: usize = 1;
 pub const V_SIZE: usize = 8;

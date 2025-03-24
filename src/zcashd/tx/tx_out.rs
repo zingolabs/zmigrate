@@ -1,7 +1,7 @@
 use anyhow::Result;
 
-use crate::{parse, zewif::parser::prelude::*};
-use crate::zewif::{Amount, Script};
+use zewif::{parse, parser::prelude::*};
+use zewif::{Amount, Script};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct TxOut {

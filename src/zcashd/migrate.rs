@@ -6,7 +6,7 @@ use sha2::Sha256;
 
 use super::ZcashdWallet;
 
-use crate::zewif::{
+use zewif::{
     self, Account, AddressId, AddressRegistry, Position, ProtocolAddress, TxId, ZewifTop,
     ZewifWallet, sapling::SaplingIncomingViewingKey, u160, u256,
 };
@@ -251,7 +251,7 @@ fn find_sapling_key_for_ivk<'a>(
 
 /// Convert ZCashd SaplingExtendedSpendingKey to Zewif SpendingKey
 fn convert_sapling_spending_key(
-    key: &crate::zewif::sapling::SaplingExtendedSpendingKey,
+    key: &zewif::sapling::SaplingExtendedSpendingKey,
 ) -> Result<zewif::SpendingKey> {
     // Create the Sapling spending key with all components including HD parameters
     // Since both structures use u256, we can directly use them without cloning

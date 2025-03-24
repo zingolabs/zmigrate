@@ -1,4 +1,4 @@
-use crate::mod_use;
+use zewif::mod_use;
 
 mod_use!(output_v4);
 mod_use!(output_v5);

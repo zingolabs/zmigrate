@@ -1,7 +1,6 @@
 use anyhow::Result;
 
-use crate::{parse, zewif::parser::prelude::*};
-
+use zewif::{parse, parser::prelude::*};
 use super::{KeyId, OrchardRawAddress, ReceiverType, SaplingZPaymentAddress, ScriptId};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

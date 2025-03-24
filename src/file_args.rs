@@ -2,7 +2,7 @@ use anyhow::Result;
 use clap::Args;
 use std::{io::Read, path::PathBuf};
 
-use crate::zewif::Data;
+use zewif::Data;
 
 pub trait FileArgsLike {
     fn file(&self) -> &PathBuf;

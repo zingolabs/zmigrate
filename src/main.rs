@@ -5,7 +5,6 @@ mod file_args;
 pub use file_args::*;
 mod styles;
 pub mod zcashd;
-mod zewif;
 pub mod zingo;
 pub mod zcashd_cmd;
 pub mod zingo_cmd;

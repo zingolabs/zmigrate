@@ -1,3 +1,3 @@
-use crate::blob;
+use zewif::blob;
 
 blob!(OrchardSignature, 64);

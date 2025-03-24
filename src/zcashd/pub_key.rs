@@ -1,7 +1,7 @@
 use anyhow::{Context, Result, bail};
 
-use crate::{parse, zewif::parser::prelude::*};
-use crate::zewif::{CompactSize, Data};
+use zewif::{parse, parser::prelude::*};
+use zewif::{CompactSize, Data};
 
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct PubKey(Data);

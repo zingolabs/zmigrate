@@ -1,7 +1,7 @@
 use anyhow::Result;
 
-use crate::{parse, zewif::parser::prelude::*};
-use crate::zewif::SecondsSinceEpoch;
+use zewif::{parse, parser::prelude::*};
+use zewif::SecondsSinceEpoch;
 
 use super::{ClientVersion, PubKey};
 

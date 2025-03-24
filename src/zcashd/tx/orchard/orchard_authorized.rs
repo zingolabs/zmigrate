@@ -1,7 +1,7 @@
 use anyhow::Result;
 
-use crate::{parse, zewif::parser::prelude::*};
-use crate::zewif::Data;
+use zewif::{parse, parser::prelude::*};
+use zewif::Data;
 
 use super::RedPallasSignature;
 

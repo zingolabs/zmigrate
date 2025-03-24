@@ -1,4 +1,4 @@
-use crate::mod_use;
+use zewif::mod_use;
 
 mod_use!(wallet_capability);
 mod_use!(zingo_parser);
