@@ -1,14 +1,17 @@
+use crate::mod_use;
+
+// Macros
 mod mod_use_macro;
 mod blob_macro;
 mod data_macro;
 mod impl_attachable_macro;
 mod string_macro;
 
+// Modules requiring qualified paths
 pub mod parser;
 pub mod sapling;
 
-use crate::mod_use;
-
+// Modules that can use unqualified paths
 mod_use!(account);
 mod_use!(address_id);
 mod_use!(address);
