@@ -1,4 +1,4 @@
-use super::{u256, Amount, Blob};
+use super::super::{u256, Amount, Blob};
 
 /// Represents a sent output in a Sapling shielded transaction within a Zcash wallet.
 ///

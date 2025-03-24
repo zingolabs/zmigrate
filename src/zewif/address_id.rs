@@ -199,8 +199,7 @@ impl AddressRegistry {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::zewif::{Network, ShieldedAddress, TransparentAddress};
+    use crate::zewif::{u256, AddressId, AddressRegistry, Network, ProtocolAddress, ShieldedAddress, TransparentAddress};
 
     #[test]
     fn test_address_id_from_protocol_address() {

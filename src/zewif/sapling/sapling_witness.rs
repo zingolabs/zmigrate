@@ -1,6 +1,4 @@
-use super::u256;
-
-use super::IncrementalWitness;
+use super::super::{IncrementalWitness, u256};
 
 const SAPLING_INCREMENTAL_MERKLE_TREE_DEPTH: usize = 32;
 pub type PedersenHash = u256;

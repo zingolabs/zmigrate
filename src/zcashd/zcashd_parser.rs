@@ -8,7 +8,9 @@ use anyhow::{Context, Result, bail};
 use crate::{parse, zewif::parser::prelude::*};
 
 use crate::zewif::{
-    Bip39Mnemonic, SaplingIncomingViewingKey, TxId, sapling::SaplingExtendedSpendingKey, u252, u256,
+    Bip39Mnemonic, TxId,
+    sapling::{SaplingExtendedSpendingKey, SaplingIncomingViewingKey},
+    u252, u256,
 };
 
 use super::{

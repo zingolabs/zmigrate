@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use crate::zewif::{SaplingIncomingViewingKey, sapling::SaplingExtendedSpendingKey};
+use crate::zewif::sapling::{SaplingExtendedSpendingKey, SaplingIncomingViewingKey};
 
 use super::super::super::KeyMetadata;
 

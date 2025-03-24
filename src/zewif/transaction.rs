@@ -1,9 +1,9 @@
-use crate::impl_attachable;
 use super::{BlockHeight, Data, TxId};
+use crate::impl_attachable;
 
 use super::{
-    Attachments, JoinSplitDescription, OrchardActionDescription, SaplingOutputDescription,
-    SaplingSpendDescription, TxIn, TxOut,
+    Attachments, JoinSplitDescription, OrchardActionDescription, TxIn, TxOut,
+    sapling::{SaplingOutputDescription, SaplingSpendDescription},
 };
 
 /// A transaction that can combine both transparent and shielded components.

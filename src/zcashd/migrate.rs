@@ -7,8 +7,8 @@ use sha2::Sha256;
 use super::ZcashdWallet;
 
 use crate::zewif::{
-    self, Account, AddressId, AddressRegistry, Position, ProtocolAddress,
-    SaplingIncomingViewingKey, TxId, ZewifTop, ZewifWallet, u256, u160,
+    self, Account, AddressId, AddressRegistry, Position, ProtocolAddress, TxId, ZewifTop,
+    ZewifWallet, sapling::SaplingIncomingViewingKey, u160, u256,
 };
 
 /// Migrate a ZCashd wallet to the Zewif wallet format
@@ -344,8 +344,7 @@ fn extract_transaction_addresses(
                 // Create a transparent P2PKH address from this pubkey hash
                 // Create a KeyId for consistent address encoding
                 let key_id = super::KeyId::from(
-                    u160::from_slice(&pubkey_hash[..])
-                        .expect("Creating u160 from RIPEMD160 hash"),
+                    u160::from_slice(&pubkey_hash[..]).expect("Creating u160 from RIPEMD160 hash"),
                 );
                 addresses.insert(key_id.to_string(wallet.network()));
             }
@@ -576,7 +575,7 @@ fn convert_transaction(tx_id: TxId, tx: &super::WalletTx) -> Result<zewif::Trans
         super::SaplingBundle::V4(bundle_v4) => {
             // Convert Sapling spends
             for (idx, spend) in bundle_v4.spends().iter().enumerate() {
-                let mut sapling_spend = zewif::SaplingSpendDescription::new();
+                let mut sapling_spend = zewif::sapling::SaplingSpendDescription::new();
                 sapling_spend.set_spend_index(idx as u32);
                 sapling_spend.set_value(Some(bundle_v4.amount()));
                 sapling_spend.set_nullifier(spend.nullifier());
@@ -586,7 +585,7 @@ fn convert_transaction(tx_id: TxId, tx: &super::WalletTx) -> Result<zewif::Trans
 
             // Convert Sapling outputs
             for (idx, output) in bundle_v4.outputs().iter().enumerate() {
-                let mut sapling_output = zewif::SaplingOutputDescription::new();
+                let mut sapling_output = zewif::sapling::SaplingOutputDescription::new();
                 sapling_output.set_output_index(idx as u32);
                 sapling_output.set_commitment(output.cmu());
                 sapling_output.set_ephemeral_key(output.ephemeral_key());
@@ -597,7 +596,7 @@ fn convert_transaction(tx_id: TxId, tx: &super::WalletTx) -> Result<zewif::Trans
         super::SaplingBundle::V5(bundle_v5) => {
             // Processing for V5 bundles
             for (idx, spend) in bundle_v5.shielded_spends().iter().enumerate() {
-                let mut sapling_spend = zewif::SaplingSpendDescription::new();
+                let mut sapling_spend = zewif::sapling::SaplingSpendDescription::new();
                 sapling_spend.set_spend_index(idx as u32);
                 sapling_spend.set_nullifier(spend.nullifier());
                 sapling_spend.set_zkproof(spend.zkproof().clone());
@@ -605,7 +604,7 @@ fn convert_transaction(tx_id: TxId, tx: &super::WalletTx) -> Result<zewif::Trans
             }
 
             for (idx, output) in bundle_v5.shielded_outputs().iter().enumerate() {
-                let mut sapling_output = zewif::SaplingOutputDescription::new();
+                let mut sapling_output = zewif::sapling::SaplingOutputDescription::new();
                 sapling_output.set_output_index(idx as u32);
                 sapling_output.set_commitment(output.cmu());
                 sapling_output.set_ephemeral_key(output.ephemeral_key());

@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::zewif::{Bip39Mnemonic, Network, SaplingIncomingViewingKey, TxId};
+use crate::zewif::{Bip39Mnemonic, Network, TxId, sapling::SaplingIncomingViewingKey};
 
 use super::{
     Address, BlockLocator, ClientVersion, KeyPoolEntry, Keys, MnemonicHDChain, NetworkInfo,
@@ -142,7 +142,9 @@ impl ZcashdWallet {
         &self.sapling_keys
     }
 
-    pub fn sapling_z_addresses(&self) -> &HashMap<SaplingZPaymentAddress, SaplingIncomingViewingKey> {
+    pub fn sapling_z_addresses(
+        &self,
+    ) -> &HashMap<SaplingZPaymentAddress, SaplingIncomingViewingKey> {
         &self.sapling_z_addresses
     }
 

@@ -1,5 +1,5 @@
 use crate::impl_attachable;
-use super::{Amount, Attachments, BlockHeight, GrothProof, u256};
+use super::super::{Amount, Attachments, BlockHeight, GrothProof, u256};
 
 /// Data specific to Sapling spends.
 #[derive(Debug, Clone, Default)]

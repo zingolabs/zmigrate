@@ -4,7 +4,7 @@ use bc_components::ARID;
 
 use crate::impl_attachable;
 
-use super::{Address, Attachments, OrchardSentOutput, SaplingSentOutput, TxId};
+use super::{Address, Attachments, OrchardSentOutput, TxId, sapling::SaplingSentOutput};
 
 /// Logical grouping within a wallet. Each account can have its own set of
 /// addresses, transactions, and other metadata.

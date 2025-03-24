@@ -1,3 +1,5 @@
+#![allow(unused_imports)]
+
 use crate::mod_use;
 
 pub mod prelude;

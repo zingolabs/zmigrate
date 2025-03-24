@@ -1,7 +1,7 @@
 use crate::impl_attachable;
-use super::{Blob, Data, u256};
 
-use super::{Anchor, Attachments, Position, SaplingWitness};
+use super::SaplingWitness;
+use super::super::{Anchor, Attachments, Position, Blob, Data, u256};
 
 pub type SaplingEncCiphertext = Blob<580>;
 

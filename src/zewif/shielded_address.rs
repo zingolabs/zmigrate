@@ -1,6 +1,6 @@
 use super::Data;
 
-use super::{SaplingIncomingViewingKey, SpendingKey};
+use super::{sapling::SaplingIncomingViewingKey, SpendingKey};
 
 /// Details specific to shielded addresses.
 #[derive(Debug, Clone)]
