@@ -4,6 +4,8 @@ use zcash_address::{ToAddress, ZcashAddress};
 use zewif::{Network, u160};
 use zewif::{parse, parser::prelude::*};
 
+use super::zewif_network_to_zcash_address_network;
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct KeyId(u160);
 
@@ -14,7 +16,7 @@ impl KeyId {
         pubkey_hash.copy_from_slice(self.0.as_ref());
 
         // Create a transparent P2PKH address using the proper constructor
-        let addr = ZcashAddress::from_transparent_p2pkh(network, pubkey_hash);
+        let addr = ZcashAddress::from_transparent_p2pkh(zewif_network_to_zcash_address_network(network), pubkey_hash);
         addr.to_string()
     }
 }
