@@ -73,7 +73,7 @@ The ZeWIF format and zmigrate tool are designed for **data interchange**, not op
 ### Testing
 
 - Add tests to `zmigrate/tests` directory
-- Test fixtures are stored in `zmigrate/tests/fixtures/`
+- Store test fixtures in `zmigrate/tests/fixtures/`
 - Don't mark tasks as complete until all tests pass
 
 ## Current Implementation Status
@@ -89,7 +89,7 @@ The ZeWIF format and zmigrate tool are designed for **data interchange**, not op
 ✅ **Transaction Processing**
 - 100% transaction assignment to correct accounts
 - Transaction metadata (status, timestamps, block hashes) preserved
-- Witness data properly extracted and preserved
+- Witness data properly extracted and preserved 
 - Note commitment trees migrated with position information
 
 ✅ **Key Management**
@@ -115,43 +115,72 @@ The ZeWIF format and zmigrate tool are designed for **data interchange**, not op
 
 ## Task Roadmap
 
-### ✅ COMPLETED TASKS
-
-**Transaction Conversion and Metadata**
-- ✅ Witness data extraction and preservation in ZeWIF format
-- ✅ Memo field preservation in encrypted ciphertexts
-- ✅ Transaction metadata extraction (status, timestamps, block hashes)
-- ✅ Transaction assignment (100% success rate)
-- ✅ Note commitment tree migration
-
 ### 🔴 CURRENT PRIORITY: Viewing Key Support
 
-**Why Critical**: Viewing keys enable transaction history access without spending capability, which is essential for watch-only wallets and enhanced security.
+1. **Enhanced Transaction Conversion**
+   - Status: Partially Implemented
+   - Why it's critical: Complete transaction metadata is essential for proper wallet functionality
+   - Subtasks:
+     a. **Implement Witness Data Support**
+       - ✅ Add proper witness data extraction from source wallet
+       - ✅ Implement witness data conversion to ZeWIF format
+       - ✅ Create validation to ensure witness data integrity
 
-**Required Tasks:**
-1. ⬜ Implement full viewing key structure and storage
-2. ⬜ Preserve viewing key relationships with addresses
-3. ⬜ Add comprehensive viewing key validation
-4. ⬜ Develop logic for deriving viewing keys from spending keys
-5. ⬜ Ensure proper key hierarchies are maintained
+     b. **Memo Field Preservation**
+       - ✅ Preserve encrypted memo data in output ciphertexts (NOT decrypting)
+       - ✅ Fix incorrect memo data storage in migration (previously storing entire ciphertext as memo)
+       - ✅ Document that memo extraction/decryption is the responsibility of receiving wallet
 
-**Implementation Approach:**
-- First focus on full viewing key data structures
-- Then implement relationship preservation between keys and addresses
-- Finally add derivation logic with validation
+     c. **Extract Transaction Metadata**
+       - ✅ Extract and preserve block hash information (block height needs chain access)
+       - ✅ Preserve transaction timestamp data when available
+       - ✅ Add proper transaction status information
 
-### 🟠 SECONDARY PRIORITIES
+2. **Viewing Key Migration**
+   - Status: Partially Implemented
+   - Why it's critical: Viewing keys are essential for transaction history without spending capability
+   - Subtasks:
+     a. **Complete Viewing Key Support**
+       - ⬜ Properly handle both incoming viewing keys and full viewing keys
+       - ⬜ Preserve viewing key relationships with addresses
+       - ⬜ Implement comprehensive viewing key validation
 
-**Unified Address Support**
-- ⬜ Add support for unified addresses with multiple receiver types
-- ⬜ Properly handle diversifier indices
-- ⬜ Support all receiver types including Orchard receivers
-- ⬜ Add comprehensive tests for unified address migration
+     b. **Add Viewing Key Derivation Logic**
+       - ⬜ Implement logic for deriving viewing keys from spending keys
+       - ⬜ Ensure proper key hierarchies are maintained
 
-**Key Mapping Improvements**
-- ⬜ Implement robust transparent address derivation from keys and scripts
-- ⬜ Create key registry for faster lookups
-- ⬜ Enhance HD path analysis for more accurate account determination
+### MEDIUM PRIORITY
+
+1. **Unified Address Support**
+   - Status: Basic Support Implemented
+   - Subtasks:
+     - ⬜ Add support for unified addresses with multiple receiver types
+     - ⬜ Properly handle diversifier indices
+     - ⬜ Ensure proper handling of receiver types including Orchard receivers
+     - ⬜ Add comprehensive tests for unified address migration
+
+2. **Key Mapping Improvements**
+   - Status: Basic Implementation Complete
+   - Subtasks:
+     - ⬜ Implement robust transparent address derivation from keys and scripts
+     - ⬜ Create a key registry for faster lookups
+     - ⬜ Enhance HD path analysis for more accurate account determination
+
+### COMPLETED TASKS
+
+1. **Transaction Assignment Logic**
+   - Status: Successfully implemented and comprehensively tested
+   - ✅ Implemented hierarchical transaction assignment strategy
+   - ✅ Created complete address-to-account mapping system
+   - ✅ Added intelligent fallback strategies based on transaction type
+   - ✅ Implemented comprehensive test suite with 100% transaction assignment success rate
+
+2. **Note Commitment Trees Migration**
+   - Status: Successfully implemented with support for all wallet formats
+   - ✅ Enhanced binary format parsing for tree structures
+   - ✅ Implemented position calculation and preservation
+   - ✅ Created three-tier approach to handle different wallet formats
+   - ✅ Added fallback mechanisms for older wallet versions
 
 ## Build/Test Commands
 
