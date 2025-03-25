@@ -12,9 +12,14 @@
 ## Introduction
 
 - The `zmigrate` tool and `zewif` framework enable migration between different ZCash wallet implementations.
-- The ZeWIF interchange format is *not* intended to provide a full wallet implementation. It is a framework for the migration of wallets between different wallet implementations.
 - The ZeWIF file format will be based on Gordian Envelope, with wallet-specific data stored in attachments. NOTE: We are *not* writing code using attachments yet.
 - The `zmigrate` command line tool converts wallets to and from ZeWIF files, enabling conversion between wallet formats.
+
+## IMPORTANT
+
+- The ZeWIF interchange format is *not* intended to provide a full wallet implementation.
+- It is a framework for the migration of wallets between different wallet implementations.
+- We are therefore not implementing anything related to wallet functionality beyond data preservation and migration.
 
 ### Purpose of ZeWIF and ZMigrate
 
@@ -97,12 +102,12 @@ Based on analysis of the current ZCashd wallet migration to ZeWIF format, the fo
        - ✅ Add proper witness data extraction from source wallet
        - ✅ Implement witness data conversion to ZeWIF format
        - ✅ Create validation to ensure witness data integrity
-     
+
      b. **Memo Field Preservation**
        - ✅ Preserve encrypted memo data in output ciphertexts (NOT decrypting)
        - ✅ Fix incorrect memo data storage in migration (previously storing entire ciphertext as memo)
        - ✅ Document that memo extraction/decryption is the responsibility of receiving wallet
-     
+
      c. **Extract Transaction Metadata**
        - ⬜ Extract and preserve block height information
        - ⬜ Preserve transaction timestamp data when available
@@ -116,7 +121,7 @@ Based on analysis of the current ZCashd wallet migration to ZeWIF format, the fo
        - ⬜ Properly handle both incoming viewing keys and full viewing keys
        - ⬜ Preserve viewing key relationships with addresses
        - ⬜ Implement comprehensive viewing key validation
-     
+
      b. **Add Viewing Key Derivation Logic**
        - ⬜ Implement logic for deriving viewing keys from spending keys
        - ⬜ Ensure proper key hierarchies are maintained
