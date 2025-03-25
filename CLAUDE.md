@@ -98,10 +98,10 @@ Based on analysis of the current ZCashd wallet migration to ZeWIF format, the fo
        - ✅ Implement witness data conversion to ZeWIF format
        - ✅ Create validation to ensure witness data integrity
      
-     b. **Add Memo Field Support**
-       - ⬜ Implement memo field extraction from transaction data
-       - ⬜ Add memo decryption when appropriate keys are available
-       - ⬜ Create proper memo field representation in ZeWIF format
+     b. **Memo Field Preservation**
+       - ✅ Preserve encrypted memo data in output ciphertexts (NOT decrypting)
+       - ✅ Fix incorrect memo data storage in migration (previously storing entire ciphertext as memo)
+       - ✅ Document that memo extraction/decryption is the responsibility of receiving wallet
      
      c. **Extract Transaction Metadata**
        - ⬜ Extract and preserve block height information

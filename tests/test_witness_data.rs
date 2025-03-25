@@ -20,7 +20,7 @@ fn dump_wallet(path_elements: &[&str]) -> Result<String> {
     }
 }
 
-/// Tests that witness data is properly migrated from ZCashd to ZeWIF format
+/// Tests that witness data and memo fields are properly migrated from ZCashd to ZeWIF format
 #[test]
 fn test_witness_data_migration() {
     // Select a variety of wallets to test with
@@ -55,9 +55,13 @@ fn test_witness_data_migration() {
         let has_witness_in_source = has_witness_data(zcashd_section);
         let witness_count_in_dest = count_witness_entries(zewif_section);
 
-        println!("\nWitness Data Migration for {:?}:", path);
+        println!("\nWitness Data & Memo Migration for {:?}:", path);
         println!("- Source has witness data: {}", has_witness_in_source);
         println!("- Destination witness entries: {}", witness_count_in_dest);
+        
+        // Check for memo field entries in the output
+        let memo_count_in_dest = count_memo_entries(zewif_section);
+        println!("- Destination memo entries: {}", memo_count_in_dest);
 
         // Note: Transaction time is noted in the code but not yet stored
         // This will be implemented in the "Extract Transaction Metadata" subtask
@@ -65,8 +69,11 @@ fn test_witness_data_migration() {
         // We don't want to strictly assert witness data exists because some wallets
         // may legitimately not have any. Instead, we just log the information.
         
-        // For now, our test is successful if it runs without errors, indicating
-        // that witness data is properly processed when available.
+        // But we can check that memo field support is working by verifying that we have some memo entries
+        // Only assert if we have sapling outputs, which should have memo fields
+        if zewif_section.contains("SaplingOutputDescription") {
+            assert!(memo_count_in_dest > 0, "Memo fields should be present in Sapling outputs");
+        }
     }
 }
 
@@ -83,5 +90,13 @@ fn count_witness_entries(zewif_section: &str) -> usize {
     // Look for witness: Some entries, which indicates witness data was migrated
     let witness_pattern = r"witness:\s*Some\(";
     let re = Regex::new(witness_pattern).unwrap();
+    re.find_iter(zewif_section).count()
+}
+
+/// Count memo entries in the destination ZeWIF format
+fn count_memo_entries(zewif_section: &str) -> usize {
+    // Look for memo: Some entries, which indicates memo data was preserved
+    let memo_pattern = r"memo:\s*Some\(";
+    let re = Regex::new(memo_pattern).unwrap();
     re.find_iter(zewif_section).count()
 }
