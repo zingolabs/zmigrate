@@ -37,18 +37,13 @@ pub fn dump_wallet(file: &Path) -> Result<String> {
         ZcashdParser::parse_dump(&zcashd_dump).context("Parsing Zcashd dump")?;
 
     let mut output = String::new();
-    writeln!(output, "{}", zcashd_dump.keyname_summary())?;
-    writeln!(output, "---")?;
-    writeln!(output, "{:#?}", zcashd_wallet)?;
-    if unparsed_keys.is_empty() {
-        let zewif_wallet = zewif_zcashd::migrate::migrate_to_zewif(&zcashd_wallet)
-            .context("Migrating to Zewif")?;
-        writeln!(output, "---")?;
-        writeln!(output, "✅ Migrated wallet: {:#?}", zewif_wallet)?;
 
-        writeln!(output, "---")?;
-        writeln!(output, "✅ Success").context("Writing to output buffer")?;
-    } else {
+    // writeln!(output, "{}", zcashd_dump.keyname_summary())?;
+    // writeln!(output, "---")?;
+
+    writeln!(output, "Source wallet:\n{:#?}", zcashd_wallet)?;
+
+    if !unparsed_keys.is_empty() {
         writeln!(output, "---")?;
         writeln!(output, "🛑 Unparsed keys:")?;
         let mut sorted_keys: Vec<_> = unparsed_keys.into_iter().collect();
@@ -65,6 +60,16 @@ pub fn dump_wallet(file: &Path) -> Result<String> {
             let value = zcashd_dump.value_for_key(&key)?;
             writeln!(output, "❌ key: {}\n\tvalue: {}", key, value)?;
         }
+        return Ok(output);
     }
+
+    let zewif_wallet = zewif_zcashd::migrate::migrate_to_zewif(&zcashd_wallet)
+        .context("Migrating to Zewif")?;
+    writeln!(output, "---")?;
+    writeln!(output, "Migrated wallet:\n{:#?}", zewif_wallet)?;
+
+    writeln!(output, "---")?;
+    writeln!(output, "✅ Success")?;
+
     Ok(output)
 }

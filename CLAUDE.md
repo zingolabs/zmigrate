@@ -103,8 +103,8 @@ The `zmigrate` tool and `zewif` framework serve several key purposes:
 - Do not use placeholder implementations when writing new code; implement the full functionality. If a particular code path is out of scope, mark it with a `todo!()` macro.
 - Use `Result<T>` and proper error handling with context (`anyhow::Context`) for all functions that can fail.
 - Always prefer "fail fast" error handling. If a function cannot proceed due to an error, return early.
-- Don't mark items complete below until they are fully implemented.
-- Make sure all errors and lints are fixed in files you modify.
+- Make sure all compiler errors and Clippy lints are fixed in crates you modify.
+- Don't mark items complete below until they are fully implemented, including fixing compile errors, clippy lints, and failing tests.
 
 ## Migration Status and Next Tasks
 
