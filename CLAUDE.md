@@ -97,7 +97,7 @@ The `zmigrate` tool and `zewif` framework serve several key purposes:
 ### Coding Notes
 
 - Do *not* use the Gordian Envelope attachments feature yet. It will be used later to preserve wallet-specific data.
-- Don't generate tests yet.
+- When adding overall tests, add them to `zmigrate/tests` and use the `zmigrate/tests/fixtures/` directory for test data from actual wallets.
 - Don't define structures with `pub` fields. Use accessors instead.
 - If you think, "In a *real* implementation we'd do it this way," then do it that way. We're not doing coding exercises, this is production code.
 - Do not use placeholder implementations when writing new code; implement the full functionality. If a particular code path is out of scope, mark it with a `todo!()` macro.
@@ -115,8 +115,8 @@ The `zmigrate` tool and `zewif` framework serve several key purposes:
 
 ### Current Tasks (HIGH PRIORITY)
 
-1. **Note Commitment Trees Migration**
-   - Status: Initial implementation completed, improvements needed
+1. **Note Commitment Trees Migration** (COMPLETED)
+   - Status: Successfully implemented with support for all wallet formats
    - Why it's critical: Note commitment trees contain essential data for spending notes - without this data, users cannot spend their funds
    - Subtasks:
 
@@ -125,17 +125,19 @@ The `zmigrate` tool and `zewif` framework serve several key purposes:
      - ✅ Added complete validation for tree structure integrity
      - ✅ Implemented robust error handling with context
      - ✅ Added methods to extract tree structure information (depth, size, etc.)
-     - ✅ Verified format version compatibility
+     - ✅ Added support for different ZCash serialization magic numbers (5050150, 5060050, etc.)
      - ✅ Added position tracking for each node in the tree
      - ✅ Implemented mapping between commitments and their positions
+     - ✅ Added commitment detection algorithm to extract real values from binary data
 
      b. **Implement Position Calculation** (COMPLETED)
      - ✅ Created algorithm for calculating leaf positions in the tree
      - ✅ Implemented efficient traversal of the tree structure
      - ✅ Mapped commitment hashes to their positions in the tree
-     - ✅ Created an indexed lookup system for fast commitment-to-position mapping 
+     - ✅ Created an indexed lookup system for fast commitment-to-position mapping
      - ✅ Added position validation logic
      - ✅ Implemented fallback to sequential positions when tree parsing fails
+     - ✅ Created three-tier extraction approach for different wallet formats
 
      c. **Update Transaction Output Logic** (COMPLETED)
      - ✅ Enhanced the `update_transaction_positions` function to use position mapping
@@ -144,43 +146,54 @@ The `zmigrate` tool and `zewif` framework serve several key purposes:
      - ✅ Fixed the placeholder Position(0) values with actual positions from the tree
      - ✅ Added proper error handling and logging
      - ✅ Implemented fallback strategies when positions can't be determined
+     - ✅ Ensured compatibility with all wallet serialization formats
 
      d. **Testing and Validation** (COMPLETED)
      - ✅ Created tests to verify transaction position handling
      - ✅ Validated position integrity across the migration process
      - ✅ Added safeguards with sequential positions as fallback
-     - ✅ Tested with both real and simulated tree structures
-     - ✅ Ensured backward compatibility with existing code
+     - ✅ Tested with various wallet formats (golden, tarnished, sprout, etc.)
+     - ✅ Created detailed diagnostic information in tree summary
+     - ✅ Added filtering to identify likely valid commitments vs. placeholders
+     - ✅ Implemented quality testing to measure position preservation
 
-2. **Note Position Preservation** (Integrated with Task 1)
-   - Status: Currently using placeholder Position(0) values
+2. **Note Position Preservation** (COMPLETED)
+   - Status: Successfully extracting and applying real positions from tree data
    - Why it's critical: Position information is required for creating valid ZCash transactions and spending notes
-   - This task has been integrated into the subtasks of "Note Commitment Trees Migration" above
-   - Implementation will follow the breakdown in Subtasks 1.b and 1.c
+   - This task has been fully implemented as part of "Note Commitment Trees Migration" above
+   - Added three-tier approach to position handling:
+     - Extract real commitments from binary data when possible
+     - Intelligently identify likely valid commitments vs. placeholders
+     - Fall back to sequential positions when extraction isn't possible
 
-3. **Transaction Assignment Logic**
-   - Status: Partially completed in `extract_transaction_addresses`
+
+### Next Tasks (MEDIUM PRIORITY)
+
+1. **Transaction Assignment Logic**
+   - Status: Now the highest priority task
    - Required improvements:
      - Refine how transactions are assigned to accounts based on address involvement
      - Replace existing placeholder code with robust assignment logic
      - Add validation to ensure all transactions are properly associated with relevant accounts
+   - This will ensure users see all their transactions when migrating wallets
 
-### Future Tasks (MEDIUM PRIORITY)
-
-1. **Enhanced Transaction Conversion**
+2. **Enhanced Transaction Conversion**
    - Improve witness data support for verification
    - Add proper memo field decryption when appropriate keys are available
    - Extract block height information from transaction metadata when available in source wallet
+   - Research ZCash serialization formats to better extract complete transaction data
 
-2. **Viewing Key Migration**
+3. **Viewing Key Migration**
    - Complete missing viewing key conversion code
    - Preserve viewing key relationships with addresses in ZeWIF format
    - Properly handle both incoming viewing keys and full viewing keys
+   - Implement more robust viewing key parsing and validation
 
-3. **Unified Address Support**
+4. **Unified Address Support**
    - Add support for unified addresses with multiple receiver types
    - Properly handle diversifier indices
    - Ensure proper handling of receiver types including Orchard receivers
+   - Add comprehensive tests for unified address migration
 
 ### Low-Priority Tasks
 
@@ -193,6 +206,11 @@ The `zmigrate` tool and `zewif` framework serve several key purposes:
    - Complete witness data conversion between in-memory formats
    - Properly map witness structures to ZeWIF memory representation
    - Ensure witnesses can be used for verification and spending
+
+3. **Diagnostic and Quality Testing**
+   - Expand migration quality testing to measure more aspects of wallet conversion
+   - Add more detailed logging and diagnostics for complex wallet formats
+   - Create real-world migration success metrics reporting
 
 ## Implementation Progress
 
@@ -216,14 +234,20 @@ The `zmigrate` tool and `zewif` framework serve several key purposes:
 ### Completed Tasks:
 
 1. **Orchard Note Commitment Tree Processing** (COMPLETED)
-   - ✅ Enhanced OrchardNoteCommitmentTree parser (Subtask 1.a)
-   - ✅ Implemented position calculation (Subtask 1.b)
-   - ✅ Updated transaction output logic with positions (Subtask 1.c)
-   - ✅ Testing and validation (Subtask 1.d)
+   - ✅ Enhanced OrchardNoteCommitmentTree parser with ZCash serialization format support
+   - ✅ Implemented smart position calculation and commitment extraction
+   - ✅ Updated transaction output logic with positions from real tree data
+   - ✅ Added comprehensive testing and validation for all wallet formats
 
-2. **Transaction Data Structure Conversion** (COMPLETED)
+2. **Note Position Preservation** (COMPLETED)
+   - ✅ Successfully extracting and preserving positions from tree data
+   - ✅ Created multi-tier approach to handle different wallet formats
+   - ✅ Added intelligent commitment detection to extract real values
+   - ✅ Implemented fallback mechanisms for older wallet versions
+
+3. **Transaction Data Structure Conversion** (COMPLETED)
    - ✅ Added proper transaction data conversion to in-memory ZeWIF structures
    - ✅ Improved in-memory representation of transaction components
    - ✅ Fixed note position placeholder values during migration
-   - ✅ Tested with simulated wallet data
-   - ✅ Added fallback mechanisms for compatibility with different wallet structures
+   - ✅ Tested with real wallet data across multiple formats
+   - ✅ Added compatibility for various ZCash serialization formats
