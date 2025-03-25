@@ -23,11 +23,11 @@ impl FileArgsLike for CommandArgs {
 impl crate::exec::Exec for CommandArgs {
     fn exec(&self) -> Result<String> {
         let file = self.file();
-        process_file(file)
+        dump_wallet(file)
     }
 }
 
-pub fn process_file(file: &Path) -> Result<String> {
+pub fn dump_wallet(file: &Path) -> Result<String> {
     let file_data = std::fs::read(file)?.into();
     let mut parser = ZingoParser::new(&file_data);
     let wallet = parser.parse()?;

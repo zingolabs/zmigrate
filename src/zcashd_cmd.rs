@@ -24,11 +24,11 @@ impl FileArgsLike for CommandArgs {
 
 impl crate::exec::Exec for CommandArgs {
     fn exec(&self) -> Result<String> {
-        process_file(self.file())
+        dump_wallet(self.file())
     }
 }
 
-pub fn process_file(file: &Path) -> Result<String> {
+pub fn dump_wallet(file: &Path) -> Result<String> {
     let db_dump = BDBDump::from_file(file).context("Parsing BerkeleyDB file")?;
 
     let zcashd_dump = ZcashdDump::from_bdb_dump(&db_dump).context("Parsing Zcashd dump")?;
