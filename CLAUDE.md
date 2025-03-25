@@ -94,7 +94,12 @@ The `zmigrate` tool and `zewif` framework serve several key purposes:
 - `Transaction`: Represents a ZCash transaction
 - `Position`: Represents a position in a note commitment tree, essential for spending notes
 
-### Coding Notes
+## Resources
+
+- The entire code for the original `zcashd` is in `reference-code/zcash-master`.
+- A detailed reference guide for how `zcashd` performs transaction assignment is in `zewif-zcashd/docs/TransactionAssignment.md`.
+
+## Coding Notes
 
 - Do *not* use the Gordian Envelope attachments feature yet. It will be used later to preserve wallet-specific data.
 - When adding overall tests, add them to `zmigrate/tests` and use the `zmigrate/tests/fixtures/` directory for test data from actual wallets.
