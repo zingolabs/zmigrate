@@ -59,16 +59,6 @@ fn test_zcashd() {
     }
 }
 
-//
-// cbbhrwiilgbrababsshsmtpr-latest.dat
-// G93738061a.dat
-// Gab72a38b.dat
-// glory_goddess.dat
-// latest.dat
-// v26.dat
-// v27.dat
-// v28.dat
-
 #[test]
 fn test_zingo() {
     let paths = vec![

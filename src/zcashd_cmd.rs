@@ -41,6 +41,11 @@ pub fn dump_wallet(file: &Path) -> Result<String> {
     writeln!(output, "---")?;
     writeln!(output, "{:#?}", zcashd_wallet)?;
     if unparsed_keys.is_empty() {
+        let zewif_wallet = zewif_zcashd::migrate::migrate_to_zewif(&zcashd_wallet)
+            .context("Migrating to Zewif")?;
+        writeln!(output, "---")?;
+        writeln!(output, "✅ Migrated wallet: {:#?}", zewif_wallet)?;
+
         writeln!(output, "---")?;
         writeln!(output, "✅ Success").context("Writing to output buffer")?;
     } else {

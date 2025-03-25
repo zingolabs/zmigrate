@@ -25,6 +25,14 @@ The `zmigrate` tool and `zewif` framework serve several key purposes:
 3. **Data Preservation** - Ensures no critical wallet data is lost during transfers between implementations
 4. **Key Recovery** - Facilitates recovery of keys and addresses from various wallet formats
 
+### ZeWIF Format Design Notes
+
+- ZeWIF uses **optional fields** throughout the format to accommodate differences between wallet implementations
+- Fields are populated only when the corresponding data exists in the source wallet
+- Fields like `raw` transaction data, `mined_height`, etc. may be `None` for wallet formats that don't include this data
+- Critical data like keys and addresses will always be migrated, while wallet-implementation-specific data might be omitted
+- The goal is to preserve all data necessary for spending and verification while maintaining wallet interoperability
+
 ### Crate Structure
 
 1. **zewif** - Core library defining the common interchange format:
@@ -84,6 +92,7 @@ The `zmigrate` tool and `zewif` framework serve several key purposes:
 - `Account`: Represents an account within a wallet
 - `Address`: Represents a ZCash address (transparent, shielded, or unified)
 - `Transaction`: Represents a ZCash transaction
+- `Position`: Represents a position in a note commitment tree, essential for spending notes
 
 ### Coding Notes
 
@@ -107,6 +116,7 @@ The `zmigrate` tool and `zewif` framework serve several key purposes:
 
 1. **Note Commitment Trees Migration**
    - Status: Initial implementation completed, improvements needed
+   - Why it's critical: Note commitment trees contain essential data for spending notes - without this data, users cannot spend their funds
    - Required improvements:
      - Complete binary tree format parser with proper error handling
      - Add detailed mapping between commitments and their positions in the tree
@@ -114,7 +124,15 @@ The `zmigrate` tool and `zewif` framework serve several key purposes:
      - Implement mutable access methods to update transaction outputs with correct positions
      - Test with real-world tree structures
 
-2. **Transaction Assignment Logic**
+2. **Note Position Preservation** (Upgraded from LOW to HIGH PRIORITY)
+   - Status: Currently using placeholder Position(0) values
+   - Why it's critical: Position information is required for creating valid ZCash transactions and spending notes
+   - Required work:
+     - Extract and preserve position information from the note commitment tree
+     - Properly link positions to the correct transaction outputs and actions
+     - Implement validation to ensure positions are correct
+
+3. **Transaction Assignment Logic**
    - Status: Partially completed in `extract_transaction_addresses`
    - Required improvements:
      - Refine how transactions are assigned to accounts based on address involvement
@@ -124,19 +142,19 @@ The `zmigrate` tool and `zewif` framework serve several key purposes:
 ### Future Tasks (MEDIUM PRIORITY)
 
 1. **Enhanced Transaction Conversion**
-   - Improve note position tracking for Sapling and Orchard outputs
-   - Add full witness data support for verification
+   - Improve witness data support for verification
    - Add proper memo field decryption when appropriate keys are available
-   - Extract block height information from transaction metadata
+   - Extract block height information from transaction metadata when available in source wallet
 
 2. **Viewing Key Migration**
    - Complete missing viewing key conversion code 
    - Preserve viewing key relationships with addresses in ZeWIF format
+   - Properly handle both incoming viewing keys and full viewing keys
 
 3. **Unified Address Support**
    - Add support for unified addresses with multiple receiver types
    - Properly handle diversifier indices
-   - Ensure proper handling of receiver types
+   - Ensure proper handling of receiver types including Orchard receivers
 
 ### Low-Priority Tasks
 
@@ -148,11 +166,7 @@ The `zmigrate` tool and `zewif` framework serve several key purposes:
 2. **Witness Data Migration**
    - Complete witness data conversion between in-memory formats
    - Properly map witness structures to ZeWIF memory representation
-
-3. **Note Position Preservation**
-   - Fix placeholder position values (currently Position(0))
-   - Implement proper position value extraction and conversion
-   - Preserve correct positional relationships in the ZeWIF format
+   - Ensure witnesses can be used for verification and spending
 
 ## Implementation Progress
 
@@ -166,6 +180,12 @@ The `zmigrate` tool and `zewif` framework serve several key purposes:
    - ✅ Improved `convert_unified_accounts` function to use the AddressRegistry
    - ✅ Updated transaction assignment logic to use the registry for account mapping
    - ✅ Updated address conversion functions to use the registry for proper account assignment
+
+2. **Basic Wallet Structure Migration**
+   - ✅ Successfully migrating wallet structure with accounts
+   - ✅ Preserving seed material when available
+   - ✅ Maintaining network information
+   - ✅ Creating appropriate account hierarchy
 
 ### In Progress
 
