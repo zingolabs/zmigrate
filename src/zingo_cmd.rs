@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use anyhow::Result;
 use clap::Args;
@@ -6,7 +6,7 @@ use zewif_zingo::ZingoParser;
 
 use crate::file_args::{FileArgs, FileArgsLike};
 
-/// Doc comment here
+/// Process a zingo wallet file
 #[derive(Debug, Args)]
 #[group(skip)]
 pub struct CommandArgs {
@@ -22,10 +22,21 @@ impl FileArgsLike for CommandArgs {
 
 impl crate::exec::Exec for CommandArgs {
     fn exec(&self) -> Result<String> {
-        let file_path = self.file();
-        let file_data = std::fs::read(file_path)?.into();
-        let mut parser = ZingoParser::new(&file_data);
-        let wallet = parser.parse()?;
-        Ok(format!("{:#?}", wallet))
+        let file = self.file();
+        process_file(file)
     }
+}
+
+pub fn process_file(file: &Path) -> Result<String> {
+    let file_data = std::fs::read(file)?.into();
+    let mut parser = ZingoParser::new(&file_data);
+    let wallet = parser.parse()?;
+    let mut dump = format!("{:#?}", wallet);
+    let remaining = wallet.remaining();
+    if remaining == 0 {
+        dump.push_str("\n---\n✅ Success");
+    } else {
+        dump.push_str(&format!("\n---\n🛑 Unparsed bytes: {}", remaining))
+    }
+    Ok(dump)
 }

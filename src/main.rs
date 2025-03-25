@@ -1,13 +1,8 @@
 
-mod exec;
-pub use exec::*;
-mod file_args;
-pub use file_args::*;
 mod styles;
-pub mod zcashd_cmd;
-pub mod zingo_cmd;
 
 use clap::{Parser as ClapParser, Subcommand};
+use zmigrate::{exec::Exec, zcashd_cmd, zingo_cmd};
 
 /// A tool for migrating Zcash wallets
 #[derive(Debug, clap::Parser)]
