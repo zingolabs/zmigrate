@@ -117,20 +117,40 @@ The `zmigrate` tool and `zewif` framework serve several key purposes:
 1. **Note Commitment Trees Migration**
    - Status: Initial implementation completed, improvements needed
    - Why it's critical: Note commitment trees contain essential data for spending notes - without this data, users cannot spend their funds
-   - Required improvements:
-     - Complete binary tree format parser with proper error handling
-     - Add detailed mapping between commitments and their positions in the tree
-     - Create proper witness data structures for each output
-     - Implement mutable access methods to update transaction outputs with correct positions
-     - Test with real-world tree structures
+   - Subtasks:
+     
+     a. **Enhance OrchardNoteCommitmentTree Parser** (IN PROGRESS)
+     - Improve the existing binary format parser to correctly process all 13,954 bytes
+     - Add complete validation for tree structure integrity
+     - Implement robust error handling with context
+     - Add methods to extract tree structure information (depth, size, etc.)
+     - Verify format version compatibility
+     
+     b. **Implement Position Calculation** (NOT STARTED)
+     - Create algorithm for calculating leaf positions in the tree
+     - Implement efficient traversal of the tree structure
+     - Map commitment hashes to their positions in the tree
+     - Create an indexed lookup system for fast commitment-to-position mapping
+     - Add position validation logic
+     
+     c. **Update Transaction Output Logic** (NOT STARTED)
+     - Enhance the `update_transaction_positions` function to use position mapping
+     - Add mutable access methods for Sapling outputs and Orchard actions
+     - Implement transaction mutation capabilities to update positions
+     - Fix the placeholder Position(0) values with actual positions
+     - Add proper error handling and logging
+     
+     d. **Testing and Validation** (NOT STARTED)
+     - Create tests with real-world tree structures from sample data
+     - Validate position integrity across the migration process
+     - Compare output positions with expected values from source wallet
+     - Ensure backward compatibility with existing code
 
-2. **Note Position Preservation** (Upgraded from LOW to HIGH PRIORITY)
+2. **Note Position Preservation** (Integrated with Task 1)
    - Status: Currently using placeholder Position(0) values
    - Why it's critical: Position information is required for creating valid ZCash transactions and spending notes
-   - Required work:
-     - Extract and preserve position information from the note commitment tree
-     - Properly link positions to the correct transaction outputs and actions
-     - Implement validation to ensure positions are correct
+   - This task has been integrated into the subtasks of "Note Commitment Trees Migration" above
+   - Implementation will follow the breakdown in Subtasks 1.b and 1.c
 
 3. **Transaction Assignment Logic**
    - Status: Partially completed in `extract_transaction_addresses`
@@ -189,12 +209,12 @@ The `zmigrate` tool and `zewif` framework serve several key purposes:
 
 ### In Progress
 
-1. **Transaction Data Structure Conversion**
+1. **Orchard Note Commitment Tree Processing**
+   - Enhancing the OrchardNoteCommitmentTree parser (Subtask 1.a)
+   - Preparing for position calculation implementation (Subtask 1.b)
+   - Following the structured subtask approach defined above
+
+2. **Transaction Data Structure Conversion**
    - Adding proper transaction data conversion to in-memory ZeWIF structures
    - Improving in-memory representation of transaction components
-   - Fixing note position placeholder values during migration
-
-2. **Orchard Note Commitment Tree Processing**
-   - Parsing the raw orchard note commitment tree data
-   - Implementing conversion to ZeWIF tree format
-   - Adding position information to transaction outputs
+   - Preparing to fix note position placeholder values during migration
