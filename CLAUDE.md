@@ -8,9 +8,9 @@ This project consists of four related crates in the `bc-rust` workspace:
 - `zewif-zcashd`: Provides ZCashd-specific structures and migration code
 - `zewif-zingo`: Provides Zingo-specific structures and migration code
 
-**IMPORTANT**: Only make changes to these four crates and no others in the workspace.
+🚨 NOTE: Only make changes to these four crates and no others in the workspace.
 
-Note: The `target` directory is located outside the workspace. For dependency information, ask for assistance or refer to online crate documentation.
+🚨 NOTE: The `target` directory is located outside the workspace. For dependency information, ask for assistance or refer to online crate documentation.
 
 ## Purpose and Design Philosophy
 
@@ -115,6 +115,8 @@ The ZeWIF format and zmigrate tool are designed for **data interchange**, not op
 
 ## Task Roadmap
 
+🚨 NOTE: All tasks must focus strictly on data preservation and migration rather than operational wallet functionality.
+
 ### ✅ COMPLETED TASKS
 
 **Transaction Conversion and Metadata**
@@ -124,34 +126,33 @@ The ZeWIF format and zmigrate tool are designed for **data interchange**, not op
 - ✅ Transaction assignment (100% success rate)
 - ✅ Note commitment tree migration
 
-### 🔴 CURRENT PRIORITY: Viewing Key Support
+### 🔴 CURRENT PRIORITY: Viewing Key Preservation
 
-**Why Critical**: Viewing keys enable transaction history access without spending capability, which is essential for watch-only wallets and enhanced security.
+**Why Critical**: Viewing keys are essential wallet data that must be preserved during migration to maintain data completeness.
 
 **Required Tasks:**
-1. ⬜ Implement full viewing key structure and storage
-2. ⬜ Preserve viewing key relationships with addresses
-3. ⬜ Add comprehensive viewing key validation
-4. ⬜ Develop logic for deriving viewing keys from spending keys
-5. ⬜ Ensure proper key hierarchies are maintained
+1. ⬜ Extract full viewing keys from source wallets
+2. ⬜ Implement proper data structures to store this information in ZeWIF format
+3. ⬜ Preserve associations between viewing keys and their corresponding addresses
+4. ⬜ Maintain any key hierarchy metadata from the original wallet
 
 **Implementation Approach:**
-- First focus on full viewing key data structures
-- Then implement relationship preservation between keys and addresses
-- Finally add derivation logic with validation
+- Focus on correctly extracting viewing key data from source wallets
+- Add appropriate storage in the interchange format
+- Preserve key-to-address mappings for data integrity
 
 ### 🟠 SECONDARY PRIORITIES
 
-**Unified Address Support**
-- ⬜ Add support for unified addresses with multiple receiver types
-- ⬜ Properly handle diversifier indices
+**Unified Address Data Preservation**
+- ⬜ Extract and preserve unified addresses with multiple receiver types
+- ⬜ Preserve diversifier indices from source wallets
 - ⬜ Support all receiver types including Orchard receivers
-- ⬜ Add comprehensive tests for unified address migration
+- ⬜ Add tests to verify complete address data preservation
 
-**Key Mapping Improvements**
-- ⬜ Implement robust transparent address derivation from keys and scripts
-- ⬜ Create key registry for faster lookups
-- ⬜ Enhance HD path analysis for more accurate account determination
+**Address and Key Relationship Preservation**
+- ⬜ Preserve transparent address derivation paths
+- ⬜ Extract and store key origin information
+- ⬜ Maintain HD path data for complete derivation information
 
 ## Build/Test Commands
 
