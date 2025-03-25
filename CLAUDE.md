@@ -129,6 +129,8 @@ The `zmigrate` tool and `zewif` framework serve several key purposes:
      - ✅ Added position tracking for each node in the tree
      - ✅ Implemented mapping between commitments and their positions
      - ✅ Added commitment detection algorithm to extract real values from binary data
+     - ✅ Fixed tree_size field to accurately reflect the actual number of nodes
+     - ✅ Implemented proper root node construction from leaf nodes
 
      b. **Implement Position Calculation** (COMPLETED)
      - ✅ Created algorithm for calculating leaf positions in the tree
@@ -214,6 +216,17 @@ The `zmigrate` tool and `zewif` framework serve several key purposes:
 
 ## Implementation Progress
 
+### Recent Improvements
+
+1. **Orchard Note Commitment Tree Enhancements** (March 2025)
+   - ✅ Fixed issues with the tree_size field showing incorrect values (like 1657887612848898305)
+   - ✅ Added proper root node construction for all tree parsing code paths
+   - ✅ Improved tree format detection with tiered fallback strategies
+   - ✅ Added comprehensive tests specifically targeting tree structure validation
+   - ✅ Enhanced debug output with consistent and accurate tree information
+   - ✅ Fixed all clippy warnings related to the tree implementation
+   - ✅ Improved memory efficiency by clearing unparsed data after successful parsing
+
 ### Completed Tasks
 
 1. **Address-to-Account Mapping**
@@ -238,6 +251,9 @@ The `zmigrate` tool and `zewif` framework serve several key purposes:
    - ✅ Implemented smart position calculation and commitment extraction
    - ✅ Updated transaction output logic with positions from real tree data
    - ✅ Added comprehensive testing and validation for all wallet formats
+   - ✅ Fixed tree_size field to accurately reflect actual number of commitments found
+   - ✅ Implemented proper root node construction based on leaf nodes
+   - ✅ Added robust fallback approaches when binary data format cannot be fully parsed
 
 2. **Note Position Preservation** (COMPLETED)
    - ✅ Successfully extracting and preserving positions from tree data

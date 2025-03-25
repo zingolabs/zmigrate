@@ -68,6 +68,33 @@ pub fn dump_wallet(file: &Path) -> Result<String> {
     writeln!(output, "---")?;
     writeln!(output, "Migrated wallet:\n{:#?}", zewif_wallet)?;
 
+    // Generate migration quality report
+    writeln!(output, "---")?;
+    
+    // Create migration quality report
+    let mut report = String::new();
+    writeln!(report, "Migration Quality Report")?;
+    
+    // Count addresses in zcashd wallet
+    let zcashd_address_count = zcashd_wallet.address_names().len();
+    
+    // Count addresses in zewif wallet - all accounts combined
+    let zewif_address_count = zewif_wallet.wallets()
+        .values()
+        .flat_map(|w| w.accounts().values())
+        .flat_map(|a| a.addresses())
+        .count();
+    
+    writeln!(report, "- Addresses: {}/{} preserved", zewif_address_count, zcashd_address_count)?;
+    
+    // Check transaction preservation
+    let zcashd_tx_count = zcashd_wallet.transactions().len();
+    let zewif_tx_count = zewif_wallet.transactions().len();
+    writeln!(report, "- Transactions: {}/{} preserved", zewif_tx_count, zcashd_tx_count)?;
+    
+    // Add the report to the output
+    writeln!(output, "{}", report)?;
+    
     writeln!(output, "---")?;
     writeln!(output, "✅ Success")?;
 
