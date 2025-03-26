@@ -4,6 +4,8 @@ The ZeWIF data format is build on [Gordian Envelope](https://developer.blockchai
 
 Another special feature of Envelope is the "attachment", which is fully detailed in [BCR-2023-006](https://github.com/BlockchainCommons/Research/blob/master/papers/bcr-2023-006-envelope-attachment.md) and summarized here. Attachments _are_ used in ZeWIF, specifically to store content for certain data classes.
 
+[[there's also a place at top-level of format, under zewif_top]]
+
 ## Data Classes in ZeWIF
 
 ZeWIF organizes data into three classes:
