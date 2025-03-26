@@ -61,7 +61,7 @@ fn test_transaction_assignment_coverage(path_elements: &[&str]) -> Result<String
     }
 
     // Migrate to ZeWIF
-    let zewif_wallet = zewif_zcashd::migrate::migrate_to_zewif(&wallet)
+    let zewif_wallet = zewif_zcashd::migrate_to_zewif(&wallet)
         .context("Migrating to ZeWIF")?;
 
     // Check that all transactions are assigned to at least one account
@@ -153,7 +153,7 @@ fn test_transaction_duplicate_assignments(path_elements: &[&str]) -> Result<Stri
     let wallet = load_zcashd_wallet(path_elements)?;
 
     // Migrate to ZeWIF
-    let zewif_wallet = zewif_zcashd::migrate::migrate_to_zewif(&wallet)
+    let zewif_wallet = zewif_zcashd::migrate_to_zewif(&wallet)
         .context("Migrating to ZeWIF")?;
 
     // Track which transactions are assigned to which accounts
@@ -240,7 +240,7 @@ fn test_change_detection(path_elements: &[&str]) -> Result<String> {
     let change_addresses = extract_change_addresses(&wallet);
 
     // Migrate to ZeWIF
-    let zewif_wallet = zewif_zcashd::migrate::migrate_to_zewif(&wallet)
+    let zewif_wallet = zewif_zcashd::migrate_to_zewif(&wallet)
         .context("Migrating to ZeWIF")?;
 
     // Find transactions that might involve change
@@ -485,7 +485,7 @@ fn test_transaction_address_registry_correlation() -> Result<()> {
     let tx_count = wallet.transactions().len();
 
     // Migrate to ZeWIF
-    let zewif_wallet = zewif_zcashd::migrate::migrate_to_zewif(&wallet)
+    let zewif_wallet = zewif_zcashd::migrate_to_zewif(&wallet)
         .context("Migrating to ZeWIF")?;
 
     // Count addresses in the ZeWIF wallet
@@ -569,7 +569,7 @@ fn test_address_registry_initialization() -> Result<()> {
     let sapling_count = wallet.sapling_z_addresses().len();
 
     // Migrate to ZeWIF
-    let zewif_wallet = zewif_zcashd::migrate::migrate_to_zewif(&wallet)
+    let zewif_wallet = zewif_zcashd::migrate_to_zewif(&wallet)
         .context("Migrating to ZeWIF")?;
 
     // Count addresses in the ZeWIF wallet
@@ -634,7 +634,7 @@ fn test_multi_account_transactions() -> Result<()> {
         let wallet = load_zcashd_wallet(path)?;
 
         // Migrate to ZeWIF
-        let zewif_wallet = zewif_zcashd::migrate::migrate_to_zewif(&wallet)
+        let zewif_wallet = zewif_zcashd::migrate_to_zewif(&wallet)
             .context("Migrating to ZeWIF")?;
 
         // Find which transactions are assigned to multiple accounts

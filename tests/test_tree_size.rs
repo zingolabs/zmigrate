@@ -37,7 +37,7 @@ fn extract_tree_data(wallet_path: &[&str]) -> Result<()> {
     println!("Unparsed data size: {}", tree.unparsed_data().len());
 
     // Migrate to ZeWIF
-    let zewif_wallet = zewif_zcashd::migrate::migrate_to_zewif(&zcashd_wallet)
+    let zewif_wallet = zewif_zcashd::migrate_to_zewif(&zcashd_wallet)
         .context("Migrating to ZeWIF")?;
 
     // Count total addresses and transactions after migration
