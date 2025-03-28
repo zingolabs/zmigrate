@@ -78,7 +78,7 @@ The goal is to create a universal wallet migration framework that can translate 
 ```mermaid
 graph TD
     A[(<b>zcashd</b><br><i>wallet.dat</i>)]
-    B[<b>zewif-zcashd</b><br><b>zecwallet-zingo</b><br><b>zewif-zingo</b><br>...<br><i>front-ends</i>]
+    B[<b>zewif-zcashd</b><br><b>zewif-zingo</b><br><b>zewif-zecwallet</b><br>...<br><i>front-ends</i>]
     C[(...)]
     D[(<b>zecwallet</b><br><i>wallet.dat</i>)]
     E[(...)]
@@ -88,7 +88,7 @@ graph TD
     J[(<b>zecwallet</b><br><i>wallet.dat</i>)]
     K[(...)]
     L[(...)]
-    M[<b>zewif-zcashd</b><br><b>zecwallet-zingo</b><br><b>zewif-zingo</b><br>...<br><i>front-ends</i>]
+    M[<b>zewif-zcashd</b><br><b>zewif-zingo</b><br><b>zewif-zecwallet</b><br>...<br><i>back-ends</i>]
     N[/<b>zmigrate</b><br><i>CLI tool</i>/]
 
     A --> B
