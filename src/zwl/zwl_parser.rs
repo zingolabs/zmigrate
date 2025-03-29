@@ -350,8 +350,36 @@ mod tests {
         );
     }
 
-    #[test]
-    fn test_parser_expected_wallets() {
-        todo!()
+    #[test_case("zwl-encrypted.dat", "basket decorate ivory office buddy embark country office trophy speak cupboard mixture crazy agent lemon permit build situate omit spider bridge panda rather chuckle", "hello world" ; "hello world")]
+    fn test_parser_encryption(filename: &str, expected_phrase: &str, password: &str) {
+        let project_root = env::current_dir().expect("Failed to get current directory");
+        let data_dir = project_root.join("src/zwl/tests/data");
+
+        // Paths to wallet files
+        let file = data_dir.join(filename);
+
+        let path = Path::new(&file);
+        assert!(path.exists(), "Wallet file missing: {:?}", path);
+
+        let file_data = crate::Data(
+            std::fs::read(path).expect(&format!("Failed to read wallet file: {:?}", path)),
+        );
+        let mut parser = ZwlParser::new(&file_data);
+        let wallet = parser.parse();
+
+        let mut real_wallet = wallet.unwrap();
+
+        let phrase = real_wallet
+            .keys
+            .get_phrase(String::from(password))
+            .unwrap()
+            .into_phrase();
+
+        assert_eq!(phrase, expected_phrase, "Expected phrase does not match");
+
+        real_wallet
+            .keys
+            .unlock_wallet(password.to_string())
+            .unwrap();
     }
 }

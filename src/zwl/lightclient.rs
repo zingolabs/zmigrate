@@ -46,4 +46,8 @@ impl<P: zcash_protocol::consensus::NetworkConstants> LightClientConfig<P> {
     pub fn base58_script_address(&self) -> [u8; 2] {
         self.params.b58_script_address_prefix()
     }
+
+    pub fn get_coin_type(&self) -> u32 {
+        self.params.coin_type()
+    }
 }

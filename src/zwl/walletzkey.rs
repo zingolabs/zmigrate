@@ -6,6 +6,9 @@ use sapling::PaymentAddress;
 use sapling::zip32::{ExtendedFullViewingKey, ExtendedSpendingKey};
 use zcash_encoding::{Optional, Vector};
 
+use super::keys::Keys;
+use super::lightclient::LightClientConfig;
+
 #[derive(PartialEq, Debug, Clone)]
 pub enum WalletZKeyType {
     HdKey = 0,
@@ -116,6 +119,74 @@ impl WalletZKey {
 
     pub fn have_spending_key(&self) -> bool {
         self.extsk.is_some() || self.enc_key.is_some() || self.hdkey_num.is_some()
+    }
+
+    pub fn unlock<P: zcash_protocol::consensus::Parameters>(
+        &mut self,
+        config: &LightClientConfig<P>,
+        bip39_seed: &[u8],
+        key: &sodiumoxide::crypto::secretbox::Key,
+    ) -> io::Result<()> {
+        match self.keytype {
+            WalletZKeyType::HdKey => {
+                let (extsk, extfvk, address) =
+                    Keys::get_zaddr_from_bip39seed(config, &bip39_seed, self.hdkey_num.unwrap());
+
+                if address != self.zaddress {
+                    return Err(io::Error::new(
+                        ErrorKind::InvalidData,
+                        format!(
+                            "zaddress mismatch at {}. {:?} vs {:?}",
+                            self.hdkey_num.unwrap(),
+                            address,
+                            self.zaddress
+                        ),
+                    ));
+                }
+
+                if extfvk != self.extfvk {
+                    return Err(io::Error::new(
+                        ErrorKind::InvalidData,
+                        format!(
+                            "fvk mismatch at {}. {:?} vs {:?}",
+                            self.hdkey_num.unwrap(),
+                            extfvk,
+                            self.extfvk
+                        ),
+                    ));
+                }
+
+                self.extsk = Some(extsk);
+            }
+            WalletZKeyType::ImportedSpendingKey => {
+                // For imported keys, we need to decrypt from the encrypted key
+                let nonce = sodiumoxide::crypto::secretbox::Nonce::from_slice(
+                    &self.nonce.as_ref().unwrap(),
+                )
+                .unwrap();
+                let extsk_bytes = match sodiumoxide::crypto::secretbox::open(
+                    &self.enc_key.as_ref().unwrap(),
+                    &nonce,
+                    &key,
+                ) {
+                    Ok(s) => s,
+                    Err(_) => {
+                        return Err(io::Error::new(
+                            ErrorKind::InvalidData,
+                            "Decryption failed. Is your password correct?",
+                        ));
+                    }
+                };
+
+                self.extsk = Some(ExtendedSpendingKey::read(&extsk_bytes[..])?);
+            }
+            WalletZKeyType::ImportedViewKey => {
+                // Viewing key unlocking is basically a no op
+            }
+        };
+
+        self.locked = false;
+        Ok(())
     }
 }
 

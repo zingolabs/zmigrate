@@ -5,6 +5,10 @@ use std::io::{self, Read};
 use zcash_encoding::{Optional, Vector};
 use zingolib::wallet::keys::ToBase58Check;
 
+use crate::zwl::extended_keys::{ExtendedPrivKey, KeyIndex};
+
+use super::lightclient::LightClientConfig;
+
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum WalletTKeyType {
     HdKey = 0,
@@ -104,7 +108,11 @@ impl WalletTKey {
         let mut hash160 = ripemd::Ripemd160::new();
         hash160.update(Sha256::digest(&pk.serialize()[..].to_vec()));
 
-        hash160.finalize().to_base58check(prefix, &[])
+        let finalized_pk = hash160.finalize().to_base58check(prefix, &[]);
+
+        println!("finalized_pk: {}", finalized_pk);
+
+        finalized_pk
     }
 
     pub fn from_raw(sk: &secp256k1::SecretKey, taddr: &String, num: u32) -> Self {
@@ -117,6 +125,100 @@ impl WalletTKey {
             enc_key: None,
             nonce: None,
         }
+    }
+
+    pub fn get_taddr_from_bip39seed<P: zcash_protocol::consensus::Parameters>(
+        config: &LightClientConfig<P>,
+        bip39_seed: &[u8],
+        pos: u32,
+    ) -> secp256k1::SecretKey {
+        assert_eq!(bip39_seed.len(), 64);
+
+        let ct = config.get_coin_type();
+
+        let ext_t_key = ExtendedPrivKey::with_seed(bip39_seed).unwrap();
+        let r = ext_t_key
+            .derive_private_key(KeyIndex::hardened_from_normalize_index(44).unwrap())
+            .unwrap()
+            .derive_private_key(
+                KeyIndex::hardened_from_normalize_index(config.get_coin_type()).unwrap(),
+            )
+            .unwrap()
+            .derive_private_key(KeyIndex::hardened_from_normalize_index(0).unwrap())
+            .unwrap()
+            .derive_private_key(KeyIndex::Normal(0))
+            .unwrap()
+            .derive_private_key(KeyIndex::Normal(pos))
+            .unwrap()
+            .private_key;
+
+        r
+    }
+
+    pub fn unlock<P: zcash_protocol::consensus::Parameters>(
+        &mut self,
+        config: &LightClientConfig<P>,
+        bip39_seed: &[u8],
+        key: &sodiumoxide::crypto::secretbox::Key,
+    ) -> io::Result<()> {
+        match self.keytype {
+            WalletTKeyType::HdKey => {
+                let sk =
+                    Self::get_taddr_from_bip39seed(&config, &bip39_seed, self.hdkey_num.unwrap());
+
+                // Transparent address generation
+                let address = Self::address_from_prefix_sk(&config.base58_pubkey_address(), &sk);
+
+                assert_eq!(
+                    address,
+                    self.address,
+                    "Transparent addresses mismatch at {}. {:?} vs {:?}",
+                    self.hdkey_num.unwrap(),
+                    address,
+                    self.address
+                );
+                if address != self.address {
+                    return Err(io::Error::new(
+                        std::io::ErrorKind::InvalidData,
+                        format!(
+                            "address mismatch at {}. {:?} vs {:?}",
+                            self.hdkey_num.unwrap(),
+                            address,
+                            self.address
+                        ),
+                    ));
+                }
+
+                self.key = Some(sk)
+            }
+            WalletTKeyType::ImportedKey => {
+                // For imported keys, we need to decrypt from the encrypted key
+                let nonce = sodiumoxide::crypto::secretbox::Nonce::from_slice(
+                    &self.nonce.as_ref().unwrap(),
+                )
+                .unwrap();
+                let sk_bytes = match sodiumoxide::crypto::secretbox::open(
+                    &self.enc_key.as_ref().unwrap(),
+                    &nonce,
+                    &key,
+                ) {
+                    Ok(s) => s,
+                    Err(_) => {
+                        return Err(io::Error::new(
+                            std::io::ErrorKind::InvalidData,
+                            "Decryption failed. Is your password correct?",
+                        ));
+                    }
+                };
+
+                let key = secp256k1::SecretKey::from_slice(&sk_bytes[..])
+                    .map_err(|e| io::Error::new(std::io::ErrorKind::InvalidData, e))?;
+                self.key = Some(key);
+            }
+        };
+
+        self.locked = false;
+        Ok(())
     }
 }
 

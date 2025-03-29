@@ -1,9 +1,14 @@
-use std::io::{self, ErrorKind};
+use std::io::{self, Error, ErrorKind, Read};
 
 use anyhow::Result;
 use byteorder::{LittleEndian, ReadBytesExt};
+use crypto_box::aead::{Aead, Payload};
+use sapling::{
+    PaymentAddress,
+    zip32::{ExtendedFullViewingKey, ExtendedSpendingKey},
+};
 use zcash_encoding::Vector;
-use zingolib::wallet::utils::read_string;
+use zingolib::wallet::{keys::double_sha256, utils::read_string};
 
 use crate::{ParseWithParam, Parser};
 
@@ -275,6 +280,150 @@ impl<P: zcash_protocol::consensus::Parameters> Keys<P> {
             .find(|zk| zk.extfvk == *extfvk)
             .map(|zk| zk.have_spending_key())
             .unwrap_or(false)
+    }
+
+    pub fn get_phrase(&mut self, passwd: String) -> io::Result<bip0039::Mnemonic> {
+        if !self.encrypted {
+            return Err(Error::new(
+                ErrorKind::AlreadyExists,
+                "Wallet is not encrypted",
+            ));
+        }
+
+        // && self.unlocked this was only used in-memory
+        if !self.encrypted {
+            return Err(Error::new(
+                ErrorKind::AlreadyExists,
+                "Wallet is already unlocked",
+            ));
+        }
+
+        // Secret key used for encryption
+        // let key = crypto_box::SecretKey::from_slice(&double_sha256(passwd.as_bytes())).unwrap();
+        let key =
+            sodiumoxide::crypto::secretbox::Key::from_slice(&double_sha256(passwd.as_bytes()))
+                .unwrap();
+
+        // Nonce
+        let nonce = match sodiumoxide::crypto::secretbox::Nonce::from_slice(&self.nonce) {
+            Some(n) => n,
+            None => {
+                return Err(io::Error::new(
+                    ErrorKind::InvalidData,
+                    "Nonce is not the right length",
+                ));
+            }
+        };
+
+        let seed = match sodiumoxide::crypto::secretbox::open(&self.enc_seed, &nonce, &key) {
+            Ok(s) => s,
+            Err(_) => {
+                return Err(io::Error::new(
+                    ErrorKind::InvalidData,
+                    "Decryption failed. Is your password correct?",
+                ));
+            }
+        };
+
+        // Now that we have the seed, we'll generate the extsks and tkeys, and verify the fvks and addresses
+        // respectively match
+
+        // The seed bytes is the raw entropy. To pass it to HD wallet generation,
+        // we need to get the 64 byte bip39 entropy
+
+        return Ok(bip0039::Mnemonic::<bip0039::language::English>::from_entropy(seed).unwrap());
+    }
+
+    pub fn unlock_wallet(&mut self, passwd: String) -> io::Result<&mut Self> {
+        if !self.encrypted {
+            return Err(Error::new(
+                ErrorKind::AlreadyExists,
+                "Wallet is not encrypted",
+            ));
+        }
+
+        // && self.unlocked this was only used in-memory
+        if !self.encrypted {
+            return Err(Error::new(
+                ErrorKind::AlreadyExists,
+                "Wallet is already unlocked",
+            ));
+        }
+
+        let double_shad = double_sha256(passwd.as_bytes());
+
+        // Get the doublesha256 of the password
+        let key = sodiumoxide::crypto::secretbox::Key::from_slice(&double_shad).unwrap();
+
+        // Nonce
+        let nonce = match sodiumoxide::crypto::secretbox::Nonce::from_slice(&self.nonce) {
+            Some(n) => n,
+            None => {
+                return Err(io::Error::new(
+                    ErrorKind::InvalidData,
+                    "Nonce is not the right length",
+                ));
+            }
+        };
+
+        let seed = match sodiumoxide::crypto::secretbox::open(&self.enc_seed, &nonce, &key) {
+            Ok(s) => s,
+            Err(_) => {
+                return Err(io::Error::new(
+                    ErrorKind::InvalidData,
+                    "Decryption failed. Is your password correct?",
+                ));
+            }
+        };
+
+        let mnemonic = bip0039::Mnemonic::<bip0039::English>::from_entropy(seed.clone()).unwrap();
+
+        let bip39_seed = mnemonic.to_seed("");
+        // Now that we have the seed, we'll generate the extsks and tkeys, and verify the fvks and addresses
+        // respectively match
+
+        // The seed bytes is the raw entropy. To pass it to HD wallet generation,
+        // we need to get the 64 byte bip39 entropy
+
+        let config = self.config.clone();
+
+        // Transparent keys
+        self.tkeys
+            .iter_mut()
+            .map(|tk| tk.unlock(&config, bip39_seed.to_vec()[..].as_ref(), &key))
+            .collect::<io::Result<Vec<()>>>()?;
+
+        // Go over the zkeys, and add the spending keys again
+        self.zkeys
+            .iter_mut()
+            .map(|zk| zk.unlock(&config, bip39_seed.to_vec()[..].as_ref(), &key))
+            .collect::<io::Result<Vec<()>>>()?;
+
+        self.seed.copy_from_slice(&seed);
+
+        self.encrypted = true;
+        return Ok(self);
+    }
+
+    pub fn get_zaddr_from_bip39seed(
+        config: &LightClientConfig<P>,
+        bip39_seed: &[u8],
+        pos: u32,
+    ) -> (ExtendedSpendingKey, ExtendedFullViewingKey, PaymentAddress) {
+        assert_eq!(bip39_seed.len(), 64);
+
+        let extsk: ExtendedSpendingKey = ExtendedSpendingKey::from_path(
+            &ExtendedSpendingKey::master(bip39_seed),
+            &[
+                zcash_primitives::zip32::ChildIndex::hardened(32),
+                zcash_primitives::zip32::ChildIndex::hardened(config.get_coin_type()),
+                zcash_primitives::zip32::ChildIndex::hardened(pos),
+            ],
+        );
+        let extfvk: ExtendedFullViewingKey = extsk.to_extended_full_viewing_key();
+        let address = extfvk.default_address().1;
+
+        (extsk, extfvk, address)
     }
 }
 

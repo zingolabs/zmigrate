@@ -2,6 +2,7 @@ mod cmd;
 pub use cmd::*;
 mod block;
 mod data;
+mod extended_keys;
 mod keys;
 mod lightclient;
 mod orchard_data;
