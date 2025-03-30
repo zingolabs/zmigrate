@@ -1,16 +1,13 @@
 use anyhow::Result;
 use zmigrate::{zcashd_cmd, zingo_cmd};
-use std::path::PathBuf;
 use regex::Regex;
 
-fn fixtures_dir() -> PathBuf {
-    PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .join("tests")
-        .join("fixtures")
-}
+// Import shared test utilities
+mod test_utils;
+use test_utils::fixtures_path;
 
 fn dump_wallet(path_elements: &[&str]) -> Result<String> {
-    let path = fixtures_dir().join(path_elements.iter().collect::<PathBuf>());
+    let path = fixtures_path(path_elements);
     if path_elements[0] == "zcashd" {
         zcashd_cmd::dump_wallet(&path)
     } else if path_elements[0] == "zingo" {

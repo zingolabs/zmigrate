@@ -1,16 +1,13 @@
 use anyhow::{Context, Result};
-use std::path::PathBuf;
 use zewif_zcashd::{BDBDump, ZcashdDump, ZcashdParser};
 
-fn fixtures_dir() -> PathBuf {
-    PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .join("tests")
-        .join("fixtures")
-}
+// Import shared test utilities
+mod test_utils;
+use test_utils::fixtures_path;
 
 /// Load a wallet file and extract the OrchardNoteCommitmentTree for testing
 fn extract_tree_data(wallet_path: &[&str]) -> Result<()> {
-    let file_path = fixtures_dir().join(wallet_path.iter().collect::<PathBuf>());
+    let file_path = fixtures_path(wallet_path);
     println!("Loading wallet: {:?}", file_path);
 
     // Parse BDB file

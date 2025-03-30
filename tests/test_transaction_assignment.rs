@@ -1,17 +1,12 @@
 use anyhow::{Context, Result};
 use std::collections::{HashMap, HashSet};
-use std::path::PathBuf;
 use std::fmt::Write;
 
 use zewif_zcashd::{BDBDump, ZcashdDump, ZcashdParser, ZcashdWallet};
 
-/// Returns the path to the test fixtures directory.
-/// This is where all the test wallet files are stored.
-fn fixtures_dir() -> PathBuf {
-    PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .join("tests")
-        .join("fixtures")
-}
+// Import shared test utilities
+mod test_utils;
+use test_utils::fixtures_path;
 
 /// Loads a ZcashdWallet from a file path relative to the fixtures directory.
 ///
@@ -22,7 +17,7 @@ fn fixtures_dir() -> PathBuf {
 /// # Returns
 /// * `Result<ZcashdWallet>` - The loaded wallet or an error
 fn load_zcashd_wallet(path_elements: &[&str]) -> Result<ZcashdWallet> {
-    let path = fixtures_dir().join(path_elements.iter().collect::<PathBuf>());
+    let path = fixtures_path(path_elements);
     println!("Loading wallet: {:?}", path);
 
     // Parse BDB file
