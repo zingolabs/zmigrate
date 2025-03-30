@@ -1,27 +1,7 @@
-mod bdb_dump;
-pub use bdb_dump::*;
-mod digest_utils;
-pub use digest_utils::*;
-mod exec;
-pub use exec::*;
-mod file_args;
-pub use file_args::*;
-mod parse_macro;
-mod parser;
-pub use parser::*;
-mod parsing;
-pub use parsing::*;
-mod sapling;
-mod string_utils;
-pub use string_utils::*;
 mod styles;
-mod types;
-pub use types::*;
-mod zcashd;
-mod zingo;
-mod zwl;
 
 use clap::{Parser as ClapParser, Subcommand};
+use zmigrate::{exec::Exec, zcashd_cmd, zingo_cmd};
 
 /// A tool for migrating Zcash wallets
 #[derive(Debug, clap::Parser)]
@@ -37,9 +17,8 @@ struct Cli {
 #[derive(Debug, Subcommand)]
 #[doc(hidden)]
 enum MainCommands {
-    Zcashd(zcashd::CommandArgs),
-    Zingo(zingo::CommandArgs),
-    Zwl(zwl::CommandArgs),
+    Zcashd(zcashd_cmd::CommandArgs),
+    Zingo(zingo_cmd::CommandArgs),
 }
 
 #[doc(hidden)]
@@ -62,7 +41,6 @@ fn inner_main() -> anyhow::Result<()> {
     let output = match cli.command {
         MainCommands::Zcashd(args) => args.exec(),
         MainCommands::Zingo(args) => args.exec(),
-        MainCommands::Zwl(args) => args.exec(),
     };
     let output = output?;
     if !output.is_empty() {

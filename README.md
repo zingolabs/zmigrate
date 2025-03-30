@@ -14,7 +14,7 @@ Currently it parses the `zcashd` and `zingo` formats into memory, and outputs a 
 
 ## Prerequisites
 
-You will need a `zcashd` or `zingo` wallet.dat file to test with. Some `wallet.dat` files may be found in the `zcash-wallet-formats` repo [here](https://github.com/zingolabs/zcash-wallet-formats/tree/master/zcashd/dat_files).
+You will need a `zcashd` or `zingo` wallet.dat file to test with. Some `wallet.dat` files may be found in the `zcash-wallet-formats` repo [here](https://github.com/zingolabs/zcash-wallet-formats/tree/master/zcashd/dat_files). They have been copied into this repo at `test/fixtures/`.
 
 Because `zcashd` uses BerkelyDB, you will need to have the `db_dump` tool installed on your system. On macOS, `db-dump` is part of the `berkeley-db` package, which can be installed with Homebrew:
 
@@ -71,26 +71,42 @@ cargo install --path .
 
 The goal is to create a universal wallet migration framework that can translate between any wallet formats, and that can be used to create wallet interchange formats that can be used to migrate wallets between different wallet apps.
 
-This crate will eventually be refactored into:
-
-- The core `zmigrate` crate, which will contain the universal parsing framework and in-memory structures.
-- Several *front-end libraries* that support the parsing of wallet formats into `zmigrate` frameworks, and
-- Several *back-end libraries* that translate `zmigrate` structures into other wallet formats.
-- the `zewif` format will be defined and used as a universal wallet interchange format.
+- The core `zmigrate` crate, which vends the command line tool.
+- The `zewif` crate contains the universal parsing framework and in-memory abstractions. This crate also directly supports the reading and writing of the `zewif` interchange format, which is based on Gordian Envelope.
+- Several *front-end back-end libraries* that support the parsing of wallet formats into `zewif` abstractions, and translating those abstractions to their format.
 
 ```mermaid
 graph TD
-    A[(zcashd)] --> B[front-ends]
-    D[(zecwallet)] --> B
-    C[(...)] --> B
-    E[(...)] --> B
-    H[(zewif)] --> G
-    B --> G[zmigrate]
-    G --> I[(zewif)]
-    G --> M[back-ends]
-    M --> J[(zecwallet)]
-    M --> K[(...)]
-    M --> L[(...)]
+    A[(<b>zcashd</b><br><i>wallet.dat</i>)]
+    B[<b>zewif-zcashd</b><br><b>zewif-zingo</b><br><b>zewif-zecwallet</b><br>...<br><i>front-ends</i>]
+    C[(...)]
+    D[(<b>zecwallet</b><br><i>wallet.dat</i>)]
+    E[(...)]
+    G[<b>zewif</b><br><i>in-memory structures</i>]
+    H[(<b>zewif</b><br><i>interchange<br>format</i>)]
+    I[(<b>zewif</b><br><i>interchange<br>format</i>)]
+    J[(<b>zecwallet</b><br><i>wallet.dat</i>)]
+    K[(...)]
+    L[(...)]
+    M[<b>zewif-zcashd</b><br><b>zewif-zingo</b><br><b>zewif-zecwallet</b><br>...<br><i>back-ends</i>]
+    N[/<b>zmigrate</b><br><i>CLI tool</i>/]
+
+    A --> B
+    D --> B
+    C --> B
+    E --> B
+
+    H --> G
+    B --> G
+    G --> I
+    G --> M
+    M --> J
+    M --> K
+    M --> L
+
+    N --> G
+    N --> B
+    N --> M
 ```
 
 ## Origin, Authors, Copyright & Licenses

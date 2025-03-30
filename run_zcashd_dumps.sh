@@ -1,9 +1,9 @@
 #!/bin/bash
 
-SRC=dat_files/zcashd
+SRC=tests/fixtures/zcashd
 TARGET=dumps/zcashd
 
-VERSION=sprout
+VERSION=golden-v5.6.0
 SRC_DIR=${SRC}/${VERSION}
 TARGET_DIR=${TARGET}/${VERSION}
 cargo run -- zcashd ${SRC_DIR}/node0_wallet.dat > ${TARGET_DIR}/node0_wallet.txt
@@ -11,7 +11,7 @@ cargo run -- zcashd ${SRC_DIR}/node1_wallet.dat > ${TARGET_DIR}/node1_wallet.txt
 cargo run -- zcashd ${SRC_DIR}/node2_wallet.dat > ${TARGET_DIR}/node2_wallet.txt
 cargo run -- zcashd ${SRC_DIR}/node3_wallet.dat > ${TARGET_DIR}/node3_wallet.txt
 
-VERSION=golden-v5.6.0
+VERSION=sprout
 SRC_DIR=${SRC}/${VERSION}
 TARGET_DIR=${TARGET}/${VERSION}
 cargo run -- zcashd ${SRC_DIR}/node0_wallet.dat > ${TARGET_DIR}/node0_wallet.txt
