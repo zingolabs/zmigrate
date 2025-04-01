@@ -4,19 +4,37 @@ The ZeWIF format is a specification for the import and export of Zcash wallet da
 
 ```mermaid
 graph TD
-    A[(zcashd)] --> B[front-ends]
-    D[(zecwallet)] --> B
-    C[(...)] --> B
-    E[(...)] --> B
-    H[(zewif)] --> G
-    B --> G[zmigrate]
-    G --> I[(zewif)]
-    G --> M[back-ends]
-    M --> J[(zecwallet)]
-    M --> K[(...)]
-    M --> L[(...)]
-```
+    A[(<b>zcashd</b><br><i>wallet.dat</i>)]
+    B[<b>zewif-zcashd</b><br><b>zewif-zingo</b><br><b>zewif-zecwallet</b><br>...<br><i>front-ends</i>]
+    C[(...)]
+    D[(<b>zecwallet</b><br><i>wallet.dat</i>)]
+    E[(...)]
+    G[<b>zewif</b><br><i>in-memory structures</i>]
+    H[(<b>zewif</b><br><i>interchange<br>format</i>)]
+    I[(<b>zewif</b><br><i>interchange<br>format</i>)]
+    J[(<b>zecwallet</b><br><i>wallet.dat</i>)]
+    K[(...)]
+    L[(...)]
+    M[<b>zewif-zcashd</b><br><b>zewif-zingo</b><br><b>zewif-zecwallet</b><br>...<br><i>back-ends</i>]
+    N[/<b>zmigrate</b><br><i>CLI tool</i>/]
 
+    A --> B
+    D --> B
+    C --> B
+    E --> B
+
+    H --> G
+    B --> G
+    G --> I
+    G --> M
+    M --> J
+    M --> K
+    M --> L
+
+    N --> G
+    N --> B
+    N --> M
+```
 As the above diagram shows, the zmigrate Rust crate lies at the center of the ZeWIF system. It creates in-memory representations of data from a variety of inputs and can  output that abstracted data in a numbers of forms. Obviously, it can accept input from ZeWIF and it can output to ZeWIF. However, that's just part of the process. Individual developers can also choose to use creat front ends that interface their own wallet data to zmigrate and back ends that export the data from zmigrate to their own wallet.
 
 The following best practices offer suggestions for those front-end and back-end wallet developers, to ensure that their data remains not just maximally interoperable, but also maximally accessible, both now and in the far future.
