@@ -2,7 +2,7 @@
 
 set -e
 
-SRC=test/fixtures/zingo
+SRC=tests/fixtures/zingo
 TARGET=dumps/zingo
 
 # cargo run -- zingo ${SRC}/mainnet/hhcclaltpcckcsslpcnetblr-gf0aaf9347.dat > ${TARGET}/mainnet/hhcclaltpcckcsslpcnetblr-gf0aaf9347.txt
